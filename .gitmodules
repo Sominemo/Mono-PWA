@@ -1,0 +1,6 @@
+[submodule "src/core"]
+	path = src/core
+	url = https://github.com/ProcSec/PWA-Core.git
+[submodule "src/environment"]
+	path = src/environment
+	url = https://github.com/ProcSec/PWA-Environment.git

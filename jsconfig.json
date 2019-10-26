@@ -1,0 +1,35 @@
+{
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "target": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@DOMPath/*": [
+        "src/core/DOM/*"
+      ],
+      "@App/*": [
+        "src/app/*"
+      ],
+      "@Core/*": [
+        "src/core/*"
+      ],
+      "@Environment/*": [
+        "src/environment/*"
+      ],
+      "@Resources/*": [
+        "src/app/res/*"
+      ],
+      "@Generated/*": [
+        "src/app/generated/*"
+      ],
+      "@Themes/*": [
+        "src/app/res/styles/themes/*",
+        "src/environment/res/styles/themes/*"
+      ]
+    }
+  }
+}

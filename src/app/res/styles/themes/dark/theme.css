@@ -1,0 +1,21 @@
+@import "~@EnvResources/styles/themes/dark/theme.css";
+:root {
+	--color-main-light-a: #fc888a;
+	--color-main-light: #fd6063;
+	--color-main: #F55053;
+	--color-main-dark: #ce4345;
+	--color-main-dark-a: #822122;
+	--color-accent-dark-a: var(--color-main-dark-a);
+	--color-accent-dark: var(--color-main-dark);
+	--color-accent: var(--color-main);
+	--color-accent-light: var(--color-main-light);
+	--color-accent-light-a: var(--color-main-light-a);
+	--color-card-main-shadow: 0px 5px 13px rgba(245, 80, 83, .2);
+	--color-card-main-border: rgba(245, 80, 83, .05);
+	--color-card-accent-shadow: 0px 5px 13px rgba(245, 80, 83, .2);
+	--color-card-accent-border: rgba(245, 80, 83, .05);
+	--color-button-text: var(--color-generic);
+	--color-toast-bg: #080808;
+	--color-toast-text: var(--color-generic);
+	--color-button-text-light: #ffffff;
+}

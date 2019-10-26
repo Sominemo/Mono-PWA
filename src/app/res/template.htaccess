@@ -1,0 +1,10 @@
+ExpiresActive On
+ExpiresByType text/javascript "access plus 1 week"
+ExpiresByType application/javascript "access plus 1 week"
+ExpiresDefault "access plus 1 week"
+
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule (.+)$ / [L]

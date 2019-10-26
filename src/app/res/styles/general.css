@@ -1,0 +1,153 @@
+body {
+    background-image: url("~@Resources/images/logo/transparent_bg.png");
+    background-size: 25vh;
+    background-repeat: no-repeat;
+    background-position: center calc(50vh + 50%);
+}
+
+.card {
+    border-radius: .4em;
+}
+
+.partner-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: solid 2px transparent !important;
+    transition: border .3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.partner-card .left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.partner-card .left .partner-logo {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    background: rgba(116, 116, 116, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7em;
+    position: relative;
+    overflow: hidden;
+}
+
+.partner-card .left .partner-logo img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 104%;
+    height: 104%;
+}
+
+.partner-card .left .partner-title {
+    margin-left: 15px;
+    font-size: 1.3em;
+    margin-right: 25px;
+}
+
+.partner-card .right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    transition: all .15s;
+    position: absolute;
+    right: 15px;
+    bottom: 0;
+    transform: translateY(-90%);
+    will-change: transform;
+}
+
+.partner-card .right md-icon {
+    margin: 2px;
+}
+
+.shown>.partner-card {
+    border-bottom-color: var(--color-card-border) !important;
+}
+
+.shown>.partner-card .right {
+    transform: translateY(100%);
+}
+
+.partner-card+.info-card {
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.partner-card .right-faker {
+    position: absolute;
+    right: 15px;
+    top: 0;
+    transition: all .15s;
+    will-change: transform;
+    transform: translateY(-100%);
+}
+
+.shown>.partner-card .right-faker {
+    transform: translateY(100%);
+}
+
+.no-border {
+    border: 0 !important;
+}
+
+.card.auth-card-with-bg {
+    background-image: url("~@Resources/images/vector/css/auth_bg.svg");
+    background-size: cover;
+    background-position: center;
+}
+
+.login-box-center {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-box-center .center-box {
+    margin: auto;
+    text-align: center;
+}
+
+.login-box-center .bottom-box {
+    display: flex;
+    padding: 10px 20px 20px 10px;
+    width: 100%;
+    justify-content: space-between;
+    max-width: 400px;
+}
+
+.login-box-center .center-box .auth-title {
+    font-size: 8vmin;
+    font-family: var(--font-accent);
+    padding: 0 10px;
+}
+
+.login-box-center .center-box .auth-title+md-button {
+    margin: 4vmin 0;
+    border-radius: 2em;
+    font-size: 5vmin;
+    padding: 2vmin 5vmin;
+    margin-bottom: 0;
+}
+
+@media (max-width: 500px) {
+    .login-box-center .bottom-box {
+        font-size: 12px;
+    }
+    
+    .login-box-center .center-box .auth-title+md-button {
+        font-size: 7vmin;
+        padding: 3vmin 7vmin;
+    }
+}
