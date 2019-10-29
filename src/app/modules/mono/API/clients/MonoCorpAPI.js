@@ -1,10 +1,9 @@
 import { API } from "@App/tools/API"
-import OfflineCache from "../../services/OfflineCache"
-import parseCurrencyRAW from "../parsers/currency"
-import Client from "../classes/Client"
+import currency from "./methods/currency"
+import clientInfo from "./methods/clientInfo"
 
 export default class MonoCorpAPI extends API {
-    constructor(token, domain) {
+    constructor(token, domain, id = null) {
         if (typeof token !== "string") throw new TypeError("String token expected")
         if (typeof domain !== "string") throw new TypeError("String domain expected")
         super({
@@ -17,36 +16,20 @@ export default class MonoCorpAPI extends API {
             },
             globalTimeout: 0,
             token,
+            id,
         })
     }
 
-    authed = true
-
-    async currency(burst = false) {
-        const currenciesRAW = await this.call("bank/currency", {
-            methodID: "bank/currency",
-            settings: (burst ? API.flags.skip | API.flags.resendOnFlood
-                : API.flags.resendOnFlood),
-        })
-
-
-        OfflineCache.saveCurrencies(currenciesRAW)
-
-        return parseCurrencyRAW(currenciesRAW)
+    get authed() {
+        return true
     }
 
-    async clientInfo(token = null) {
-        const data = await this.call("personal/client-info", {
-            methodID: "personal/client-info",
-            useAuth: true,
-            customToken: token,
-        })
-        if (!("name" in data && "accounts" in data)) throw Error("Incorrect Client Info")
-        return new Client(data.name, data.accounts, this)
-    }
+    currency = currency.bind(this)
+
+    clientInfo = clientInfo.bind(this)
 
     _authAttacher(object, request) {
-        object.headers["X-Request-Id"] = (request.customToken ? request.customToken : this.token)
+        object.headers["X-Request-Id"] = this.token
         return object
     }
 }

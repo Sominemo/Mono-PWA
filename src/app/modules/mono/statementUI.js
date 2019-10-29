@@ -3,8 +3,9 @@ import WindowManager from "@Core/Services/SimpleWindowManager"
 import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import { Title } from "@Environment/Library/DOM/object"
+import { Title, TwoSidesWrapper } from "@Environment/Library/DOM/object"
 import { InDevelopmentCard } from "@Environment/Library/DOM/object/warnings"
+import { Card } from "@Environment/Library/DOM/object/card"
 
 export default class StatementUI {
     static async Init() {
@@ -13,6 +14,14 @@ export default class StatementUI {
 
         w.render(new Title($$("@statement")))
         w.render(new InDevelopmentCard())
+    }
+
+    static GenerateCard(data) {
+        return new Card([
+            new TwoSidesWrapper([
+
+            ]),
+        ])
     }
 }
 

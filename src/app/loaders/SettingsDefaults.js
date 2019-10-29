@@ -10,16 +10,6 @@ CoreLoader.registerTask({
     task() {
         SettingsCheckProvider.setRules([
             {
-                name: "token",
-                rule: {
-                    async onupdate() {
-                        await Auth.reloadInstance()
-                    },
-                },
-            },
-        ], "user")
-        SettingsCheckProvider.setRules([
-            {
                 name: "miscellaneous_in_settings",
                 rule: {
                     default: App.debug,

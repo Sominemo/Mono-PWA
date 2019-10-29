@@ -26,12 +26,13 @@ export default class API {
     }
 
     constructor({
-        domain, globalTimeout = 0, requestTimeouts = {}, token = null,
+        domain, globalTimeout = 0, requestTimeouts = {}, token = null, id = null,
     }) {
         this.domain = domain
         this.globalTimeout = globalTimeout
         this.requestTimeouts = requestTimeouts
         this.token = token
+        this.id = id
     }
 
     get _tokenError() {

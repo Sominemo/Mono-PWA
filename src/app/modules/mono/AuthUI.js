@@ -11,14 +11,14 @@ import {
 } from "@Environment/Library/DOM/object/card"
 import { Title } from "@Environment/Library/DOM/object"
 import Toast from "@Environment/Library/DOM/elements/toast"
-import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import loadingPopup from "@App/library/loadingPopup"
 import tryToOpenProtocol from "custom-protocol-detection"
 import { Align } from "@Environment/Library/DOM/style"
 import { $$ } from "@Core/Services/Language/handler"
 import BRify from "@Core/Tools/transformation/text/BRify"
-import MonoAPI from "./API/clients/MonoAPI"
+import Report from "@Core/Services/report"
 import PWA from "../main/PWA"
+import Auth from "./services/Auth"
 
 class AuthSettings {
     constructor(s = null, options = {}) {
@@ -365,6 +365,7 @@ export default class AuthUI {
     }
 
     static async continue(state) {
+        Report.write(state.settings.are)
         if (state.settings.are.type === AuthUI.authTypes.DIRECT) {
             this.directUI(state)
         } else if (state.settings.are.type === AuthUI.authTypes.CORP) {
@@ -376,19 +377,17 @@ export default class AuthUI {
 
     static async directUI(state) {
         const l = loadingPopup()
-        const a = new MonoAPI(state.settings.are.token)
+        const set = { type: "user", token: state.settings.are.token }
+        const a = await Auth.genInstance({ settings: set, id: 0 })
         try {
             await a.clientInfo(true)
-
-            SettingsStorage.set("auth_domain", null)
-                .then(() => {
-                    SettingsStorage.set("token", state.settings.are.token)
-                })
+            await Auth.addInstance(set)
 
             Toast.add($$("@auth/success"))
             state.blockerPopup.close()
             Navigation.defaultScreen()
         } catch (e) {
+            Report.write(e)
             Toast.add($$("@auth/fail"))
         }
         l.close()
@@ -586,14 +585,12 @@ export default class AuthUI {
                 },
             ],
         })
-        state.waitSuccess = (token) => {
+        state.waitSuccess = async (token) => {
             p.close()
             state.blockerPopup.close()
             Toast.add($$("@auth/stage/authed"))
-            SettingsStorage.set("auth_domain", state.settings.are.domain)
-                .then(() => {
-                    SettingsStorage.set("token", token)
-                })
+            await Auth.addInstance({ type: "corp", domain: `${state.settings.are.domain}/request`, token })
+
 
             Navigation.defaultScreen()
         }
@@ -706,11 +703,8 @@ export default class AuthUI {
             p.close()
             state.blockerPopup.close()
             Toast.add($$("@auth/stage/authed"))
-            SettingsStorage.set("auth_domain", state.settings.are.domain)
-                .then(() => {
-                    SettingsStorage.set("token", token)
-                })
 
+            Auth.addInstance({ type: "corp", domain: `${state.settings.are.domain}/request`, token })
             Navigation.defaultScreen()
         }
 
