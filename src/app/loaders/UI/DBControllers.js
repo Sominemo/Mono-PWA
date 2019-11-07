@@ -4,6 +4,9 @@ import Report from "@Core/Services/report"
 import download from "@App/tools/interaction/download"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
+import StatementStorage from "@App/modules/mono/services/StatementStorage"
+import Auth from "@App/modules/mono/services/Auth"
+import Prompt from "@Environment/Library/DOM/elements/prompt"
 
 CoreLoader.registerTask({
     id: "db-presence",
@@ -41,10 +44,12 @@ CoreLoader.registerTask({
                     name: "clear",
                     handler: () => new Promise(async (resolve, reject) => {
                         const db = await Report.DBConnection()
-                        db.getObjectStore("console-output", true)
-                            .then(a => a.clear())
-                            .then(() => resolve())
-                            .catch(e => reject(e))
+                        try {
+                            await db.OSTool("console-output").clear()
+                            resolve()
+                        } catch (e) {
+                            reject()
+                        }
                     }),
                 },
                 {
@@ -90,8 +95,7 @@ CoreLoader.registerTask({
                     name: "clear",
                     handler: () => new Promise(async (resolve, reject) => {
                         const db = await OfflineCache.DBConnection()
-                        db.getObjectStore("main", true)
-                            .then(a => a.clear())
+                        db.OSTool("main").clear()
                             .then(() => resolve())
                             .catch(e => reject(e))
                     }),
@@ -101,6 +105,118 @@ CoreLoader.registerTask({
                     async handler() {
                         const db = (await OfflineCache.DBConnection()).OSTool("main")
                         await db.clearPercent(0.5)
+                    },
+                },
+            ],
+        })
+
+        DBUserPresence.registerNewPresence({
+            id: "Accounts",
+            name: $$("@settings/storage/dbs/accounts"),
+            description: $$("@settings/storage/dbs/accounts/description"),
+            icon: "account_circle",
+            size: async () => {
+                const db = await Auth._db.onReady()
+                const res = await db.getDBSize()
+                return res
+            },
+            config: {
+                changeable: false,
+                display: true,
+            },
+            actions: [
+                {
+                    name: $$("@settings/storage/actions/log_out"),
+                    handler: () => new Promise((resolve, reject) => {
+                        try {
+                            const p = Prompt({
+                                title: $$("@settings/storage/actions/log_out"),
+                                text: $$("@settings/storage/actions/log_out/you_will_log_out"),
+                                buttons: [
+                                    {
+                                        content: $$("close"),
+                                        handler() {
+                                            p.close()
+                                            reject()
+                                        },
+                                        type: "light",
+                                    },
+                                    {
+                                        content: $$("continue"),
+                                        handler() {
+                                            DBUserPresence.get("Accounts").functions.find(e => e.name === "clear").handler()
+                                            p.close()
+                                            resolve()
+                                        },
+                                    },
+                                ],
+                            })
+                        } catch (e) {
+                            reject()
+                        }
+                    }),
+                },
+            ],
+            functions: [
+                {
+                    name: "clear",
+                    handler: () => new Promise(async (resolve, reject) => {
+                        try {
+                            await Promise.all(Auth.all.map(e => Auth.destroyInstance(e.id)))
+                            const db = await Auth._db.onReady()
+                            await db.OSTool("accounts").clear()
+                            await Auth.initInstances()
+                            resolve()
+                        } catch (e) {
+                            reject()
+                        }
+                    }),
+                },
+            ],
+        })
+
+        DBUserPresence.registerNewPresence({
+            id: "StatementCache",
+            name: $$("@settings/storage/dbs/statement_cache"),
+            description: $$("@settings/storage/dbs/statement_cache/description"),
+            icon: "account_balance_wallet",
+            size: async () => {
+                const db = await (await StatementStorage.statementDB()).onReady()
+                const res = await db.getDBSize()
+                return res
+            },
+            config: {
+                changeable: false,
+                display: true,
+            },
+            actions: [
+                {
+                    name: $$("@settings/storage/actions/clear"),
+                    handler: () => DBUserPresence.get("StatementCache").functions.find(e => e.name === "clear").handler(),
+                },
+            ],
+            functions: [
+                {
+                    name: "clear",
+                    handler: () => new Promise(async (resolve, reject) => {
+                        try {
+                            const db = await StatementStorage.statementDB()
+                            await Promise.all((await db.getTablesList()).map(
+                                e => db.OSTool(e).clear(),
+                            ))
+                            resolve()
+                        } catch (e) {
+                            reject()
+                        }
+                    }),
+                },
+                {
+                    name: "auto-clean",
+                    async handler() {
+                        const db = await StatementStorage.statementDB()
+                        await Promise.all((await db.getTablesList()).map(
+                            e => async () => db.OSTool(e).clearPercent(0.5),
+                        ))
                     },
                 },
             ],

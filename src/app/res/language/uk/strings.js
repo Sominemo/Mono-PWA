@@ -158,8 +158,11 @@ export default {
         auth: {
             __index: "авторизація",
             log_in: "увійти",
-            logined: "ви авторизовані",
-            log_out: "вийти",
+            not_logined_title: "ви не увійшли в акаунт",
+            not_logined_text: "увійдіть, щоб використовувати всі функції",
+            personal_token: "персональний токен",
+            monobank_account: "акаунт Monobank",
+            add_account: "додати акаунт",
         },
         actions: {
             open_about: "про програму",
@@ -187,11 +190,23 @@ export default {
                     __index: "автономні дані",
                     description: "збережена інформація, отримана з Інтернету, для роботи з нею без підключення до мережі",
                 },
+                accounts: {
+                    __index: "акаунти",
+                    description: "ваші авторизовані профілі Monobank",
+                },
+                statement_cache: {
+                    __index: "виписка",
+                    description: "збережена копія виписок з ваших акаунтів",
+                },
             },
             actions: {
                 clear: "очистити",
                 export: "експорт",
                 import: "імпорт",
+                log_out: {
+                    __index: "вийти",
+                    you_will_log_out: "продовжуючи, ви вийдете з усіх акаунтів",
+                },
             },
         },
         updates: {
@@ -252,4 +267,5 @@ export default {
     close: "закрити",
     next: "далі",
     accept: "приняти",
+    continue: "далі",
 }

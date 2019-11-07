@@ -2,7 +2,6 @@ import SettingsCheckProvider from "@Core/Services/Settings/SettingsCheckProvider
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import App from "@Core/Services/app"
 import { CoreLoader, CoreLoaderResult } from "@Core/Init/CoreLoader"
-import Auth from "@App/modules/mono/services/Auth"
 
 CoreLoader.registerTask({
     id: "settings-defaults",
@@ -42,6 +41,17 @@ CoreLoader.registerTask({
                 },
             },
         ], "flags")
+
+        SettingsCheckProvider.setRules([
+            {
+                name: "statement_db_version",
+                rule: {
+                    default: 0,
+                    checker: new FieldChecker({ isInt: true }),
+                    onfail: async (a, b, c) => { await c(0); return true },
+                },
+            },
+        ])
 
         return new CoreLoaderResult(true, { SettingsCheckProvider })
     },

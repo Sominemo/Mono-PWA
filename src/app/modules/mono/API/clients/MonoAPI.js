@@ -3,7 +3,7 @@ import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
 
 export default class MonoAPI extends API {
-    constructor(token, id = null) {
+    constructor(token, id = null, name = "Mono Account") {
         super({
             domain: "https://api.monobank.ua",
             requestTimeouts: {
@@ -14,6 +14,7 @@ export default class MonoAPI extends API {
             globalTimeout: 0,
             token,
             id,
+            name,
         })
     }
 

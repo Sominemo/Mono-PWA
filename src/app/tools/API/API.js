@@ -26,13 +26,14 @@ export default class API {
     }
 
     constructor({
-        domain, globalTimeout = 0, requestTimeouts = {}, token = null, id = null,
+        domain, globalTimeout = 0, requestTimeouts = {}, token = null, id = null, name = "Account",
     }) {
         this.domain = domain
         this.globalTimeout = globalTimeout
         this.requestTimeouts = requestTimeouts
         this.token = token
         this.id = id
+        this.name = name
     }
 
     get _tokenError() {
@@ -111,6 +112,9 @@ export default class API {
                         return
                     }
 
+                    requestObject
+                        .originalTimestamp = this.lastRequests[requestObject.request.methodID]
+
                     if (this.requestTimeouts[requestObject.request.methodID] === 0) {
                         this.lastRequests[requestObject.request.methodID] = true
                     }
@@ -147,7 +151,9 @@ export default class API {
         return (getValue ? value : value === 0)
     }
 
-    async _sendRequest({ request, resolve, reject }) {
+    async _sendRequest({
+        request, resolve, reject, originalTimestamp = null,
+    }) {
         const self = this
         const url = request.method
 
@@ -179,8 +185,10 @@ export default class API {
                 errorObject = new APIError(error.response.status, { type: 1 })
             } else if (error.request) {
                 errorObject = new APIError(0, { type: 1 })
+                self.lastRequests[request.methodID] = originalTimestamp || 0
             } else {
                 errorObject = new APIError(-1, { type: 1 })
+                self.lastRequests[request.methodID] = originalTimestamp || 0
                 Report.write("Error", error.message)
             }
 

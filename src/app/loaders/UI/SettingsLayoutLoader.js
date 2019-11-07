@@ -11,6 +11,11 @@ import SettingsLayoutManager from "@Core/Services/Settings/user/manager"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import Auth from "@App/modules/mono/services/Auth"
 import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
+import { TwoSidesWrapper, Icon } from "@Environment/Library/DOM/object"
+import { Align } from "@Environment/Library/DOM/style"
+import MonoAPI from "@App/modules/mono/API/clients/MonoAPI"
+import { CardTextList, CardList } from "@Environment/Library/DOM/object/card"
+import DOM from "@DOMPath/DOM/Classes/dom"
 import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
 import generateTFSettingsLayout from "../SettingsLayout/Transformators"
@@ -64,21 +69,77 @@ CoreLoader.registerTask({
             .getGroup("auth-promo-group")
             .createItem({
                 dom() {
-                    if (!Auth.instance.authed) {
-                        return new SettingsActLink([() => { Navigation.url = { module: "auth" } }, $$("@settings/auth/log_in")])
+                    const accounts = Auth.authed
+
+                    if (accounts.length === 0) {
+                        return new WarningConstructorButton({
+                            type: 1,
+                            title: $$("@settings/auth/not_logined_title"),
+                            content: $$("@settings/auth/not_logined_text"),
+                            icon: "person_pin",
+                            button: {
+                                content: $$("@settings/auth/log_in"),
+                                handler() {
+                                    Navigation.url = { module: "auth" }
+                                },
+                            },
+                        })
                     }
 
+                    const elements = []
 
-                    return new WarningConstructorButton({
-                        content: $$("@settings/auth/logined"),
-                        button: {
-                            content: $$("@settings/auth/log_out"),
-                            async handler() {
-                                await Promise.all([SettingsStorage.set("token", ""), SettingsStorage.set("auth_domain", null)])
-                                Navigation.url = { module: "settings" }
+                    accounts.forEach((account) => {
+                        const element = new TwoSidesWrapper(
+                            new Align([
+                                new Icon("account_circle", { fontSize: "32px", opacity: 0.5, marginRight: "10px" }),
+                                new Align([
+                                    new DOM({ new: "div", content: account.name }),
+                                    new DOM({
+                                        new: "div",
+                                        content:
+                                    (account instanceof MonoAPI ? $$("@settings/auth/personal_token") : $$("@settings/auth/monobank_account")),
+                                        style: {
+                                            opacity: 0.5,
+                                            fontSize: "0.7em",
+                                        },
+                                    }),
+                                ], ["column"]),
+                            ], ["row", "middle"]),
+                            new DOM({
+                                new: "div",
+                                content: new Icon("cancel"),
+                                events: [
+                                    {
+                                        event: "click",
+                                        async handler() {
+                                            await Auth.destroyInstance(account.id)
+                                            Navigation.url = Navigation.url
+                                        },
+                                    },
+                                ],
+                                style: {
+                                    cursor: "pointer",
+                                    display: "flex",
+                                },
+                            }),
+                        )
+                        elements.push(element)
+                    })
+
+                    return new CardList([
+                        ...elements.map(content => ({ content })),
+                        {
+                            content: new Align([
+                                new Icon("add", { fontSize: "32px", opacity: 0.5, marginRight: "10px" }),
+                                new Align([
+                                    new DOM({ new: "div", content: $$("@settings/auth/add_account") }),
+                                ], ["column"]),
+                            ], ["row", "middle"]),
+                            handler() {
+                                Navigation.url = { module: "auth" }
                             },
                         },
-                    })
+                    ], true)
                 },
                 options: [],
                 id: "auth-link",

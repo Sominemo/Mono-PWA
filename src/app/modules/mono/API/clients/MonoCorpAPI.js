@@ -3,7 +3,7 @@ import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
 
 export default class MonoCorpAPI extends API {
-    constructor(token, domain, id = null) {
+    constructor(token, domain, id = null, name = "Mono Account") {
         if (typeof token !== "string") throw new TypeError("String token expected")
         if (typeof domain !== "string") throw new TypeError("String domain expected")
         super({
@@ -17,6 +17,7 @@ export default class MonoCorpAPI extends API {
             globalTimeout: 0,
             token,
             id,
+            name,
         })
     }
 

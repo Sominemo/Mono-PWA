@@ -23,7 +23,7 @@ export default class StatementItem {
         const out = !!(amount < 0)
         amount = Money.integer(Math.abs(amount), account.balance.currency)
         operationAmount = Money.integer(Math.abs(operationAmount), Currency.number(currencyCode))
-        if (Number.isNaN(commissionRate)) throw new TypeError("Incorrect Commission Rate")
+        commissionRate = Money.integer(Math.abs(commissionRate), Currency.number(currencyCode))
         if (Number.isNaN(cashbackAmount)) throw new TypeError("Incorrect Cashback Amount")
         balance = Money.integer(balance, account.balance.currency)
 

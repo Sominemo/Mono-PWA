@@ -1,0 +1,19 @@
+.mono-cards-gallery {
+    height: 50vh;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: radial-gradient(#c5c5c559, transparent 70%);
+}
+
+.mono-cards-gallery-scroller {
+    height: 100%;
+    white-space: nowrap;
+}
+
+.mono-card-absolute-holder {
+    display: inline-block;
+    width: 70%;
+    position: relative;
+    height: 100%;
+}

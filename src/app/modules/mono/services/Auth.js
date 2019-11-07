@@ -7,6 +7,8 @@ import hashCode from "@Core/Tools/transformation/text/hashCode"
 import MonoAPI from "../API/clients/MonoAPI"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAnonymousAPI from "../API/clients/MonoAnonymousAPI"
+import StatementStorage from "./StatementStorage"
+import OfflineCache from "./OfflineCache"
 
 export default class Auth {
     static _instances = new Map()
@@ -141,6 +143,17 @@ export default class Auth {
         return id.value
     }
 
+    static async updateName(id, name) {
+        const settings = this.findInstanceSettings(id)
+        this.updateInstance(id, { ...settings, name: `${name}` })
+    }
+
+    static async updateInstance(id, settings) {
+        if (id === 0) return
+        await (await this.accountsDB()).put({ settings, id })
+        this.initInstances()
+    }
+
     static async initInstances() {
         const accounts = await (await this.accountsDB()).getAll()
         this._instances.clear()
@@ -154,12 +167,16 @@ export default class Auth {
         }
 
         this._mainInstance = await this.getMainInstance()
+        StatementStorage.syncCardStorageList()
         this.updateIcons()
     }
 
-    static async addInstance(settings) {
-        await (await this.accountsDB()).put({ settings, id: hashCode(JSON.stringify(settings)) })
+    static async addInstance(settings, accountsCache = []) {
+        const id = hashCode(JSON.stringify(settings))
+        await (await this.accountsDB()).put({ settings, id })
+        await OfflineCache.updateAccounts(id, accountsCache)
         this.initInstances()
+        return id
     }
 
     static async findInstanceSettings(id) {
@@ -172,7 +189,8 @@ export default class Auth {
 
     static async destroyInstance(id) {
         await (await this.accountsDB()).delete(id)
-        this.initInstances()
+        await OfflineCache.destroyAccounts(id)
+        await this.initInstances()
     }
 
     static getInstanceByID(id) {
@@ -184,9 +202,9 @@ export default class Auth {
         let instance
 
         if (settings.type === "corp") {
-            instance = new MonoCorpAPI(settings.token, settings.domain, account.id)
+            instance = new MonoCorpAPI(settings.token, settings.domain, account.id, settings.name)
         } else if (settings.type === "user") {
-            instance = new MonoAPI(settings.token, account.id)
+            instance = new MonoAPI(settings.token, account.id, settings.name)
         } else {
             instance = new MonoAnonymousAPI(account.id)
         }

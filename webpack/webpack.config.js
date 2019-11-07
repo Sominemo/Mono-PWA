@@ -12,6 +12,7 @@ const webpack = require("webpack")
 const fecha = require("fecha")
 const fs = require("fs-extra")
 const chokidar = require("chokidar")
+const mccCodes = require("mcc/emojiMap")
 
 const __root = process.cwd()
 
@@ -47,8 +48,10 @@ if (!fs.existsSync(PATHS.generated)) {
 
 const makeLangMap = require(path.join(__dirname, "scripts", "languageList"))
 const makeThemesMap = require(path.join(__dirname, "scripts", "themesList"))
+const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
 makeLangMap(PATHS.language, PATHS.generated)
 makeThemesMap(PATHS.themes, PATHS.generated)
+const mccEmojiMap = mccEmoji(mccCodes)
 PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
 
 const builder = {
@@ -273,10 +276,11 @@ module.exports = (env = {}) => {
             new webpack.DefinePlugin({
                 __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
                 __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
-                __PACKAGE_BRANCH: JSON.stringify(builder.pack.config.branch),
+                __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
                 __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
                 __PACKAGE_CHANGELOG: JSON.stringify([]),
                 __PACKAGE_WG: JSON.stringify(!!env.WG),
+                __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
             }),
         ],
     }

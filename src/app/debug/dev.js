@@ -34,6 +34,7 @@ import Statement from "@App/modules/mono/API/classes/Statement"
 import Auth from "@App/modules/mono/services/Auth"
 import AuthUI from "@App/modules/mono/AuthUI"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
+import StatementStorage from "@App/modules/mono/services/StatementStorage"
 
 
 function compare(a, b, path = "/") {
@@ -50,7 +51,6 @@ async function compareLanguages(a, b) {
     await Promise.all([a.loadData(), b.loadData()])
     compare(a.strings, b.strings)
 }
-
 const DevUtils = {
     app: PWA,
     dom: DOM,
@@ -92,6 +92,7 @@ const DevUtils = {
     Statement,
     Auth,
     AuthUI,
+    StatementStorage,
 }
 
 CoreLoader.registerTask({
