@@ -1,5 +1,5 @@
 module.exports = function mccEmoji(map) {
-    const emojiMap = []
+    const emojiMap = {}
     Object.entries(map).forEach(([emoji, mccs]) => {
         mccs.forEach((mcc) => {
             if (!emojiMap[mcc]) emojiMap[mcc] = emoji

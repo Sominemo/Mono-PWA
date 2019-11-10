@@ -73,6 +73,7 @@
         "mcc": "^2.2.0",
         "node-fetch": "^2.6.0",
         "regenerator-runtime": "^0.13.2",
-        "sjcl": "^1.0.8"
+        "sjcl": "^1.0.8",
+        "smoothscroll-polyfill": "^0.4.4"
     }
 }

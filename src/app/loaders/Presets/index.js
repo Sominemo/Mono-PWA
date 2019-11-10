@@ -1,3 +1,4 @@
+import "./Polyfills"
 import "./CoreLoaderListener"
 import "./LanguageSettings"
 import "./ThemeSettings"
