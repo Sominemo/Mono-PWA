@@ -1,6 +1,8 @@
 import DBTool from "@Core/Tools/db/DBTool"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import Auth from "./Auth"
+import MonoCorpAPI from "../API/clients/MonoCorpAPI"
+import MonoAPI from "../API/clients/MonoAPI"
 
 export default class StatementStorage {
     static async get(id, from, to) {
@@ -36,16 +38,19 @@ export default class StatementStorage {
         await Promise.all(res[1].map(async e => (await db()).deleteObjectStore(e)))
     }
 
-    static async getCardList(objects = false) {
-        const cardList = new Set()
+    static async getCardList(objects = false, preferOffline = true) {
+        const cardList = new Map()
         await Promise.all(Auth.authed.map(async (account) => {
-            const ci = await account.clientInfo({ preferOffline: true })
+            const ci = await account.clientInfo({ preferOffline })
             ci.accounts.forEach((e) => {
-                cardList.add((objects ? e : e.id))
+                if (!(e.client instanceof MonoAPI
+                     && cardList.get(e.id) && cardList.get(e.id).client instanceof MonoCorpAPI)) {
+                    cardList.set(e.id, (objects ? e : e.id))
+                }
             })
         }))
 
-        return Array.from(cardList)
+        return Array.from(cardList.values())
     }
 
     static async addItems(id, data) {

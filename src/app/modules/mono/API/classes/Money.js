@@ -34,6 +34,14 @@ export default class Money {
         return this.integer * (10 ** this.currency.digits) + this.decimal
     }
 
+    get string() {
+        return this.float.toFixed(this.currency.digits)
+    }
+
+    get isZero() {
+        return (this.integer === 0 && this.decimal === 0)
+    }
+
     static integer(expression, currency) {
         if (!Number.isInteger(expression) || expression < 0) throw new TypeError("Wrong expression")
         if (!(currency instanceof Currency)) throw new TypeError("Currency constructor expected")

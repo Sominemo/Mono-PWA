@@ -17,6 +17,8 @@ export default class Client {
             creditLimit: Money.integer(e.creditLimit, Currency.number(e.currencyCode)),
             cashbackType: e.cashbackType,
         }, mono))
+
+        this.api = mono
         this.raw = raw
     }
 }

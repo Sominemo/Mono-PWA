@@ -12,7 +12,7 @@ export default class MCC {
     constructor(code) {
         const data = mcc.get(code)
 
-        let irsDescription = "???"
+        let irsDescription = "Operation"
         let usdaDescription = ""
         let combinedDescription = ""
         let editedDescription = ""

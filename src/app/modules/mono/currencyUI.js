@@ -179,7 +179,7 @@ export default class CurrencyUI {
                                         ? data.currencyA
                                         : data.currencyB),
                                 ),
-                            ).float.toFixed(2),
+                            ).string,
                     },
                 )
             }

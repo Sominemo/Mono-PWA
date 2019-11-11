@@ -73,7 +73,7 @@
 
 .mono-card-absolute-balance-block {
     margin-top: auto;
-    margin-bottom: 10%;
+    margin-bottom: 8%;
     text-align: center;
     font-size: 2.5em;
     font-weight: 300;
@@ -109,4 +109,82 @@
 
 .mono-card.--card-blue-sideline::before {
     background: #4BC8FE;
+}
+
+.statement-body-container {
+    transform: translateY(-5px);
+}
+
+.statement-body-container>.card.originally-null:empty {
+    transition: all .2s;
+    transform: scaleY(0);
+    min-height: 0;
+}
+
+.statement-body-container>.card {
+    min-height: calc(100vh - 60vmin - var(--size-nav-height))
+}
+
+.statement-item-category {
+    background: rgba(255, 255, 255, .2);
+    display: flex;
+    height: 42px;
+    width: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    border-radius: 50%;
+    line-height: 1;
+    font-size: 1.3em;
+    font-family: "Emoji Font";
+}
+
+.statement-item-list {
+    padding: 15px;
+    border-bottom: solid 1.5px var(--color-card-border);
+}
+
+.statement-item-list:last-child {
+    border-bottom: 0;
+}
+
+.amount-statement-item {
+    white-space: nowrap;
+    margin-left: 4px;
+}
+
+.amount-statement-item.out {
+    color: #FF7272;
+}
+
+.amount-statement-item.in {
+    color: #6df16d;
+}
+
+.statement-item-descr {
+    font-size: .8em;
+    color: #aeaeae;
+    font-family: var(--font-main), "Emoji Font";
+}
+
+@keyframes updating {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.mono-card-absolute-balance-number.updating {
+    animation: updating 1.5s;
+    transition: all .5s;
+    animation-iteration-count: infinite;
 }

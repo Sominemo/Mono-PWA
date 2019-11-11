@@ -12,6 +12,6 @@ export default class MoneyCashback extends Cashback {
     }
 
     get object() {
-        return new Money(this.amount, this.currency)
+        return Money.integer(this.amount, this.currency)
     }
 }

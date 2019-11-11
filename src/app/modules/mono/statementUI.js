@@ -7,19 +7,230 @@ import DOM from "@DOMPath/DOM/Classes/dom"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
 import cubicBeizer from "@DOMPath/Animation/Library/Timing/cubicBeizer"
-import randBetween from "@Core/Tools/objects/randBetween"
-import randomFromArray from "@Core/Tools/objects/randomFromArray"
-import Sleep from "@Core/Tools/objects/sleep"
+import { Card } from "@Environment/Library/DOM/object/card"
+import { Preloader, TwoSidesWrapper, Title } from "@Environment/Library/DOM/object"
+import { Align } from "@Environment/Library/DOM/style"
+import LottieAnimation from "@App/library/LottieAnimation"
+import { Button } from "@Environment/Library/DOM/object/input"
+import { $$, $ } from "@Core/Services/Language/handler"
+import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
+import Prompt from "@Environment/Library/DOM/elements/prompt"
 import Currency from "./API/classes/Currency"
-import Account from "./API/classes/Account"
+import StatementStorage from "./services/StatementStorage"
+import NoCashback from "./API/cashbacks/NoCashback"
+import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
+import MilesCashback from "./API/classes/cashbacks/MilesCashback"
+import Auth from "./services/Auth"
 import Money from "./API/classes/Money"
+import MonoAPI from "./API/clients/MonoAPI"
 
 export default class StatementUI {
     static async Init() {
+        if (!Auth.isAnyAuthed) {
+            Navigation.url = { module: "auth" }
+            return
+        }
+        let isLoading = true
+        let prevDate = Date.now()
+        let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
         w.style({ padding: 0 })
-        w.render(await this.makeCardGallery())
+        let statementBody
+
+        const gallery = await this.makeCardGallery(async (account, visual) => {
+            if (account.client instanceof MonoAPI) {
+                if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
+                    Prompt({
+                        title: $$("@statement/warning"),
+                        text: $("@statement/requests_throttling"),
+                        buttons: [
+                            {
+                                content: $$("close"),
+                                handler: "close",
+                            },
+                        ],
+                    })
+                    SettingsStorage.setFlag("seen_token_throttling_warn", true)
+                }
+            }
+
+            let genList
+            const contentCard = new Card(
+                new Preloader({ style: { margin: "auto" } }),
+                { style: { display: "flex" } },
+            )
+            statementBody.clear(contentCard)
+
+            const loadMore = () => {
+                isLoading = true
+
+                const loader = new Align(
+                    new Preloader(),
+                    ["center", "row"], { padding: "15px" },
+                )
+                statementBody.render(loader)
+                window.requestIdleCallback(async () => {
+                    prevDate = fromDate
+                    fromDate -= 1000 * 60 * 60 * 24 * 7
+                    genList(Array.from(
+                        await account.statement(new Date(fromDate), new Date(prevDate)),
+                    ), true)
+                    loader.destructSelf()
+                    isLoading = false
+                }, { timeout: 100 })
+            }
+
+            genList = (items, noReplace = false) => {
+                const toRender = []
+
+                items.forEach((item, i) => {
+                    if (
+                        (i - 1 in items && !sameDay(items[i - 1].time.getTime(),
+                            item.time.getTime()))
+                        || (!(i - 1 in items))
+                    ) {
+                        toRender.push(new Title(relativeDate(item.time), 3))
+                    }
+
+                    const descriptionArray = []
+
+                    descriptionArray.push(item.mcc.title)
+
+                    if (!(item.cashback instanceof NoCashback)) {
+                        if (item.cashback instanceof MoneyCashback) {
+                            if (!item.cashback.object.isZero) descriptionArray.push(`👛 ${printMoney(item.cashback.object, true)}`)
+                        } else if (item.cashback instanceof MilesCashback) {
+                            descriptionArray.push(`✈ ${item.cashback.amount} mi`)
+                        } else {
+                            descriptionArray.push(`✨ ${item.cashback.amount} ${item.cashback.type}`)
+                        }
+                    }
+
+                    if (!item.commissionRate.isZero) {
+                        descriptionArray.push(`➖ ${item.commissionRate.string}`)
+                    }
+
+                    const description = descriptionArray.join(" | ")
+
+                    toRender.push(new DOM({
+                        new: "div",
+                        class: "statement-item-list",
+                        intersections: (i === items.length - Math.floor(items.length * 0.3) - 1
+                            ? [
+                                {
+                                    config: {
+                                        root: WindowManager.controlWin.elementParse.native,
+                                    },
+                                    handler(e, obs) {
+                                        if (!e.some(el => el.isIntersecting) || isLoading) return
+                                        obs.disconnect()
+
+                                        loadMore()
+                                    },
+                                },
+                            ] : []),
+                        content:
+                            new TwoSidesWrapper(
+                                new Align([
+                                    new DOM({
+                                        new: "div",
+                                        class: "statement-item-category",
+                                        content: item.mcc.emoji,
+                                    }),
+                                    new DOM({
+                                        new: "div",
+                                        content: [
+                                            new DOM({
+                                                new: "div",
+                                                class: "statement-item-title",
+                                                content: item.description,
+                                            }),
+                                            new DOM({
+                                                new: "div",
+                                                class: "statement-item-descr",
+                                                content: description,
+                                            }),
+                                        ],
+                                    }),
+                                ], ["row"], { align: "center" }),
+                                new DOM({
+                                    new: "div",
+                                    class: ["amount-statement-item", (item.out ? "out" : "in")],
+                                    content: String((item.out ? -1 : 1) * item.amount.integer),
+                                }),
+                            ),
+                    }))
+                })
+
+                contentCard.render(...toRender)
+
+
+                if (items.length === 0) {
+                    if (!noReplace) {
+                        contentCard.classList.add("originally-null")
+                        contentCard.clear(
+                            new DOM({
+                                new: "div",
+                                style: { margin: "auto", textAlign: "center" },
+                                content: [
+                                    new LottieAnimation(require("@Resources/animations/failed.json"),
+                                        { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
+                                    new Title($$("@statement/no_operations_for_last_week"), 3, { marginLeft: "5px", marginRight: "5px" }),
+                                    new Button({
+                                        content: $$("@statement/load_more"),
+                                        handler() {
+                                            contentCard.clear()
+                                            loadMore()
+                                        },
+                                    }),
+                                ],
+                            }),
+                        )
+                    } else {
+                        const loader = new Align(
+                            new Button({
+                                content: $$("@statement/load_more"),
+                                handler() {
+                                    loader.destructSelf()
+                                    loadMore()
+                                },
+                            }),
+                            ["center", "row"], { padding: "15px" },
+                        )
+                        statementBody.render(loader)
+                    }
+                } else {
+                    contentCard.style({ display: "" })
+                }
+
+                isLoading = false
+            }
+
+            const requestFirstData = async () => {
+                const cont = Array.from(
+                    await account.statement(
+                        new Date(fromDate),
+                    ),
+                )
+
+                contentCard.clear()
+                window.requestIdleCallback(() => genList(cont))
+            }
+
+            window.requestIdleCallback(requestFirstData)
+        })
+
+        statementBody = new DOM({
+            new: "div",
+            class: "statement-body-container",
+            onRendered() {
+                gallery.calculate()
+            },
+        })
+
+        w.render(gallery)
+        w.render(statementBody)
     }
 
     static cardItemGenerator({
@@ -59,36 +270,23 @@ export default class StatementUI {
 
     static async cardList(accounts) {
         const settings = await SettingsStorage.get("mono_cards_config") || {}
-        const banks = ["mono", "mono", "mono", "iron"]
-        const looks = ["black", "grey", "pink"]
 
-        const cards = accounts.map((card) => {
+        const cards = accounts.map((card, i) => {
             const params = settings[card.id]
                 || {
-                    bank: randomFromArray(banks),
-                    look: randomFromArray(looks),
-                    cardholder: `${randomFromArray([
-                        "Олексій", "Степан", "Захар",
-                        "Сергій", "Макар", "Андрій",
-                        "Богдан", "Євген", "Григорій"])
-                    } ${
-                        randomFromArray([
-                            "Мірошниченко", "Вороний", "Шевченко",
-                            "Радченко", "Хмельницький", "Скиба",
-                            "Куліш", "Гончаренко", "Грушевський"])}`,
-                    currency: card.balance.currency,
-                }
-
-            /*
-|| {
                     bank: "mono",
                     look: "black",
                     cardholder: card.client.name,
                     currency: card.balance.currency,
                 }
-                */
 
             const cardVisual = this.cardItemGenerator(params)
+
+            const balanceItem = new DOM({
+                new: "div",
+                content: printMoney(card.balance),
+                class: "mono-card-absolute-balance-number",
+            })
 
             return new DOM({
                 new: "div",
@@ -105,16 +303,27 @@ export default class StatementUI {
                         new DOM({
                             new: "div",
                             content: [
-                                new DOM({
-                                    new: "div",
-                                    content: printMoney(card.balance),
-                                    class: "mono-card-absolute-balance-number",
-                                }),
+                                balanceItem,
                             ],
                             class: "mono-card-absolute-balance-block",
                         }),
                     ],
                 }),
+                objectProperty: [
+                    {
+                        name: "updateState",
+                        handler(state) {
+                            if (state === true) {
+                                balanceItem.classList.add("updating")
+                                return
+                            }
+                            balanceItem.classList.remove("updating")
+                            if (state instanceof Money) {
+                                balanceItem.clear(new DOM({ type: "text", new: printMoney(state) }))
+                            }
+                        },
+                    },
+                ],
             })
         })
 
@@ -122,27 +331,32 @@ export default class StatementUI {
     }
 
     static async allCardInfo() {
-        // const cardList = await StatementStorage.getCardList(true)
-        const currs = [Currency.code("UAH"), Currency.code("UAH"), Currency.code("UAH"), Currency.code("USD"), Currency.code("EUR"), Currency.code("PLN")]
-        const cardList = Array(20).fill(null).map(() => {
-            const cur = randomFromArray(currs)
-            return new Account({
-                id: "id",
-                balance: new Money(randBetween(0, 99999), randBetween(0, 99), cur),
-                creditLimit: new Money(0, 0, cur),
-                cashbackType: cur.code,
-            })
-        })
+        const cardList = await StatementStorage.getCardList(true)
+
         const cardVisuals = await this.cardList(cardList)
         return [cardList, cardVisuals]
     }
 
-    static async makeCardGallery() {
+    static async makeCardGallery(callback = () => { }) {
         const cubicB = cubicBeizer(0.3, 0.6, 0, 3)
         const [cardList, cardVisuals] = await this.allCardInfo()
-        let currentSelection = 0
+        let currentSelection = null
         let speed
         let gallery
+
+        cardVisuals.forEach(e => e.updateState(true))
+        const updateCards = async () => {
+            const ci = await StatementStorage.getCardList(true, false)
+
+            ci.forEach((account) => {
+                const id = cardList.findIndex(e => e.id === account.id)
+                if (id === -1) return
+
+                cardVisuals[id].updateState(account.balance)
+            })
+        }
+
+        window.requestIdleCallback(updateCards)
 
 
         function visibleWidth(card, container) {
@@ -173,7 +387,12 @@ export default class StatementUI {
                 return visibleWidth(cardSizes, gallerySize)
             })
 
-            currentSelection = visibleWidths.indexOf(Math.max(...visibleWidths))
+            const cs = visibleWidths.indexOf(Math.max(...visibleWidths))
+
+            if (currentSelection !== cs) {
+                currentSelection = cs
+                callback(cardList[currentSelection], cardVisuals[currentSelection])
+            }
 
             scrollTo()
         }
@@ -220,7 +439,8 @@ export default class StatementUI {
 
                     speed = Math.abs(deltaX / deltaTime / 4)
                     el.scrollBy({
-                        left: deltaX * cubicB(Math.abs(fullDelta) / el.sizes.width) * Math.max(1, speed),
+                        left: deltaX * cubicB(Math.abs(fullDelta) / el.sizes.width)
+                            * Math.max(1, speed),
                     })
                 },
             })
@@ -253,6 +473,13 @@ export default class StatementUI {
             onClear() {
                 window.removeEventListener("resize", rem)
             },
+
+            objectProperty: [
+                {
+                    name: "calculate",
+                    handler: calculateCurrent,
+                },
+            ],
         })
 
         return gallery
