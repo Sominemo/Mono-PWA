@@ -1,4 +1,9 @@
 # Содержание
+
+Не хочу читать,
+* [У меня проблема!](https://github.com/Sominemo/Mono-PWA/issues/new/choose)
+* [У меня предложение!](https://github.com/Sominemo/Mono-PWA/issues/new/choose)
+
 [Связь](#связь)
 
 [Тестирование](#тестирование)
