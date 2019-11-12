@@ -188,3 +188,9 @@
     transition: all .5s;
     animation-iteration-count: infinite;
 }
+
+.statement-row-container-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

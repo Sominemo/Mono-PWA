@@ -172,7 +172,7 @@ module.exports = (env = {}) => {
                     loader: ["url-loader"],
                 },
                 {
-                    test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+                    test: /\.(woff(2)?|ttf|eot|font\.svg)(\?v=[a-z0-9]\.[a-z0-9]\.[a-z0-9])?$/,
                     use: [{
                         loader: "file-loader",
                         options: {

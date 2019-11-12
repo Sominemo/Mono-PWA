@@ -17,7 +17,7 @@ import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import Currency from "./API/classes/Currency"
 import StatementStorage from "./services/StatementStorage"
-import NoCashback from "./API/cashbacks/NoCashback"
+import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
 import MilesCashback from "./API/classes/cashbacks/MilesCashback"
 import Auth from "./services/Auth"
@@ -30,15 +30,15 @@ export default class StatementUI {
             Navigation.url = { module: "auth" }
             return
         }
-        let isLoading = true
-        let prevDate = Date.now()
-        let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
         w.style({ padding: 0 })
         let statementBody
 
         const gallery = await this.makeCardGallery(async (account, visual) => {
+            let isLoading = true
+            let prevDate = Date.now()
+            let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
@@ -97,7 +97,7 @@ export default class StatementUI {
 
                     descriptionArray.push(item.mcc.title)
 
-                    if (!(item.cashback instanceof NoCashback)) {
+                    if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
                         if (item.cashback instanceof MoneyCashback) {
                             if (!item.cashback.object.isZero) descriptionArray.push(`👛 ${printMoney(item.cashback.object, true)}`)
                         } else if (item.cashback instanceof MilesCashback) {
@@ -140,6 +140,7 @@ export default class StatementUI {
                                     }),
                                     new DOM({
                                         new: "div",
+                                        class: "statement-row-container-text",
                                         content: [
                                             new DOM({
                                                 new: "div",
