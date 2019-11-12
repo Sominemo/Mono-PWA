@@ -40,7 +40,7 @@
         "copy-webpack-plugin": "^5.0.0",
         "css-loader": "^3.0.0",
         "eslint": "^5.10.0",
-        "eslint-config-airbnb-base": "^13.1.0",
+        "eslint-config-airbnb-base": "^14.0.0",
         "eslint-import-resolver-webpack": "^0.11.1",
         "eslint-plugin-import": "^2.16.0",
         "extra-watch-webpack-plugin": "^1.0.3",
