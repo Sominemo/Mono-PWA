@@ -1,8 +1,6 @@
 .vscode
 node_modules
-package-lock.json
 dev-env
-yarn.lock
 yarn-error.log
 /*build
 /webpack/scripts/config
