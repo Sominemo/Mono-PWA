@@ -1,5 +1,6 @@
 import { API } from "@App/tools/API"
 import currency from "./methods/currency"
+import destroyInstance from "./methods/destroyInstance"
 
 export default class MonoAnonymousAPI extends API {
     constructor(id = null) {
@@ -19,4 +20,6 @@ export default class MonoAnonymousAPI extends API {
     }
 
     currency = currency.bind(this)
+
+    _tokenErrorHandler = destroyInstance.bind(this)
 }

@@ -11,15 +11,22 @@ export default class OfflineCache {
         const self = this
 
         if (!this._dbConnectionInstance) {
-            this._dbConnectionInstance = new DBTool("OfflineCache", 2, {
+            this._dbConnectionInstance = new DBTool("OfflineCache", 5, {
                 upgrade(db, oldVersion, newVersion, transaction) {
-                    if (oldVersion === 0) {
+                    try {
                         db.createObjectStore(self.StorageName, {
                             keyPath: "key",
                         })
+                    } catch (e) {
+                        // Object Store exists
+                    }
+
+                    try {
                         db.createObjectStore(self.AdditionalStorageName, {
                             keyPath: "key",
                         })
+                    } catch (e) {
+                        // Object Store exists
                     }
                 },
             })

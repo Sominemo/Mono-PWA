@@ -3,12 +3,13 @@ import Money from "./Money"
 import StatementStorage from "../../services/StatementStorage"
 
 export default function Account({
-    id, balance, creditLimit, cashbackType,
+    id, balance, creditLimit, cashbackType, isOverdraft,
 }, mono = null) {
     if (typeof id !== "string") throw new TypeError("Incorrect ID")
     if (!(balance instanceof Money)) throw new TypeError("Money constructor expected")
     if (!(creditLimit instanceof Money)) throw new TypeError("Money constructor expected")
     if (typeof cashbackType !== "string") throw new TypeError("Incorrect cashback type")
+    if (typeof isOverdraft !== "boolean") throw new TypeError("Incorrect isOverdraft type")
 
     Object.defineProperties(this, {
         id: {
@@ -18,6 +19,11 @@ export default function Account({
         },
         balance: {
             value: balance,
+            writable: false,
+            configurable: true,
+        },
+        isOverdraft: {
+            value: isOverdraft,
             writable: false,
             configurable: true,
         },

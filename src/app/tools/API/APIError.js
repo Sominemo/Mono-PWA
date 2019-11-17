@@ -4,16 +4,8 @@ export default class APIError {
     type = 0
 
     constructor(data, { type = 0 } = {}) {
-        Object.defineProperty(this, "data", {
-            value: data,
-            writable: false,
-            configurable: true,
-        })
-        Object.defineProperty(this, "type", {
-            value: type,
-            writable: false,
-            configurable: true,
-        })
+        this.data = data
+        this.type = type
     }
 
     get info() {

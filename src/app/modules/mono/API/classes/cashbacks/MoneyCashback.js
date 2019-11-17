@@ -12,6 +12,10 @@ export default class MoneyCashback extends Cashback {
     }
 
     get object() {
-        return Money.integer(this.amount, this.currency)
+        return Money.integer(Math.abs(this.amount), this.currency)
+    }
+
+    get sign() {
+        return Math.sign(this.amount)
     }
 }

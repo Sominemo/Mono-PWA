@@ -25,7 +25,7 @@ export default class StatementItem {
         operationAmount = Money.integer(Math.abs(operationAmount), Currency.number(currencyCode))
         commissionRate = Money.integer(Math.abs(commissionRate), Currency.number(currencyCode))
         if (Number.isNaN(cashbackAmount)) throw new TypeError("Incorrect Cashback Amount")
-        balance = Money.integer(balance, account.balance.currency)
+        balance = Money.integer(Math.abs(balance), account.balance.currency)
 
         this.id = id
         this.time = time
@@ -37,5 +37,6 @@ export default class StatementItem {
         this.commissionRate = commissionRate
         this.cashback = cashback(cashbackAmount, account.cashbackType)
         this.balance = balance
+        this.balanceOverdraft = (balance < 0)
     }
 }

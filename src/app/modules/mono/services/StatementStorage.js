@@ -8,7 +8,7 @@ export default class StatementStorage {
     static async get(id, from, to) {
         const db = (await this.statementDB()).OSTool(id)
         return (await db.getWhere(null, v => (v.time >= from && v.time <= to)))
-            .sort((a, b) => a - b)
+            .sort((a, b) => b.time - a.time)
     }
 
     static async syncCardStorageList() {

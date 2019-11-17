@@ -1,3 +1,4 @@
+import Report from "@Core/Services/report"
 import StatementItem from "./StatementItem"
 
 export default class Statement {
@@ -8,7 +9,13 @@ export default class Statement {
         if (from.getTime() > to.getTime()) throw new Error("From can't be later than to")
 
         list.forEach((item) => {
-            this.list.push(new StatementItem(item, account))
+            try {
+                this.list.push(
+                    new StatementItem(item, account),
+                )
+            } catch (e) {
+                Report.error("Failed to construct StatementItem", JSON.parse(JSON.stringify(item)))
+            }
         })
     }
 

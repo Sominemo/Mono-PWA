@@ -1,6 +1,7 @@
 import { API } from "@App/tools/API"
 import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
+import destroyInstance from "./methods/destroyInstance"
 
 export default class MonoAPI extends API {
     constructor(token, id = null, name = "Mono Account") {
@@ -21,6 +22,8 @@ export default class MonoAPI extends API {
     currency = currency.bind(this)
 
     clientInfo = clientInfo.bind(this)
+
+    _tokenErrorHandler = destroyInstance.bind(this)
 
     get authed() {
         return true

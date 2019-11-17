@@ -15,14 +15,15 @@ import { Button } from "@Environment/Library/DOM/object/input"
 import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
+import Report from "@Core/Services/report"
 import Currency from "./API/classes/Currency"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
 import MilesCashback from "./API/classes/cashbacks/MilesCashback"
 import Auth from "./services/Auth"
-import Money from "./API/classes/Money"
 import MonoAPI from "./API/clients/MonoAPI"
+import Account from "./API/classes/Account"
 
 export default class StatementUI {
     static async Init() {
@@ -62,21 +63,25 @@ export default class StatementUI {
             )
             statementBody.clear(contentCard)
 
+            let loader
+
             const loadMore = () => {
                 isLoading = true
 
-                const loader = new Align(
+                if (loader) loader.destructSelf()
+
+                const thisLoader = new Align(
                     new Preloader(),
                     ["center", "row"], { padding: "15px" },
                 )
-                statementBody.render(loader)
+                statementBody.render(thisLoader)
                 window.requestIdleCallback(async () => {
                     prevDate = fromDate
                     fromDate -= 1000 * 60 * 60 * 24 * 7
                     genList(Array.from(
                         await account.statement(new Date(fromDate), new Date(prevDate)),
                     ), true)
-                    loader.destructSelf()
+                    thisLoader.destructSelf()
                     isLoading = false
                 }, { timeout: 100 })
             }
@@ -85,83 +90,89 @@ export default class StatementUI {
                 const toRender = []
 
                 items.forEach((item, i) => {
-                    if (
-                        (i - 1 in items && !sameDay(items[i - 1].time.getTime(),
-                            item.time.getTime()))
-                        || (!(i - 1 in items))
-                    ) {
-                        toRender.push(new Title(relativeDate(item.time), 3))
-                    }
-
-                    const descriptionArray = []
-
-                    descriptionArray.push(item.mcc.title)
-
-                    if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
-                        if (item.cashback instanceof MoneyCashback) {
-                            if (!item.cashback.object.isZero) descriptionArray.push(`👛 ${printMoney(item.cashback.object, true)}`)
-                        } else if (item.cashback instanceof MilesCashback) {
-                            descriptionArray.push(`✈ ${item.cashback.amount} mi`)
-                        } else {
-                            descriptionArray.push(`✨ ${item.cashback.amount} ${item.cashback.type}`)
+                    try {
+                        if (
+                            (i - 1 in items && !sameDay(items[i - 1].time.getTime(),
+                                item.time.getTime()))
+                            || (!(i - 1 in items))
+                        ) {
+                            toRender.push(new Title(relativeDate(item.time), 3))
                         }
-                    }
 
-                    if (!item.commissionRate.isZero) {
-                        descriptionArray.push(`➖ ${item.commissionRate.string}`)
-                    }
+                        const descriptionArray = []
 
-                    const description = descriptionArray.join(" | ")
+                        descriptionArray.push(item.mcc.title)
 
-                    toRender.push(new DOM({
-                        new: "div",
-                        class: "statement-item-list",
-                        intersections: (i === items.length - Math.floor(items.length * 0.3) - 1
-                            ? [
-                                {
-                                    config: {
-                                        root: WindowManager.controlWin.elementParse.native,
+                        if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
+                            if (item.cashback instanceof MoneyCashback) {
+                                if (!item.cashback.object.isZero) descriptionArray.push(`👛 ${(item.cashback.sign === -1 ? "-" : "") + printMoney(item.cashback.object, true)}`)
+                            } else if (item.cashback instanceof MilesCashback) {
+                                descriptionArray.push(`✈ ${item.cashback.amount} mi`)
+                            } else {
+                                descriptionArray.push(`✨ ${item.cashback.amount} ${item.cashback.type}`)
+                            }
+                        }
+
+                        if (!item.commissionRate.isZero) {
+                            descriptionArray.push(`➖ ${item.commissionRate.string}`)
+                        }
+
+                        const description = descriptionArray.join(" | ")
+
+                        toRender.push(new DOM({
+                            new: "div",
+                            class: "statement-item-list",
+                            intersections: (i === items.length - Math.floor(items.length * 0.3) - 1
+                                ? [
+                                    {
+                                        config: {
+                                            root: WindowManager.controlWin.elementParse.native,
+                                        },
+                                        handler(e, obs) {
+                                            if (
+                                                !e.some(el => el.isIntersecting) || isLoading
+                                            ) return
+                                            obs.disconnect()
+
+                                            loadMore()
+                                        },
                                     },
-                                    handler(e, obs) {
-                                        if (!e.some(el => el.isIntersecting) || isLoading) return
-                                        obs.disconnect()
-
-                                        loadMore()
-                                    },
-                                },
-                            ] : []),
-                        content:
-                            new TwoSidesWrapper(
-                                new Align([
+                                ] : []),
+                            content:
+                                new TwoSidesWrapper(
+                                    new Align([
+                                        new DOM({
+                                            new: "div",
+                                            class: "statement-item-category",
+                                            content: item.mcc.emoji,
+                                        }),
+                                        new DOM({
+                                            new: "div",
+                                            class: "statement-row-container-text",
+                                            content: [
+                                                new DOM({
+                                                    new: "div",
+                                                    class: "statement-item-title",
+                                                    content: item.description,
+                                                }),
+                                                new DOM({
+                                                    new: "div",
+                                                    class: "statement-item-descr",
+                                                    content: description,
+                                                }),
+                                            ],
+                                        }),
+                                    ], ["row"], { align: "center" }),
                                     new DOM({
                                         new: "div",
-                                        class: "statement-item-category",
-                                        content: item.mcc.emoji,
+                                        class: ["amount-statement-item", (item.out ? "out" : "in")],
+                                        content: String((item.out ? -1 : 1) * item.amount.integer),
                                     }),
-                                    new DOM({
-                                        new: "div",
-                                        class: "statement-row-container-text",
-                                        content: [
-                                            new DOM({
-                                                new: "div",
-                                                class: "statement-item-title",
-                                                content: item.description,
-                                            }),
-                                            new DOM({
-                                                new: "div",
-                                                class: "statement-item-descr",
-                                                content: description,
-                                            }),
-                                        ],
-                                    }),
-                                ], ["row"], { align: "center" }),
-                                new DOM({
-                                    new: "div",
-                                    class: ["amount-statement-item", (item.out ? "out" : "in")],
-                                    content: String((item.out ? -1 : 1) * item.amount.integer),
-                                }),
-                            ),
-                    }))
+                                ),
+                        }))
+                    } catch (e) {
+                        Report.error("Failed to render statement item", JSON.parse(JSON.stringify(item)))
+                    }
                 })
 
                 contentCard.render(...toRender)
@@ -188,21 +199,19 @@ export default class StatementUI {
                                 ],
                             }),
                         )
-                    } else {
-                        const loader = new Align(
-                            new Button({
-                                content: $$("@statement/load_more"),
-                                handler() {
-                                    loader.destructSelf()
-                                    loadMore()
-                                },
-                            }),
-                            ["center", "row"], { padding: "15px" },
-                        )
-                        statementBody.render(loader)
                     }
                 } else {
                     contentCard.style({ display: "" })
+                    loader = new Align(
+                        new Button({
+                            content: $$("@statement/load_more"),
+                            handler() {
+                                loadMore()
+                            },
+                        }),
+                        ["center", "row"], { padding: "15px" },
+                    )
+                    statementBody.render(loader)
                 }
 
                 isLoading = false
@@ -289,6 +298,17 @@ export default class StatementUI {
                 class: "mono-card-absolute-balance-number",
             })
 
+            const setAmount = (state) => {
+                if (state === true) {
+                    balanceItem.classList.add("updating")
+                    return
+                }
+                balanceItem.classList.remove("updating")
+                if (state instanceof Account) {
+                    balanceItem.clear(new DOM({ type: "text", new: (state.isOverdraft ? "-" : "") + printMoney(state.balance) }))
+                }
+            }
+
             return new DOM({
                 new: "div",
                 class: "mono-card-scroll-block",
@@ -313,16 +333,7 @@ export default class StatementUI {
                 objectProperty: [
                     {
                         name: "updateState",
-                        handler(state) {
-                            if (state === true) {
-                                balanceItem.classList.add("updating")
-                                return
-                            }
-                            balanceItem.classList.remove("updating")
-                            if (state instanceof Money) {
-                                balanceItem.clear(new DOM({ type: "text", new: printMoney(state) }))
-                            }
-                        },
+                        handler: setAmount,
                     },
                 ],
             })
@@ -353,7 +364,7 @@ export default class StatementUI {
                 const id = cardList.findIndex(e => e.id === account.id)
                 if (id === -1) return
 
-                cardVisuals[id].updateState(account.balance)
+                cardVisuals[id].updateState(account)
             })
         }
 

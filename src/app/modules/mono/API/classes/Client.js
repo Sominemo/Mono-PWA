@@ -13,7 +13,8 @@ export default class Client {
         this.name = name
         this.accounts = accounts.map(e => new Account({
             id: e.id,
-            balance: Money.integer(e.balance, Currency.number(e.currencyCode)),
+            balance: Money.integer(Math.abs(e.balance), Currency.number(e.currencyCode)),
+            isOverdraft: (e.balance < 0),
             creditLimit: Money.integer(e.creditLimit, Currency.number(e.currencyCode)),
             cashbackType: e.cashbackType,
         }, mono))

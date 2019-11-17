@@ -44,18 +44,29 @@ export default class API {
         return errorObject.info.data === 429
     }
 
+    _tokenErrorHandler() {
+
+    }
+
     call(method, {
         methodID = null, data = {}, requestMethod = "get", useAuth = this.token !== null, settings = API.flags.waiting,
         customToken = null,
     } = {}) {
-        if (this.token === null && useAuth && !customToken) return Promise.reject(this._tokenError)
+        if (this.token === null && useAuth && !customToken) {
+            this._tokenErrorHandler()
+            return Promise.reject(this._tokenError)
+        }
 
 
         let resolve
         let reject
         const p = new Promise((res, rej) => {
             resolve = res
-            reject = rej
+            reject = (e) => {
+                if (e instanceof APIError
+                    && (e.data === 403 || e.data === 401)) this._tokenErrorHandler()
+                rej()
+            }
         })
 
         this.sendToCart({
