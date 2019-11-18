@@ -380,8 +380,8 @@ export default class AuthUI {
         const set = { type: "user", token: state.settings.are.token }
         const a = await Auth.genInstance({ settings: set, id: 0 })
         try {
-            await a.clientInfo(true)
-            await Auth.addInstance(set)
+            const result = await a.clientInfo()
+            await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
 
             Toast.add($$("@auth/success"))
             state.blockerPopup.close()
@@ -586,13 +586,20 @@ export default class AuthUI {
             ],
         })
         state.waitSuccess = async (token) => {
-            p.close()
-            state.blockerPopup.close()
-            Toast.add($$("@auth/stage/authed"))
-            await Auth.addInstance({ type: "corp", domain: `${state.settings.are.domain}/request`, token })
+            try {
+                const set = { type: "corp", domain: `${state.settings.are.domain}/request`, token }
+                const a = await Auth.genInstance({ settings: set, id: 0 })
+                const result = await a.clientInfo()
+                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
+                p.close()
+                state.blockerPopup.close()
+                Toast.add($$("@auth/stage/authed"))
 
-
-            Navigation.defaultScreen()
+                Navigation.defaultScreen()
+            } catch (e) {
+                Toast.add($$("@auth/stage/error"))
+                p.close()
+            }
         }
 
         state.waitError = (e) => {
@@ -698,14 +705,22 @@ export default class AuthUI {
             ],
         })
 
-        state.waitSuccess = (token) => {
-            if (p1) p1.close()
-            p.close()
-            state.blockerPopup.close()
-            Toast.add($$("@auth/stage/authed"))
+        state.waitSuccess = async (token) => {
+            try {
+                const set = { type: "corp", domain: `${state.settings.are.domain}/request`, token }
+                const a = await Auth.genInstance({ settings: set, id: 0 })
 
-            Auth.addInstance({ type: "corp", domain: `${state.settings.are.domain}/request`, token })
-            Navigation.defaultScreen()
+                const result = await a.clientInfo()
+                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
+
+                if (p1) p1.close()
+                p.close()
+                state.blockerPopup.close()
+                Toast.add($$("@auth/stage/authed"))
+                Navigation.defaultScreen()
+            } catch (e) {
+                state.waitError(-1)
+            }
         }
 
         state.waitError = (e) => {

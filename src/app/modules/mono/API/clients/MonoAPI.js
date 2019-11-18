@@ -1,9 +1,10 @@
 import { API } from "@App/tools/API"
 import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
+import destroyInstance from "./methods/destroyInstance"
 
 export default class MonoAPI extends API {
-    constructor(token, id = null) {
+    constructor(token, id = null, name = "Mono Account") {
         super({
             domain: "https://api.monobank.ua",
             requestTimeouts: {
@@ -14,12 +15,15 @@ export default class MonoAPI extends API {
             globalTimeout: 0,
             token,
             id,
+            name,
         })
     }
 
     currency = currency.bind(this)
 
     clientInfo = clientInfo.bind(this)
+
+    _tokenErrorHandler = destroyInstance.bind(this)
 
     get authed() {
         return true

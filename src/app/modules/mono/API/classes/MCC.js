@@ -1,4 +1,8 @@
+/* global __MCC_CODES_EMOJI */
+
 import mcc from "mcc"
+
+const emojiFallback = "\uD83D\uDCB3"
 
 export default class MCC {
     id = 0
@@ -8,7 +12,7 @@ export default class MCC {
     constructor(code) {
         const data = mcc.get(code)
 
-        let irsDescription = "???"
+        let irsDescription = "Operation"
         let usdaDescription = ""
         let combinedDescription = ""
         let editedDescription = ""
@@ -24,5 +28,13 @@ export default class MCC {
 
         this.title = irsDescription || usdaDescription || combinedDescription || editedDescription
         this.id = id
+        this.code = code
+
+
+        try {
+            this.emoji = __MCC_CODES_EMOJI[code] || emojiFallback
+        } catch (e) {
+            this.emoji = emojiFallback
+        }
     }
 }

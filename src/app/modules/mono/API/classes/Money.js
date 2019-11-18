@@ -6,24 +6,9 @@ export default class Money {
         if (!Number.isInteger(decimal) || decimal < 0) throw new TypeError("Wrong decimal")
         if (!(currency instanceof Currency)) throw new TypeError("Currency constructor expected")
 
-        Object.defineProperties(this,
-            {
-                integer: {
-                    value: integer,
-                    writable: false,
-                    configurable: true,
-                },
-                decimal: {
-                    value: decimal,
-                    writable: false,
-                    configurable: true,
-                },
-                currency: {
-                    value: currency,
-                    writable: false,
-                    configurable: true,
-                },
-            })
+        this.integer = integer
+        this.decimal = decimal
+        this.currency = currency
     }
 
     get float() {
@@ -32,6 +17,14 @@ export default class Money {
 
     get number() {
         return this.integer * (10 ** this.currency.digits) + this.decimal
+    }
+
+    get string() {
+        return this.float.toFixed(this.currency.digits)
+    }
+
+    get isZero() {
+        return (this.integer === 0 && this.decimal === 0)
     }
 
     static integer(expression, currency) {

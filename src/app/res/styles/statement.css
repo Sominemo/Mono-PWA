@@ -1,0 +1,196 @@
+.mono-cards-gallery {
+    height: 60vmin;
+    max-height: 360px;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.mono-cards-gallery-scroller {
+    height: 100%;
+    white-space: nowrap;
+}
+
+.mono-card-absolute-holder {
+    display: inline-flex;
+    width: 60%;
+    position: relative;
+    height: 100%;
+    margin: 0 5%;
+    padding-top: 5%;
+    flex-direction: column;
+}
+
+.mono-card-scroll-block {
+    display: inline;
+    outline: solid transparent;
+}
+
+.mono-card-scroll-block:nth-child(1) .mono-card-absolute-holder {
+    margin-left: 20%;
+}
+
+.mono-card-scroll-block:last-child .mono-card-absolute-holder {
+    margin-right: 20%;
+}
+
+.mono-card-absolute-visual-block {
+    height: 67%;
+}
+
+.mono-card {
+    height: 100%;
+    max-width: 350px;
+    margin: auto;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 5% 8%;
+    box-shadow: rgba(0, 0, 0, 0.6) 0 -2vmin 10vmin, rgba(255, 255, 255, 0.15) 0 10vmin 20vmin;
+    position: relative;
+    overflow: hidden;
+}
+
+.mono-card:after {
+    content: url("~@Resources/images/vector/css/chip.svg");
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    width: 12%;
+    transform: translateY(-50%);
+}
+
+.mono-card-cardholder {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-weight: 300;
+    font-size: 3vmin;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.mono-card-absolute-balance-block {
+    margin-top: auto;
+    margin-bottom: 8%;
+    text-align: center;
+    font-size: 2.5em;
+    font-weight: 300;
+    z-index: 2;
+}
+
+.mono-card-bank-image {
+    width: 60%;
+}
+
+.mono-card.mono-card-inverted::after {
+    filter: brightness(1.54);
+}
+
+.mono-card.mono-card-decorator::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.5%;
+    height: 100%;
+    background: rgba(0, 0, 0, .3);
+}
+
+.mono-card.--card-green-sideline::before {
+    background: #2DE078;
+}
+
+.mono-card.--card-red-sideline::before {
+    background: #FF4D73;
+}
+
+.mono-card.--card-blue-sideline::before {
+    background: #4BC8FE;
+}
+
+.statement-body-container {
+    transform: translateY(-5px);
+}
+
+.statement-body-container>.card.originally-null:empty {
+    transition: all .2s;
+    transform: scaleY(0);
+    min-height: 0;
+}
+
+.statement-body-container>.card {
+    min-height: calc(100vh - 60vmin - var(--size-nav-height))
+}
+
+.statement-item-category {
+    background: rgba(255, 255, 255, .2);
+    display: flex;
+    height: 42px;
+    width: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    border-radius: 50%;
+    line-height: 1;
+    font-size: 1.3em;
+    font-family: "Emoji Font";
+}
+
+.statement-item-list {
+    padding: 15px;
+    border-bottom: solid 1.5px var(--color-card-border);
+}
+
+.statement-item-list:last-child {
+    border-bottom: 0;
+}
+
+.amount-statement-item {
+    white-space: nowrap;
+    margin-left: 4px;
+}
+
+.amount-statement-item.out {
+    color: #FF7272;
+}
+
+.amount-statement-item.in {
+    color: #6df16d;
+}
+
+.statement-item-descr {
+    font-size: .8em;
+    color: #aeaeae;
+    font-family: var(--font-main), "Emoji Font";
+}
+
+@keyframes updating {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.mono-card-absolute-balance-number.updating {
+    animation: updating 1.5s;
+    transition: all .5s;
+    animation-iteration-count: infinite;
+}
+
+.statement-row-container-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

@@ -48,6 +48,7 @@ if (isRecoveryMode()) {
         overlay.style.height = "100%"
         overlay.style.display = "block"
         overlay.style.background = "white"
+        overlay.style.color = "black"
         overlay.style.overflow = "auto"
         overlay.style.userSelect = "all"
         overlay.oncontextmenu = (e) => { e.preventDefault(); document.body.removeChild(overlay) }

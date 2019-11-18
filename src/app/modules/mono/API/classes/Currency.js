@@ -11,29 +11,10 @@ export default class Currency {
 
         code = String(code).toUpperCase()
 
-        Object.defineProperties(this,
-            {
-                code: {
-                    value: code,
-                    writable: false,
-                    configurable: true,
-                },
-                number: {
-                    value: number,
-                    writable: false,
-                    configurable: true,
-                },
-                digits: {
-                    value: digits,
-                    writable: false,
-                    configurable: true,
-                },
-                currency: {
-                    value: currency,
-                    writable: false,
-                    configurable: true,
-                },
-            })
+        this.code = code
+        this.number = number
+        this.digits = digits
+        this.currency = currency
     }
 
     static code(expression) {

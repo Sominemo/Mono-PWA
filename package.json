@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "3.1.2",
+    "version": "3.2.0",
     "description": "Monobank PWA",
     "main": "index.html",
     "config": {
@@ -14,6 +14,7 @@
         "minor": "webpack --config webpack/webpack.config.js --env.minor",
         "patch": "webpack --config webpack/webpack.config.js --env.patch",
         "build-debug": "webpack --config  webpack/webpack.config.js --env.makeMaps",
+        "ci": "webpack --config webpack/webpack.config.js --env.CI",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": "git+https://github.com/Sominemo/Mono-PWA.git",
@@ -36,6 +37,7 @@
         "babel-loader": "^8.0.4",
         "bitbar-webpack-progress-plugin": "^1.0.0",
         "bundle-loader": "^0.5.6",
+        "chokidar": "^3.3.0",
         "clean-webpack-plugin": "^3.0.0",
         "copy-webpack-plugin": "^5.0.0",
         "css-loader": "^3.0.0",
@@ -72,6 +74,9 @@
         "mcc": "^2.2.0",
         "node-fetch": "^2.6.0",
         "regenerator-runtime": "^0.13.2",
-        "sjcl": "^1.0.8"
+        "requestidlecallback-polyfill": "^1.0.2",
+        "sjcl": "^1.0.8",
+        "smoothscroll-polyfill": "^0.4.4",
+        "twemoji": "^12.1.3"
     }
 }

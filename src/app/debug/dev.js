@@ -34,6 +34,8 @@ import Statement from "@App/modules/mono/API/classes/Statement"
 import Auth from "@App/modules/mono/services/Auth"
 import AuthUI from "@App/modules/mono/AuthUI"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
+import StatementStorage from "@App/modules/mono/services/StatementStorage"
+import MonoCorpAPI from "@App/modules/mono/API/clients/MonoCorpAPI"
 
 
 function compare(a, b, path = "/") {
@@ -84,6 +86,7 @@ const DevUtils = {
     CoreLoader,
     SW,
     MonoAPI,
+    MonoCorpAPI,
     APIError,
     CurrencyInfo,
     Money,
@@ -92,6 +95,7 @@ const DevUtils = {
     Statement,
     Auth,
     AuthUI,
+    StatementStorage,
 }
 
 CoreLoader.registerTask({

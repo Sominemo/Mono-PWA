@@ -1,9 +1,10 @@
 import { API } from "@App/tools/API"
 import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
+import destroyInstance from "./methods/destroyInstance"
 
 export default class MonoCorpAPI extends API {
-    constructor(token, domain, id = null) {
+    constructor(token, domain, id = null, name = "Mono Account") {
         if (typeof token !== "string") throw new TypeError("String token expected")
         if (typeof domain !== "string") throw new TypeError("String domain expected")
         super({
@@ -17,6 +18,7 @@ export default class MonoCorpAPI extends API {
             globalTimeout: 0,
             token,
             id,
+            name,
         })
     }
 
@@ -27,6 +29,8 @@ export default class MonoCorpAPI extends API {
     currency = currency.bind(this)
 
     clientInfo = clientInfo.bind(this)
+
+    _tokenErrorHandler = destroyInstance.bind(this)
 
     _authAttacher(object, request) {
         object.headers["X-Request-Id"] = this.token
