@@ -171,11 +171,15 @@ export default class Auth {
         this.updateIcons()
     }
 
-    static async addInstance(settings, accountsCache = []) {
+    static async addInstance(settings, accountsCache = [], wait = false) {
         const id = hashCode(JSON.stringify(settings))
         await (await this.accountsDB()).put({ settings, id })
         await OfflineCache.updateAccounts(id, accountsCache)
-        this.initInstances()
+        if (wait) {
+            await this.initInstances()
+        } else {
+            this.initInstances()
+        }
         return id
     }
 

@@ -381,7 +381,7 @@ export default class AuthUI {
         const a = await Auth.genInstance({ settings: set, id: 0 })
         try {
             const result = await a.clientInfo()
-            await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts)
+            await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
 
             Toast.add($$("@auth/success"))
             state.blockerPopup.close()
@@ -590,7 +590,7 @@ export default class AuthUI {
                 const set = { type: "corp", domain: `${state.settings.are.domain}/request`, token }
                 const a = await Auth.genInstance({ settings: set, id: 0 })
                 const result = await a.clientInfo()
-                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts)
+                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
                 p.close()
                 state.blockerPopup.close()
                 Toast.add($$("@auth/stage/authed"))
@@ -711,7 +711,7 @@ export default class AuthUI {
                 const a = await Auth.genInstance({ settings: set, id: 0 })
 
                 const result = await a.clientInfo()
-                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts)
+                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
 
                 if (p1) p1.close()
                 p.close()
