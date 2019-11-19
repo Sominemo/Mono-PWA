@@ -15,7 +15,7 @@
         "patch": "webpack --config webpack/webpack.config.js --env.patch",
         "build-debug": "webpack --config  webpack/webpack.config.js --env.makeMaps",
         "ci": "webpack --config webpack/webpack.config.js --env.CI",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"No tests specified\""
     },
     "repository": "git+https://github.com/Sominemo/Mono-PWA.git",
     "keywords": [],
