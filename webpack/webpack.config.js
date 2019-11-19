@@ -58,12 +58,14 @@ const builder = {
     pack: require(path.join(__root, "package.json")),
 }
 
-chokidar.watch(PATHS.themes).on("all", () => {
-    PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
-})
-
 module.exports = (env = {}) => {
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
+
+    if (!env.CI) {
+        chokidar.watch(PATHS.themes).on("all", () => {
+            PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
+        })
+    }
 
     return {
         performance: { hints: false },
