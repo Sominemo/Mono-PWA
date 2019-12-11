@@ -4,7 +4,7 @@ Monobank Progressive Web Application
 [Бета](https://github.com/Sominemo/Mono-PWA/blob/master/CONTRIBUTING.MD#тестирование)  
 *<sup>общедоступный, бесплатный, с открытым исходным кодом</sup>*
 
-## Список возможнотей - [Лендинг](https://sominemo.com/mono)
+## Список возможностей - [Лендинг](https://sominemo.com/mono)
 ### Работа с профилями
 - Добавление нескольких профилей Monobank
 - Неограниченное количество привязываемых устройств - [Список устройств](https://api.monobank.ua)
