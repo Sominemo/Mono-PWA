@@ -1,8 +1,8 @@
 # Содержание
 
 Не хочу читать,
-* [У меня проблема!](https://github.com/Sominemo/mono-PWA/issues/new/choose)
-* [У меня предложение!](https://github.com/Sominemo/mono-PWA/issues/new/choose)
+* [У меня проблема!](https://github.com/SominemoMono-PWA/issues/new/choose)
+* [У меня предложение!](https://github.com/SominemoMono-PWA/issues/new/choose)
 
 [Связь](#связь)
 
@@ -17,7 +17,7 @@
 [Pull-запросы](#pull-запросы)
 
 # Связь
-Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/Sominemo/mono-PWA/)
+Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/SominemoMono-PWA/)
 
 # Тестирование
 
@@ -27,7 +27,7 @@
 ## Как сообщать о ошибках
 1) Убедитесь, что у вас последняя сборка: перегрузите страницу, подождите, не возникает ли предложение о перезагрузке, сверьте версию с информацией в чате и т.д.
 2) Убедитесь, используя поиск и/или тег bug, не был ли случайно баг обнаружен ранее
-3) Заполните форму https://github.com/Sominemo/mono-PWA/issues/new/choose
+3) Заполните форму https://github.com/SominemoMono-PWA/issues/new/choose
 
 ## Белый экран
 ### Если сборка должна работать

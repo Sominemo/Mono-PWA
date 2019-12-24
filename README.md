@@ -1,7 +1,7 @@
 # monobank PWA
 monobank Progressive Web Application  
 Неофициальный клиент monobank - [Открыть](https://mono.sominemo.com) - 
-[Бета](https://github.com/Sominemo/mono-PWA/blob/master/CONTRIBUTING.MD#тестирование)  
+[Бета](https://github.com/SominemoMono-PWA/blob/master/CONTRIBUTING.MD#тестирование)  
 *<sup>общедоступный, бесплатный, с открытым исходным кодом</sup>*
 
 ## Список возможностей - [Лендинг](https://sominemo.com/mono)
