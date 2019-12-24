@@ -1,4 +1,4 @@
-/* global __PACKAGE_WG */
+/* global __PACKAGE_WG, __PACKAGE_ANALYTICS */
 
 import App from "@Core/Services/app"
 import { SVG } from "@Environment/Library/DOM/basic"
@@ -20,7 +20,15 @@ export default class PWA extends App {
         return __PACKAGE_WG
     }
 
+    static get analyticsAllowed() {
+        if (!this.isWG && this.analyticsDenyCache) return false
+        return __PACKAGE_ANALYTICS
+    }
+
+    static analyticsDenyCache = false
+
     static InitAboutScreen() {
+        Navigation.updateTitle($$("@about/app"))
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
 

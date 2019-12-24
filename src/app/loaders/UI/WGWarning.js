@@ -15,7 +15,7 @@ CoreLoader.registerTask({
         function popupOpen() {
             SettingsStorage.setFlag("wg_popup_first_seen", true)
             const w = Prompt({
-                title: "Mono PWA Working Group",
+                title: "mono PWA Working Group",
                 centredTitle: true,
                 text: new DOM({
                     new: "div",
@@ -42,7 +42,7 @@ CoreLoader.registerTask({
         }
 
         if (firstSeen) {
-            Toast.add("Добро пожаловать в программу тестирования Mono PWA", -1, {
+            Toast.add("Добро пожаловать в программу тестирования mono PWA", -1, {
                 buttons: [
                     {
                         content: "Инфо",

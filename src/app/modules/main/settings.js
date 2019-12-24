@@ -12,6 +12,7 @@ import { CoreLoader } from "@Core/Init/CoreLoader"
 
 export default class SettingsUI {
     static async Init() {
+        Navigation.updateTitle($$("@settings"))
         const w = new WindowContainer()
         const l = SettingsLayoutManager.layout
 

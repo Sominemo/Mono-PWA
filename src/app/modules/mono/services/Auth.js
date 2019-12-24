@@ -4,6 +4,9 @@ import { Nav } from "@Environment/Library/DOM/buildBlock"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import DBTool from "@Core/Tools/db/DBTool"
 import hashCode from "@Core/Tools/transformation/text/hashCode"
+import PWA from "@App/modules/main/PWA"
+import delayAction from "@Core/Tools/objects/delayAction"
+import Report from "@Core/Services/report"
 import MonoAPI from "../API/clients/MonoAPI"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAnonymousAPI from "../API/clients/MonoAnonymousAPI"
@@ -169,6 +172,17 @@ export default class Auth {
         this._mainInstance = await this.getMainInstance()
         StatementStorage.syncCardStorageList()
         this.updateIcons()
+
+        if (PWA.analyticsAllowed) {
+            delayAction(() => {
+                const accountsCount = Auth.all.filter(
+                    (obj, pos, arr) => arr.map(mapObj => mapObj.name)
+                        .indexOf(obj.name) === pos,
+                ).length
+
+                window.gtag("set", { user_properties: { bank_accounts_count: accountsCount } })
+            })
+        }
     }
 
     static async addInstance(settings, accountsCache = [], wait = false) {

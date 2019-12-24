@@ -10,6 +10,7 @@ import Auth from "./services/Auth"
 
 export default class MenuUI {
     static async Init() {
+        Navigation.updateTitle($$("menu"))
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
 
@@ -74,5 +75,7 @@ CoreLoader.registerTask({
         Navigation.defaultScreen = () => {
             Navigation.url = { module: "menu" }
         }
+
+        Navigation.titleFallback = "monobank"
     },
 })

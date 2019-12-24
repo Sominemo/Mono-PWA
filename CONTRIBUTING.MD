@@ -1,8 +1,8 @@
 # Содержание
 
 Не хочу читать,
-* [У меня проблема!](https://github.com/Sominemo/Mono-PWA/issues/new/choose)
-* [У меня предложение!](https://github.com/Sominemo/Mono-PWA/issues/new/choose)
+* [У меня проблема!](https://github.com/Sominemo/mono-PWA/issues/new/choose)
+* [У меня предложение!](https://github.com/Sominemo/mono-PWA/issues/new/choose)
 
 [Связь](#связь)
 
@@ -17,7 +17,7 @@
 [Pull-запросы](#pull-запросы)
 
 # Связь
-Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/Sominemo/Mono-PWA/)
+Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/Sominemo/mono-PWA/)
 
 # Тестирование
 
@@ -27,7 +27,7 @@
 ## Как сообщать о ошибках
 1) Убедитесь, что у вас последняя сборка: перегрузите страницу, подождите, не возникает ли предложение о перезагрузке, сверьте версию с информацией в чате и т.д.
 2) Убедитесь, используя поиск и/или тег bug, не был ли случайно баг обнаружен ранее
-3) Заполните форму https://github.com/Sominemo/Mono-PWA/issues/new/choose
+3) Заполните форму https://github.com/Sominemo/mono-PWA/issues/new/choose
 
 ## Белый экран
 ### Если сборка должна работать
@@ -57,7 +57,7 @@
 Окно с логами будет появляться при каждой новой строчке логов, переграждая весь контент
 
 ## Сброс приложения
-Следуйте [инструкциям](https://temply.procsec.top/help/article/ru/troubleshoot-loading-error), они идентичны к Mono PWA.
+Следуйте [инструкциям](https://temply.procsec.top/help/article/ru/troubleshoot-loading-error), они идентичны к mono PWA.
 
 # Pull-запросы
 В данный репозиторий принимаются pull-запросы, нужны:

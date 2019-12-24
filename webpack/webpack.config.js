@@ -17,6 +17,7 @@ const mccCodes = require("mcc/emojiMap")
 const __root = process.cwd()
 
 const PROD = process.env.NODE_ENV === "production"
+const DOWNLOAD_LANG_PACKS = false
 
 const PATHS = {
     root: __root,
@@ -61,13 +62,25 @@ const builder = {
 module.exports = (env = {}) => {
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
 
-    if (!env.CI) {
-        chokidar.watch(PATHS.themes).on("all", () => {
-            PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
-        })
+    const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
+
+    if (env.watch && !env.CI) {
+        const cb = () => {
+            try {
+                PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
+            } catch (e) {
+                console.warn("File is busy")
+            }
+        }
+
+        chokidar.watch(PATHS.themes)
+            .on("add", cb)
+            .on("change", cb)
+            .on("unlink", cb)
     }
 
     return {
+        watch: !!env.watch,
         performance: { hints: false },
         optimization: {
             namedChunks: true,
@@ -80,17 +93,18 @@ module.exports = (env = {}) => {
                         name: "vendor",
                         enforce: true,
                     },
-                    language: {
-                        test: /language[\\/].+[\\/]/,
-                        enforce: true,
-                        name(module, chunks) {
-                        // get the name. E.g. node_modules/packageName/not/this/part.js
-                        // or node_modules/packageName
-                            const packageName = module.context.match(/language[\\/](.*?)([\\/]|$)/)[1]
-                            // npm package names are URL-safe, but some servers don't like @ symbols
-                            return `.assets/language/${packageName.replace("@", "")}`
+                    ...(DOWNLOAD_LANG_PACKS ? {
+                        language: {
+                            test: /language[\\/].+[\\/]/,
+                            enforce: true,
+                            name(module, chunks) {
+                                const packageName = module.context
+                                    .match(/language[\\/](.*?)([\\/]|$)/)[1]
+                                return `.assets/language/${packageName.replace("@", "")}`
+                            },
                         },
-                    },
+                    } : {}),
+
                 },
             },
             ...(PROD ? {
@@ -213,25 +227,26 @@ module.exports = (env = {}) => {
                 },
             }),
             new HtmlWebpackPlugin({
-                title: "Monobank",
+                title: "monobank",
                 favicon: path.join(PATHS.resources, "images", "logo", "favicon.ico"),
-                template: path.join(PATHS.source, "index.html"),
+                template: path.join(PATHS.source, "index.ejs"),
                 inject: "head",
                 charset: "utf-8",
                 meta: {
                     viewport: "width=device-width, initial-scale=1.0, maximum-scale=5.0",
-                    description: "Monobank Progressive Web Application",
+                    description: "monobank Progressive Web Application",
                 },
                 prefetch: [
                     "https://fonts.googleapis.com/css?family=Roboto:400,500&subset=cyrillic",
                     "https://fonts.googleapis.com/css?family=IM+Fell+English:400,400italic|Product+Sans",
                 ],
+                gTag: ANALYTICS_TAG,
             }),
             new ResourceHintWebpackPlugin(),
             new WebpackPwaManifest({
-                name: `Monobank${env.WG ? " WG" : ""}`,
-                short_name: `Mono${env.WG ? " WG" : ""}`,
-                description: "Monobank Progressive Web Application",
+                name: `monobank${env.WG ? " WG" : ""}`,
+                short_name: `mono${env.WG ? " WG" : ""}`,
+                description: "monobank Progressive Web Application",
                 background_color: "#181A1D",
                 theme_color: "#181A1D",
                 start_url: "/",
@@ -252,6 +267,7 @@ module.exports = (env = {}) => {
                 navigateFallback: "/",
                 navigateFallbackBlacklist: [/^\/\.well-known/, /^\/\.assets/, /^\/favicon\.ico$/, /^\/sw\.js$/],
                 directoryIndex: "index.html",
+                offlineGoogleAnalytics: env.ANALYTICS,
                 runtimeCaching: [
                     {
                         urlPattern: /language/,
@@ -282,6 +298,8 @@ module.exports = (env = {}) => {
                 __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
                 __PACKAGE_CHANGELOG: JSON.stringify([]),
                 __PACKAGE_WG: JSON.stringify(!!env.WG),
+                __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
+                __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
                 __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
             }),
         ],

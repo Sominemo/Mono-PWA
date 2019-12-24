@@ -2,12 +2,13 @@ import cc from "currency-codes"
 
 export default class Currency {
     constructor({
-        code, number, digits, currency,
+        code, number, digits, currency, countries,
     }) {
         if (!(typeof code === "string")) throw new TypeError("Incorrect currency code")
         if (!Number.isInteger(number) || number < 0) throw new TypeError("Incorrect number")
         if (!Number.isInteger(digits) || digits < 0) throw new TypeError("Incorrect digits amount")
         if (!(typeof currency === "string")) throw new TypeError("Incorrect currency name")
+        if (!Array.isArray(countries) || countries.some(e => typeof e !== "string")) throw new TypeError("Incorrect countries")
 
         code = String(code).toUpperCase()
 
@@ -15,6 +16,7 @@ export default class Currency {
         this.number = number
         this.digits = digits
         this.currency = currency
+        this.countries = countries
     }
 
     static code(expression) {
@@ -30,14 +32,26 @@ export default class Currency {
     }
 
     static number(expression) {
-        const info = cc.number(String(expression))
-        if (!info) throw new Error("Unknown currency")
+        const expr = String(expression).padStart(3, "0")
+        let info = cc.number(expr)
+        if (!info) {
+            // throw new Error("Unknown currency")
+
+            info = {
+                code: expr,
+                number: "000",
+                digits: 2,
+                currency: `#${expr}`,
+                countries: [],
+            }
+        }
 
         return new Currency({
             code: info.code,
             number: Number.parseInt(info.number, 10),
             digits: info.digits,
             currency: info.currency,
+            countries: info.countries,
         })
     }
 

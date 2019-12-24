@@ -27,6 +27,7 @@ import Account from "./API/classes/Account"
 
 export default class StatementUI {
     static async Init() {
+        Navigation.updateTitle($$("@statement"))
         if (!Auth.isAnyAuthed) {
             Navigation.url = { module: "auth" }
             return
@@ -75,7 +76,7 @@ export default class StatementUI {
                     ["center", "row"], { padding: "15px" },
                 )
                 statementBody.render(thisLoader)
-                window.requestIdleCallback(async () => {
+                window.requestAnimationFrame(async () => {
                     prevDate = fromDate
                     fromDate -= 1000 * 60 * 60 * 24 * 7
                     genList(Array.from(
@@ -225,10 +226,10 @@ export default class StatementUI {
                 )
 
                 contentCard.clear()
-                window.requestIdleCallback(() => genList(cont))
+                window.requestAnimationFrame(() => genList(cont))
             }
 
-            window.requestIdleCallback(requestFirstData)
+            window.requestAnimationFrame(requestFirstData)
         })
 
         statementBody = new DOM({
@@ -368,7 +369,7 @@ export default class StatementUI {
             })
         }
 
-        window.requestIdleCallback(updateCards)
+        window.requestAnimationFrame(updateCards)
 
 
         function visibleWidth(card, container) {

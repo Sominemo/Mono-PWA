@@ -44,7 +44,7 @@ export default function Account({
         },
         statement: {
             async value(from, to = new Date()) {
-                if (!mono || !mono.authed) throw new Error("No access to Mono")
+                if (!mono || !mono.authed) throw new Error("No access to mono")
                 if (!(from instanceof Date && to instanceof Date)) throw new TypeError("Date constructor expected")
 
                 const fromTime = Math.floor(from.getTime() / 1000)

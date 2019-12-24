@@ -40,6 +40,14 @@ CoreLoader.registerTask({
                     onfail: async (a, b, c) => { await c(!!a); return true },
                 },
             },
+            {
+                name: "deny_analytics",
+                rule: {
+                    default: !!window.navigator.doNotTrack || false,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                },
+            },
         ], "flags")
 
         SettingsCheckProvider.setRules([

@@ -6,7 +6,7 @@ import { CoreLoader } from "@Core/Init/CoreLoader"
 import { Title } from "@Environment/Library/DOM/object"
 import loadingPopup from "@App/library/loadingPopup"
 import {
-    Card, CardList,
+    Card, CardList, CardContent,
 } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
@@ -18,6 +18,7 @@ import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/W
 import reflect from "@Core/Tools/objects/reflect"
 import SlideOut from "@Environment/Library/Animations/slideOut"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
+import IconSide from "@Environment/Library/DOM/object/iconSide"
 import Auth from "./services/Auth"
 import Money from "./API/classes/Money"
 import OfflineCache from "./services/OfflineCache"
@@ -25,6 +26,7 @@ import parseCurrencyRAW from "./API/parsers/currency"
 
 export default class CurrencyUI {
     static async Init() {
+        Navigation.updateTitle($$("@currency"))
         const self = this
         const w = new WindowContainer()
         const b = new DOM({ new: "div" })
@@ -247,6 +249,7 @@ export default class CurrencyUI {
                     handler() {
                         converter(element)
                     },
+                    data: element,
                 },
             )
         })
@@ -289,9 +292,42 @@ export default class CurrencyUI {
                 ),
             )
         }
-
+        let searchbox
         if (cross.length) {
             w.render(new Title($$("@currency/payment_systems"), 2))
+            w.render(searchbox = new Card(
+                new CardContent(
+                    new IconSide(
+                        "search",
+                        new ContentEditable({
+                            placeholder: $$("search"),
+                            onEnter(v, ev) { ev.preventDefault() },
+                            onKey(v) {
+                                v = v.toUpperCase()
+                                cross.forEach((el) => {
+                                    let trigger = false
+
+                                    if (el.data.currencyA.currency
+                                        .toUpperCase().indexOf(v) !== -1) trigger = true
+                                    else if (String(el.data.currencyA.number)
+                                        .padStart(3, "0").indexOf(v) !== -1) trigger = true
+                                    else if (el.data.currencyA.code
+                                        .toUpperCase().indexOf(v) !== -1) trigger = true
+                                    else if (el.data.currencyA.countries
+                                        .some(e => e.toUpperCase()
+                                            .indexOf(v) !== -1)) trigger = true
+
+                                    el.content.parent.parent.style({ display: (trigger ? "" : "none") })
+                                })
+                                searchbox.scrollIntoView(true)
+                            },
+                        }),
+                        {
+                            contentStyle: { flexGrow: "1", marginTop: "-10px" },
+                        },
+                    ),
+                ),
+            ))
             w.render(
                 new Card(
                     new CardList([

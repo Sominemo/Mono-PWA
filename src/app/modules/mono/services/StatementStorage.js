@@ -1,8 +1,12 @@
 import DBTool from "@Core/Tools/db/DBTool"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
+import delayAction from "@Core/Tools/objects/delayAction"
+import modeString from "@App/tools/transform/modeString"
+import PWA from "@App/modules/main/PWA"
 import Auth from "./Auth"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAPI from "../API/clients/MonoAPI"
+import MCC from "../API/classes/MCC"
 
 export default class StatementStorage {
     static async get(id, from, to) {
@@ -44,7 +48,7 @@ export default class StatementStorage {
             const ci = await account.clientInfo({ preferOffline })
             ci.accounts.forEach((e) => {
                 if (!(e.client instanceof MonoAPI
-                     && cardList.get(e.id) && cardList.get(e.id).client instanceof MonoCorpAPI)) {
+                    && cardList.get(e.id) && cardList.get(e.id).client instanceof MonoCorpAPI)) {
                     cardList.set(e.id, (objects ? e : e.id))
                 }
             })
@@ -54,10 +58,23 @@ export default class StatementStorage {
     }
 
     static async addItems(id, data) {
-        const db = (await this.statementDB()).OSTool(id)
-        await Promise.all(data.map(async (e) => {
+        const dbTool = await this.statementDB()
+        const db = (dbTool).OSTool(id)
+        const cnt = (await Promise.all(data.map(async (e) => {
             if (!((await db.getWhere(null, v => v.id === e.id)).length)) db.put(e)
-        }))
+        }))).length
+
+        if (cnt && PWA.analyticsAllowed) {
+            delayAction(async () => {
+                const t = await dbTool.getTablesList()
+
+                const res = modeString([].concat(...await Promise.all(
+                    t.map(async p => (await (dbTool).OSTool(p).getAll())
+                        .map(e => new MCC(e.mcc).title)),
+                )))
+                window.gtag("set", { user_properties: { popular_spend_category: res } })
+            })
+        }
     }
 
     static upgradeDB(explict = false, nonUpgrade = false) {

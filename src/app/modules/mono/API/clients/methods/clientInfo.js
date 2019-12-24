@@ -5,6 +5,7 @@ import Client from "../../classes/Client"
 export default async function clientInfo({ preferOffline = false } = {}) {
     let data = {}
     let self = this
+    let online = true
     try {
         if (preferOffline) throw new Error("Use offline")
         data = await this.call("personal/client-info", {
@@ -16,6 +17,7 @@ export default async function clientInfo({ preferOffline = false } = {}) {
     } catch (e) {
         data.accounts = await OfflineCache.getAccounts(this.id) || []
         data.name = this.name
+        online = false
     }
 
 
@@ -25,5 +27,5 @@ export default async function clientInfo({ preferOffline = false } = {}) {
         await Auth.updateName(this.id, data.name)
         self = Auth.getInstanceByID(this.id)
     }
-    return new Client(data.name, data.accounts, self, data)
+    return new Client(data.name, data.accounts, self, data, online)
 }

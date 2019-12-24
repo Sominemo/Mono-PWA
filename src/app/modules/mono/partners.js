@@ -40,6 +40,7 @@ export default class PartnersUI {
     }
 
     static async Init() {
+        Navigation.updateTitle($$("p4"))
         const self = this
         const w = new WindowContainer()
         const b = new DOM({ new: "div" })

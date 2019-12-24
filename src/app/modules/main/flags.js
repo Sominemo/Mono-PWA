@@ -1,3 +1,4 @@
+/* global __PACKAGE_ANALYTICS */
 import { WindowContainer } from "@Environment/Library/DOM/buildBlock"
 import WindowManager from "@Core/Services/SimpleWindowManager"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
@@ -11,9 +12,11 @@ import App from "@Core/Services/app"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import { SVG } from "@Environment/Library/DOM/basic"
 import { CoreLoader } from "@Core/Init/CoreLoader"
+import PWA from "./PWA"
 
 export default class FlagsUI {
     static async Init() {
+        Navigation.updateTitle($$("experiments"))
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
         const testEnabled = !!await SettingsStorage.getFlag("test_field_enabled")
@@ -59,17 +62,28 @@ export default class FlagsUI {
         ]))
         const exps = []
 
+        if (__PACKAGE_ANALYTICS) {
+            if (!PWA.isWG) {
+                exps.push({
+                    title: "Отказаться от сбора данных",
+                    about: `Отключить сервис Google Analytics и прекратить сбор деперсонифицированных данных,
+которые используются для улучшения опыта использования (подробнее в меню "О программе" › "Дисклеймер").
+Данная настройка включается автоматически, если в браузере включены Do Not Track запросы`,
+                    id: "deny_analytics",
+                })
+            }
+        }
+
         if (App.debug) {
             exps.push({
-                title: "Displaying 'Experiments' section in settings menu",
-                about: "Enables 'Miscellaneous' group and a link to 'Experiments' section for main settings menu",
+                title: "Показать меню «Эксперименты» в меню",
+                about: "Добавляет эту страницу в меню настроек",
                 id: "miscellaneous_in_settings",
             })
             exps.push({
-                title: "TAB-powered navigation",
-                about: `Adds tabIndex attributes to all clickable elements so they can be
-                focused by pressing the 'TAB' button and adds event listener for the 'Enter' key to simulate
-                click event for current active element`,
+                title: "Навигация с помощью клавиши TAB",
+                about: `Симуляция навигации по приложению, где нажатие на TAB равноценно
+переходу к следующему элементу, а нажатие Enter — клику по элементу`,
                 id: "enable_tab_navigation",
             })
         }

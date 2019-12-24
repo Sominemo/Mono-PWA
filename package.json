@@ -1,30 +1,30 @@
 {
     "name": "mono-pwa",
-    "version": "3.2.1",
-    "description": "Monobank PWA",
+    "version": "3.2.3",
+    "description": "monobank PWA",
     "main": "index.html",
     "config": {
         "branch": "master"
     },
     "scripts": {
-        "build": "webpack --config webpack/webpack.config.js --watch",
-        "local": "webpack-dev-server --config webpack/webpack.config.js --env.LOCAL --watch",
-        "wg": "webpack --config webpack/webpack.config.js --env.WG --watch",
-        "major": "webpack --config webpack/webpack.config.js --env.major",
-        "minor": "webpack --config webpack/webpack.config.js --env.minor",
-        "patch": "webpack --config webpack/webpack.config.js --env.patch",
-        "build-debug": "webpack --config  webpack/webpack.config.js --env.makeMaps",
+        "build": "webpack --config webpack/webpack.config.js --env.ANALYTICS",
+        "local": "webpack-dev-server --config webpack/webpack.config.js --env.LOCAL --env.watch",
+        "wg": "webpack --config webpack/webpack.config.js --env.WG --env.ANALYTICS --env.watch",
+        "major": "webpack --config webpack/webpack.config.js --env.major --env.ANALYTICS",
+        "minor": "webpack --config webpack/webpack.config.js --env.minor --env.ANALYTICS",
+        "patch": "webpack --config webpack/webpack.config.js --env.patch --env.ANALYTICS",
+        "build-debug": "webpack --config  webpack/webpack.config.js --env.makeMaps --env.ANALYTICS",
         "ci": "webpack --config webpack/webpack.config.js --env.CI",
         "test": "echo \"No tests specified\""
     },
-    "repository": "git+https://github.com/Sominemo/Mono-PWA.git",
+    "repository": "git+https://github.com/Sominemo/mono-PWA.git",
     "keywords": [],
     "author": "Sominemo <me@sominemo.com>",
     "license": "GPL-2.0",
     "bugs": {
-        "url": "https://github.com/Sominemo/Mono-PWA/issues"
+        "url": "https://github.com/Sominemo/mono-PWA/issues"
     },
-    "homepage": "https://github.com/Sominemo/Mono-PWA#readme",
+    "homepage": "https://github.com/Sominemo/mono-PWA#readme",
     "devDependencies": {
         "@babel/core": "^7.7.2",
         "@babel/plugin-proposal-class-properties": "^7.7.0",
