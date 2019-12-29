@@ -1,5 +1,5 @@
 import Cashback from "../Cashback"
-import Currency from "../Currency"
+import { Currency } from "../Currency"
 import Money from "../Money"
 
 export default class MoneyCashback extends Cashback {

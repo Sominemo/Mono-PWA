@@ -14,7 +14,7 @@ export default class Statement {
                     new StatementItem(item, account),
                 )
             } catch (e) {
-                Report.error("Failed to construct StatementItem", JSON.parse(JSON.stringify(item)))
+                Report.error("Failed to construct StatementItem", JSON.parse(JSON.stringify(item)), e)
             }
         })
     }

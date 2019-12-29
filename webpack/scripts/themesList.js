@@ -3,9 +3,9 @@ const {
 } = require("fs")
 const { join } = require("path")
 
-const isDirectory = source => lstatSync(source[0]).isDirectory()
-const getDirectories = source => readdirSync(source)
-    .map(name => [join(source, name), name])
+const isDirectory = (source) => lstatSync(source[0]).isDirectory()
+const getDirectories = (source) => readdirSync(source)
+    .map((name) => [join(source, name), name])
     .filter(isDirectory)
 
 const getVar = (theme, name) => (theme.match(RegExp(`--${name}: (.+?);`, "m")) || [])[1]
@@ -40,7 +40,7 @@ function getThemesFolderMap(path) {
 function getThemesMap(paths) {
     if (!Array.isArray(paths)) return getThemesFolderMap(paths)
     return paths.reduce((r, i) => [...r, ...getThemesFolderMap(i)], [])
-        .filter((a, i, self) => i === self.findIndex(t => (
+        .filter((a, i, self) => i === self.findIndex((t) => (
             t.dir === a.dir
         )))
 }

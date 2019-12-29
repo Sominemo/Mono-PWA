@@ -3,9 +3,9 @@ const {
 } = require("fs")
 const { join } = require("path")
 
-const isDirectory = source => lstatSync(source[0]).isDirectory()
-const getDirectories = source => readdirSync(source)
-    .map(name => [join(source, name), name])
+const isDirectory = (source) => lstatSync(source[0]).isDirectory()
+const getDirectories = (source) => readdirSync(source)
+    .map((name) => [join(source, name), name])
     .filter(isDirectory)
 
 function getLangMap(path) {

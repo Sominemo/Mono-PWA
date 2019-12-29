@@ -1,6 +1,6 @@
 import MCC from "./MCC"
 import Money from "./Money"
-import Currency from "./Currency"
+import { Currency } from "./Currency"
 import cashback from "../parsers/cashback"
 
 export default class StatementItem {

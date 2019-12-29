@@ -45,7 +45,7 @@ export default class CurrencyUI {
                     Auth.instance.currency(true),
                     Toast.add(text, -1),
                 ].map(reflect),
-            )).map(e => e.data)
+            )).map((e) => e.data)
 
             if (cur instanceof APIError || cur instanceof Error) {
                 text.clear(new DOM({ type: "text", new: $$("@currency/error_refresh") }))
@@ -236,7 +236,7 @@ export default class CurrencyUI {
                                 ...(element.cross
                                     ? [String(element.rateBuy)]
                                     : [String(element.rateBuy), String(element.rateSell)])
-                                    .map(e => new DOM({
+                                    .map((e) => new DOM({
                                         new: "div",
                                         content: e,
                                         style: {
@@ -314,7 +314,7 @@ export default class CurrencyUI {
                                     else if (el.data.currencyA.code
                                         .toUpperCase().indexOf(v) !== -1) trigger = true
                                     else if (el.data.currencyA.countries
-                                        .some(e => e.toUpperCase()
+                                        .some((e) => e.toUpperCase()
                                             .indexOf(v) !== -1)) trigger = true
 
                                     el.content.parent.parent.style({ display: (trigger ? "" : "none") })

@@ -32,7 +32,7 @@ export default function generateDBSettingsLayout(act) {
                         ? [
                             new IconSide(
                                 "warning",
-                                (e.functions.find(er => er.name === "auto-clean") ? $$("@settings/storage/cleanup_planned") : $$("@settings/storage/over_quota")),
+                                (e.functions.find((er) => er.name === "auto-clean") ? $$("@settings/storage/cleanup_planned") : $$("@settings/storage/over_quota")),
                             ),
                         ]
                         : []),
@@ -71,7 +71,7 @@ export default function generateDBSettingsLayout(act) {
                     {
                         content: new DOM({
                             new: "div",
-                            content: e.actions.map(action => new Button({
+                            content: e.actions.map((action) => new Button({
                                 content: action.name,
                                 async handler(...a) {
                                     await action.handler(...a)

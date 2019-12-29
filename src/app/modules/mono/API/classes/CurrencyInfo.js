@@ -1,4 +1,4 @@
-import Currency from "./Currency"
+import { Currency } from "./Currency"
 import Money from "./Money"
 
 export default class CurrencyInfo {

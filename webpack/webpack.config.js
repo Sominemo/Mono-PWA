@@ -53,7 +53,7 @@ const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
 makeLangMap(PATHS.language, PATHS.generated)
 makeThemesMap(PATHS.themes, PATHS.generated)
 const mccEmojiMap = mccEmoji(mccCodes)
-PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
+PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
 
 const builder = {
     pack: require(path.join(__root, "package.json")),
@@ -67,7 +67,7 @@ module.exports = (env = {}) => {
     if (env.watch && !env.CI) {
         const cb = () => {
             try {
-                PATHS.themes.map(el => fs.copySync(el, PATHS.themesGenerated))
+                PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
             } catch (e) {
                 console.warn("File is busy")
             }
@@ -167,11 +167,11 @@ module.exports = (env = {}) => {
                 {
                     test: /\.css$/,
                     exclude: /theme\.css$/,
-                    use: ["style-loader", "css-loader"],
+                    use: [{ loader: "style-loader", options: { injectType: "styleTag" } }, { loader: "css-loader" }],
                 },
                 {
                     test: /theme\.css$/,
-                    loader: "style-loader/useable!css-loader",
+                    use: [{ loader: "style-loader", options: { injectType: "lazyStyleTag" } }, { loader: "css-loader" }],
                 },
                 {
                     test: /\.svg$/,

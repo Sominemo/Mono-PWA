@@ -11,6 +11,7 @@ export default function destroyInstance() {
                 {
                     content: $$("@auth/reload"),
                     handler() {
+                        // eslint-disable-next-line no-self-assign
                         Navigation.url = Navigation.url
                     },
                 },

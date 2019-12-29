@@ -60,7 +60,7 @@ export default class PartnersUI {
                     self.partnersGetter(),
                     Toast.add(text, -1),
                 ].map(reflect),
-            )).map(e => e.data)
+            )).map((e) => e.data)
 
             if (cur instanceof APIError || cur instanceof Error) {
                 text.clear(new DOM({ type: "text", new: $$("@currency/error_refresh") }))
@@ -90,7 +90,7 @@ export default class PartnersUI {
             interator(self.categories.values())
 
             let selection = false
-            if (filterKey) selection = opts.findIndex(e => e.value === filterKey)
+            if (filterKey) selection = opts.findIndex((e) => e.value === filterKey)
             if (selection === -1) opts.push({ content: filterKey, value: filterKey })
 
             const p = Prompt({
@@ -206,8 +206,8 @@ export default class PartnersUI {
             const right = []
             const info = []
 
-            item.categories.forEach(c => this.categories.set(c.id, c))
-            if (filter) if (!item.categories.find(e => e.id === filter)) return
+            item.categories.forEach((c) => this.categories.set(c.id, c))
+            if (filter) if (!item.categories.find((e) => e.id === filter)) return
 
             if (typeof item.note === "string" && item.note.length > 0) {
                 right.push(new Icon("info"))

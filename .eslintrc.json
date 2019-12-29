@@ -5,6 +5,7 @@
     },
     "settings": {
         "import/resolver": {
+            "node": {},
             "webpack": {
                 "config": "./webpack/webpack.config.js"
             }
@@ -45,6 +46,8 @@
         "import/no-cycle": "off",
         "no-bitwise": "off",
         "class-methods-use-this": "off",
+        "max-classes-per-file": "off",
+        "no-async-promise-executor": "off",
         "no-unused-vars": [
             "error",
             {

@@ -10,7 +10,7 @@ export default function generateLanguageList(act) {
     const langs = LanguageCore.languageList
     const current = LanguageCore.language.info.code
 
-    const list = langs.map(lang => ({
+    const list = langs.map((lang) => ({
         content: new DOM({
             new: "div",
             content: [

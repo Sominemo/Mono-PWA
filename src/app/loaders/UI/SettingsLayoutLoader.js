@@ -14,7 +14,7 @@ import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/W
 import { TwoSidesWrapper, Icon } from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
 import MonoAPI from "@App/modules/mono/API/clients/MonoAPI"
-import { CardTextList, CardList } from "@Environment/Library/DOM/object/card"
+import { CardList } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
@@ -113,6 +113,7 @@ CoreLoader.registerTask({
                                         event: "click",
                                         async handler() {
                                             await Auth.destroyInstance(account.id)
+                                            // eslint-disable-next-line no-self-assign
                                             Navigation.url = Navigation.url
                                         },
                                     },
@@ -127,7 +128,7 @@ CoreLoader.registerTask({
                     })
 
                     return new CardList([
-                        ...elements.map(content => ({ content })),
+                        ...elements.map((content) => ({ content })),
                         {
                             content: new Align([
                                 new Icon("add", { fontSize: "32px", opacity: 0.5, marginRight: "10px" }),

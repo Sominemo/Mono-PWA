@@ -57,7 +57,7 @@ export default class MonoAuth {
                         Toast.add("In development")
                     },
                 }),
-            ].map(e => new DOM({ new: "div", content: e, style: { display: "flex", flexDirection: "column" } })),
+            ].map((e) => new DOM({ new: "div", content: e, style: { display: "flex", flexDirection: "column" } })),
             style: {
                 display: "flex",
                 flexDirection: "column",
@@ -127,7 +127,7 @@ export default class MonoAuth {
                         box.close()
                     },
                 }),
-            ].map(e => new DOM({ new: "div", content: e, style: { display: "flex", flexDirection: "column" } })),
+            ].map((e) => new DOM({ new: "div", content: e, style: { display: "flex", flexDirection: "column" } })),
             style: {
                 display: "flex",
                 flexDirection: "column",

@@ -21,7 +21,7 @@ CoreLoader.registerTask({
                     new: "div",
                     content: [
                         "Использование этой сборки предполагает участие в чате Telegram и сообщение о найденых ошибках",
-                    ].map(e => new DOM({ new: "p", content: e, style: { margin: "10px" } })),
+                    ].map((e) => new DOM({ new: "p", content: e, style: { margin: "10px" } })),
                 }),
                 buttons: [
                     {

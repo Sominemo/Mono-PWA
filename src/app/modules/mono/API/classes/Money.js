@@ -1,4 +1,4 @@
-import Currency from "./Currency"
+import { Currency } from "./Currency"
 
 export default class Money {
     constructor(integer, decimal, currency) {

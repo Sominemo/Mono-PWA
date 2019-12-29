@@ -32,11 +32,11 @@ CoreLoader.registerTask({
             actions: [
                 {
                     name: $$("@settings/storage/actions/clear"),
-                    handler: () => DBUserPresence.get("LogData").functions.find(e => e.name === "clear").handler(),
+                    handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "clear").handler(),
                 },
                 {
                     name: $$("@settings/storage/actions/export"),
-                    handler: () => DBUserPresence.get("LogData").functions.find(e => e.name === "export").handler(),
+                    handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "export").handler(),
                 },
             ],
             functions: [
@@ -87,7 +87,7 @@ CoreLoader.registerTask({
             actions: [
                 {
                     name: $$("@settings/storage/actions/clear"),
-                    handler: () => DBUserPresence.get("OfflineCache").functions.find(e => e.name === "clear").handler(),
+                    handler: () => DBUserPresence.get("OfflineCache").functions.find((e) => e.name === "clear").handler(),
                 },
             ],
             functions: [
@@ -97,7 +97,7 @@ CoreLoader.registerTask({
                         const db = await OfflineCache.DBConnection()
                         db.OSTool("main").clear()
                             .then(() => resolve())
-                            .catch(e => reject(e))
+                            .catch((e) => reject(e))
                     }),
                 },
                 {
@@ -144,7 +144,7 @@ CoreLoader.registerTask({
                                     {
                                         content: $$("continue"),
                                         handler() {
-                                            DBUserPresence.get("Accounts").functions.find(e => e.name === "clear").handler()
+                                            DBUserPresence.get("Accounts").functions.find((e) => e.name === "clear").handler()
                                             p.close()
                                             resolve()
                                         },
@@ -162,7 +162,7 @@ CoreLoader.registerTask({
                     name: "clear",
                     handler: () => new Promise(async (resolve, reject) => {
                         try {
-                            await Promise.all(Auth.all.map(e => Auth.destroyInstance(e.id)))
+                            await Promise.all(Auth.all.map((e) => Auth.destroyInstance(e.id)))
                             const db = await Auth._db.onReady()
                             await db.OSTool("accounts").clear()
                             await Auth.initInstances()
@@ -192,7 +192,7 @@ CoreLoader.registerTask({
             actions: [
                 {
                     name: $$("@settings/storage/actions/clear"),
-                    handler: () => DBUserPresence.get("StatementCache").functions.find(e => e.name === "clear").handler(),
+                    handler: () => DBUserPresence.get("StatementCache").functions.find((e) => e.name === "clear").handler(),
                 },
             ],
             functions: [
@@ -202,7 +202,7 @@ CoreLoader.registerTask({
                         try {
                             const db = await StatementStorage.statementDB()
                             await Promise.all((await db.getTablesList()).map(
-                                e => db.OSTool(e).clear(),
+                                (e) => db.OSTool(e).clear(),
                             ))
                             resolve()
                         } catch (e) {
@@ -215,7 +215,7 @@ CoreLoader.registerTask({
                     async handler() {
                         const db = await StatementStorage.statementDB()
                         await Promise.all((await db.getTablesList()).map(
-                            e => async () => db.OSTool(e).clearPercent(0.5),
+                            (e) => async () => db.OSTool(e).clearPercent(0.5),
                         ))
                     },
                 },

@@ -6,7 +6,6 @@ import DBTool from "@Core/Tools/db/DBTool"
 import hashCode from "@Core/Tools/transformation/text/hashCode"
 import PWA from "@App/modules/main/PWA"
 import delayAction from "@Core/Tools/objects/delayAction"
-import Report from "@Core/Services/report"
 import MonoAPI from "../API/clients/MonoAPI"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAnonymousAPI from "../API/clients/MonoAnonymousAPI"
@@ -22,12 +21,12 @@ export default class Auth {
 
     static get authed() {
         const i = this.all
-        return i.filter(ir => ir.authed)
+        return i.filter((ir) => ir.authed)
     }
 
     static get isAnyAuthed() {
         const i = this.all
-        return i.some(ir => ir.authed)
+        return i.some((ir) => ir.authed)
     }
 
     static get instance() {
@@ -35,7 +34,7 @@ export default class Auth {
         function fallback() {
             const authList = self.authed
             if (authList.length > 0) {
-                const corp = self.all.find(e => e instanceof MonoCorpAPI)
+                const corp = self.all.find((e) => e instanceof MonoCorpAPI)
                 if (corp) {
                     return corp
                 }
@@ -176,7 +175,7 @@ export default class Auth {
         if (PWA.analyticsAllowed) {
             delayAction(() => {
                 const accountsCount = Auth.all.filter(
-                    (obj, pos, arr) => arr.map(mapObj => mapObj.name)
+                    (obj, pos, arr) => arr.map((mapObj) => mapObj.name)
                         .indexOf(obj.name) === pos,
                 ).length
 

@@ -11,7 +11,7 @@ import MCC from "../API/classes/MCC"
 export default class StatementStorage {
     static async get(id, from, to) {
         const db = (await this.statementDB()).OSTool(id)
-        return (await db.getWhere(null, v => (v.time >= from && v.time <= to)))
+        return (await db.getWhere(null, (v) => (v.time >= from && v.time <= to)))
             .sort((a, b) => b.time - a.time)
     }
 
@@ -35,11 +35,11 @@ export default class StatementStorage {
                 })
             }
             if (res[0].includes(e)) {
-                delete res[1][res[1].findIndex(v => v === e)]
+                delete res[1][res[1].findIndex((v) => v === e)]
             }
         }))
 
-        await Promise.all(res[1].map(async e => (await db()).deleteObjectStore(e)))
+        await Promise.all(res[1].map(async (e) => (await db()).deleteObjectStore(e)))
     }
 
     static async getCardList(objects = false, preferOffline = true) {
@@ -61,7 +61,7 @@ export default class StatementStorage {
         const dbTool = await this.statementDB()
         const db = (dbTool).OSTool(id)
         const cnt = (await Promise.all(data.map(async (e) => {
-            if (!((await db.getWhere(null, v => v.id === e.id)).length)) db.put(e)
+            if (!((await db.getWhere(null, (v) => v.id === e.id)).length)) db.put(e)
         }))).length
 
         if (cnt && PWA.analyticsAllowed) {
@@ -69,8 +69,8 @@ export default class StatementStorage {
                 const t = await dbTool.getTablesList()
 
                 const res = modeString([].concat(...await Promise.all(
-                    t.map(async p => (await (dbTool).OSTool(p).getAll())
-                        .map(e => new MCC(e.mcc).title)),
+                    t.map(async (p) => (await (dbTool).OSTool(p).getAll())
+                        .map((e) => new MCC(e.mcc).title)),
                 )))
                 window.gtag("set", { user_properties: { popular_spend_category: res } })
             })

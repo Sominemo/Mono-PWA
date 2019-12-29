@@ -16,7 +16,7 @@ import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import Report from "@Core/Services/report"
-import Currency from "./API/classes/Currency"
+import { Currency } from "./API/classes/Currency"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -131,7 +131,7 @@ export default class StatementUI {
                                         },
                                         handler(e, obs) {
                                             if (
-                                                !e.some(el => el.isIntersecting) || isLoading
+                                                !e.some((el) => el.isIntersecting) || isLoading
                                             ) return
                                             obs.disconnect()
 
@@ -357,12 +357,12 @@ export default class StatementUI {
         let speed
         let gallery
 
-        cardVisuals.forEach(e => e.updateState(true))
+        cardVisuals.forEach((e) => e.updateState(true))
         const updateCards = async () => {
             const ci = await StatementStorage.getCardList(true, false)
 
             ci.forEach((account) => {
-                const id = cardList.findIndex(e => e.id === account.id)
+                const id = cardList.findIndex((e) => e.id === account.id)
                 if (id === -1) return
 
                 cardVisuals[id].updateState(account)
