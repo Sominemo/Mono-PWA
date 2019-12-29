@@ -49,12 +49,25 @@ export default class StatementStorage {
             ci.accounts.forEach((e) => {
                 if (!(e.client instanceof MonoAPI
                     && cardList.get(e.id) && cardList.get(e.id).client instanceof MonoCorpAPI)) {
-                    cardList.set(e.id, (objects ? e : e.id))
+                    cardList.set(e.id, e)
                 }
             })
         }))
 
-        return Array.from(cardList.values())
+        const order = await SettingsStorage.get("card_order") || []
+        const accounts = Array.from(cardList.values())
+
+        const list = [...order.map((el) => {
+            const ind = accounts.findIndex((em) => em && em.id === el)
+            if (ind !== -1) {
+                const acc = accounts[ind]
+                delete accounts[ind]
+                return acc
+            }
+            return undefined
+        }), ...accounts].filter((e) => e !== undefined)
+
+        return (objects ? list : list.map((e) => e.id))
     }
 
     static async addItems(id, data) {

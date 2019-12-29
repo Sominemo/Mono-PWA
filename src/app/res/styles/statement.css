@@ -173,11 +173,9 @@
     0% {
         opacity: 1;
     }
-
     50% {
         opacity: .3;
     }
-
     100% {
         opacity: 1;
     }
@@ -193,4 +191,45 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.card-selector {
+    width: 15vmin;
+    height: 10vmin;
+    margin: 1vmin;
+}
+
+.card-selector .mono-card .mono-card-cardholder {
+    font-size: 0.1ch;
+    padding-bottom: 3%;
+}
+
+.card-selector .mono-card {
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0 3vmin;
+    border-radius: 1vmin;
+}
+
+.card-selector .mono-card .mono-card-bank-image {
+    margin-top: 5%;
+}
+
+.card-selector .mono-card .mono-card-bank-image svg {
+    float: left;
+}
+
+.icon-clicker {
+    border-radius: 2em;
+    background: transparent;
+    transition: background .2s;
+    cursor: pointer;
+    width: var(--size-icon-default);
+    height: var(--size-icon-default);
+    padding: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-clicker:hover {
+    background: rgba(190, 190, 190, 0.2);
 }

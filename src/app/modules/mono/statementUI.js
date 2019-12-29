@@ -2,7 +2,6 @@ import { WindowContainer } from "@Environment/Library/DOM/buildBlock"
 import WindowManager from "@Core/Services/SimpleWindowManager"
 import Navigation from "@Core/Services/navigation"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import { SVG } from "@Environment/Library/DOM/basic"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
@@ -16,7 +15,10 @@ import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import Report from "@Core/Services/report"
-import { Currency } from "./API/classes/Currency"
+import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
+import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
+import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
+import Sleep from "@Core/Tools/objects/sleep"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -24,10 +26,23 @@ import MilesCashback from "./API/classes/cashbacks/MilesCashback"
 import Auth from "./services/Auth"
 import MonoAPI from "./API/clients/MonoAPI"
 import Account from "./API/classes/Account"
+import { cardItemGenerator } from "./functions/cardItemGenerator"
+import CardCustomization from "./controllers/CardCustomization"
 
 export default class StatementUI {
     static async Init() {
         Navigation.updateTitle($$("@statement"))
+
+        Navigation.Current = {
+            navMenu: [
+                {
+                    icon: "credit_card",
+                    title: $$("@customization/open"),
+                    handler() { CardCustomization.cardList(true) },
+                },
+            ],
+        }
+
         if (!Auth.isAnyAuthed) {
             Navigation.url = { module: "auth" }
             return
@@ -60,7 +75,7 @@ export default class StatementUI {
             let genList
             const contentCard = new Card(
                 new Preloader({ style: { margin: "auto" } }),
-                { style: { display: "flex" } },
+                { style: { display: "flex", flexDirection: "column" } },
             )
             statementBody.clear(contentCard)
 
@@ -215,6 +230,36 @@ export default class StatementUI {
                     statementBody.render(loader)
                 }
 
+                SettingsStorage.get("my_cards_hint_shown").then((v) => {
+                    if (v) return
+                    const warning = new WarningConstructorButton({
+                        type: 3,
+                        title: $$("@statement/hint_customize"),
+                        content: $$("@statement/hint_customize_text"),
+                        icon: "credit_card",
+                        button: {
+                            content: $$("@statement/open"),
+                            handler() {
+                                CardCustomization.cardList(true)
+                            },
+                        },
+                        style: {
+                            margin: "15px",
+                        },
+                    })
+
+                    new SlideInCSS({
+                        renderAwait: true,
+                        duration: 300,
+                        timingFunc: EaseOutCubic,
+                    }).apply(warning).then(() => { warning.style({ margin: "15px" }) })
+
+                    Sleep(1000).then(() => {
+                        contentCard.prepend(warning)
+                        SettingsStorage.set("my_cards_hint_shown", true)
+                    })
+                })
+
                 isLoading = false
             }
 
@@ -244,54 +289,19 @@ export default class StatementUI {
         w.render(statementBody)
     }
 
-    static cardItemGenerator({
-        bank = "mono", look = "black", cardholder = "", currency = null,
-    }) {
-        const bankImg = this.bankImg(bank)
-        const [cardBG, invert] = this.cardBG(look)
-        const cardDecoration = this.cardDecoration(currency)
-        const cardSign = String(cardholder)
-
-        return new DOM({
-            new: "div",
-            class: ["mono-card", ...(cardDecoration === null ? [] : ["mono-card-decorator", cardDecoration]), ...(invert ? ["mono-card-inverted"] : [])],
-            style: {
-                background: cardBG,
-            },
-            content: [
-                new DOM({
-                    new: "div",
-                    class: "mono-card-bank-image",
-                    content: bankImg,
-                    style: {
-                        filter: (invert ? "brightness(0)" : ""),
-                    },
-                }),
-                new DOM({
-                    new: "div",
-                    class: "mono-card-cardholder",
-                    content: cardSign,
-                    style: {
-                        filter: (invert ? "brightness(0)" : ""),
-                    },
-                }),
-            ],
-        })
-    }
-
     static async cardList(accounts) {
         const settings = await SettingsStorage.get("mono_cards_config") || {}
 
         const cards = accounts.map((card, i) => {
-            const params = settings[card.id]
-                || {
-                    bank: "mono",
-                    look: "black",
-                    cardholder: card.client.name,
-                    currency: card.balance.currency,
-                }
+            const params = settings[card.id] || {
+                id: card.id,
+                bank: "mono",
+                look: "black",
+                cardholder: card.client.name,
+                currency: card.balance.currency.number,
+            }
 
-            const cardVisual = this.cardItemGenerator(params)
+            const cardVisual = cardItemGenerator(params)
 
             const balanceItem = new DOM({
                 new: "div",
@@ -341,13 +351,6 @@ export default class StatementUI {
         })
 
         return cards
-    }
-
-    static async allCardInfo() {
-        const cardList = await StatementStorage.getCardList(true)
-
-        const cardVisuals = await this.cardList(cardList)
-        return [cardList, cardVisuals]
     }
 
     static async makeCardGallery(callback = () => { }) {
@@ -498,36 +501,11 @@ export default class StatementUI {
         return gallery
     }
 
-    static bankImg(bank) {
-        let img = require("@Resources/images/banklogos/mono.svg")
-        if (bank === "iron") img = require("@Resources/images/banklogos/iron.svg")
-        return new SVG(img)
-    }
+    static async allCardInfo() {
+        const cardList = await StatementStorage.getCardList(true)
 
-    static cardBG(look) {
-        let gradient = "linear-gradient(45deg, #333333 0%, #000 100%)"
-        let invert = false
-        if (look === "grey") {
-            gradient = "linear-gradient(45deg, #d8d8d8 0%, #9d9d9d 100%)"
-            invert = true
-        } else
-        if (look === "pink") {
-            gradient = "linear-gradient(45deg, #ffe6e5 0%, #ca9695 100%)"
-            invert = true
-        }
-
-        return [gradient, invert]
-    }
-
-    static cardDecoration(currency) {
-        let decoration = null
-        if (currency instanceof Currency) {
-            if (currency.number === 840) decoration = "--card-green-sideline"; else
-            if (currency.number === 978) decoration = "--card-red-sideline"; else
-            if (currency.number === 985) decoration = "--card-blue-sideline"
-        }
-
-        return decoration
+        const cardVisuals = await this.cardList(cardList)
+        return [cardList, cardVisuals]
     }
 }
 

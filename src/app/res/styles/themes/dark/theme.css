@@ -19,3 +19,7 @@
 	--color-toast-text: var(--color-generic);
 	--color-button-text-light: #ffffff;
 }
+
+md-button.alert {
+	color: var(--color-button-background-light);
+}

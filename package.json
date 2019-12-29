@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "3.2.3",
+    "version": "3.3.0-dev1",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -77,6 +77,7 @@
         "requestidlecallback-polyfill": "^1.0.2",
         "sjcl": "^1.0.8",
         "smoothscroll-polyfill": "^0.4.4",
+        "sortablejs": "^1.10.2",
         "twemoji": "^12.1.4"
     }
 }

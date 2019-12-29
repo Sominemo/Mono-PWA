@@ -16,6 +16,7 @@ import { Align } from "@Environment/Library/DOM/style"
 import MonoAPI from "@App/modules/mono/API/clients/MonoAPI"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
+import CardCustomization from "@App/modules/mono/controllers/CardCustomization"
 import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
 import generateTFSettingsLayout from "../SettingsLayout/Transformators"
@@ -138,6 +139,17 @@ CoreLoader.registerTask({
                             ], ["row", "middle"]),
                             handler() {
                                 Navigation.url = { module: "auth" }
+                            },
+                        },
+                        {
+                            content: new Align([
+                                new Icon("credit_card", { fontSize: "32px", color: "var(--color-main)", marginRight: "10px" }),
+                                new Align([
+                                    new DOM({ new: "div", content: $$("@customization/open") }),
+                                ], ["column"]),
+                            ], ["row", "middle"]),
+                            handler() {
+                                CardCustomization.cardList()
                             },
                         },
                     ], true)
