@@ -3,7 +3,9 @@ import Prompt from "@Environment/Library/DOM/elements/prompt"
 import {
     CardList, CardContent, CardTextList, Card,
 } from "@Environment/Library/DOM/object/card"
-import { TwoSidesWrapper, Icon, Title } from "@Environment/Library/DOM/object"
+import {
+    TwoSidesWrapper, Icon, Title,
+} from "@Environment/Library/DOM/object"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
 import DOM from "@DOMPath/DOM/Classes/dom"
@@ -11,6 +13,7 @@ import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
 import { RadioLabel } from "@Environment/Library/DOM/object/input"
 import { Align } from "@Environment/Library/DOM/style"
+import loadingPopup from "@App/library/loadingPopup"
 import { cardItemGenerator } from "../functions/cardItemGenerator"
 import StatementStorage from "../services/StatementStorage"
 import { Currency } from "../API/classes/Currency"
@@ -39,11 +42,10 @@ export default class CardCustomization {
             })
         }
 
-        await getCards()
-
         const cont = new DOM({ new: "div" })
 
-        function updateList() {
+        async function updateList() {
+            await getCards()
             const cl = new CardList(cards.map((card) => ({
                 content: new TwoSidesWrapper(
                     new DOM({
@@ -70,7 +72,7 @@ export default class CardCustomization {
                     }),
                     new DOM({
                         new: "div",
-                        class: "icon-clicker",
+                        class: ["icon-clicker", "side-card-settings-button"],
                         content: new Icon("settings"),
                         events: [
                             {
@@ -98,6 +100,7 @@ export default class CardCustomization {
                     await SettingsStorage.set("card_order", newOrder)
                     getCards()
                 },
+                filter: ".side-card-settings-button",
             })
 
             cont.clear(cl)
@@ -124,18 +127,21 @@ export default class CardCustomization {
             const config = await SettingsStorage.get("mono_cards_config") || {}
             params.bank = newBank
             config[id] = params
+            const l = loadingPopup()
             await SettingsStorage.set("mono_cards_config", config)
+            l.close()
         }
 
         async function setColor(newColor) {
             const config = await SettingsStorage.get("mono_cards_config") || {}
             params.look = newColor
             config[id] = params
+            const l = loadingPopup()
             await SettingsStorage.set("mono_cards_config", config)
+            l.close()
         }
 
         Prompt({
-            title: $$("@customization/card"),
             buttons: [
                 {
                     content: $$("close"),

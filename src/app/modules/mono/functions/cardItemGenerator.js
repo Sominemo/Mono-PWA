@@ -22,12 +22,16 @@ function bankImg(bank) {
 function cardBG(look) {
     let gradient = "linear-gradient(45deg, #333333 0%, #000 100%)"
     let invert = false
-    if (look === "grey" || look === "iron") {
-        gradient = "linear-gradient(45deg, #d8d8d8 0%, #9d9d9d 100%)"
+    if (look === "grey") {
+        gradient = "linear-gradient(45deg, #d0d0d0 0%, #6b6b6b 100%)"
         invert = true
     } else
     if (look === "pink") {
         gradient = "linear-gradient(45deg, #ffe6e5 0%, #ca9695 100%)"
+        invert = true
+    } else
+    if (look === "iron") {
+        gradient = "linear-gradient(45deg, #888994 0%, #c2c2da 100%)"
         invert = true
     } else
     if (look === "white") {
