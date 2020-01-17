@@ -258,6 +258,10 @@ export default {
                     __index: "виписка",
                     description: "збережена копія виписок з ваших акаунтів",
                 },
+                card_settings: {
+                    __index: "картки",
+                    description: "налаштування карток, такі як їх порядок, колір і т.п.",
+                },
             },
             actions: {
                 clear: "очистити",
