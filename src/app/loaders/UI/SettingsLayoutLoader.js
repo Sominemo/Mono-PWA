@@ -17,6 +17,7 @@ import MonoAPI from "@App/modules/mono/API/clients/MonoAPI"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import CardCustomization from "@App/modules/mono/controllers/CardCustomization"
+import { SwitchLabel } from "@Environment/Library/DOM/object/input"
 import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
 import generateTFSettingsLayout from "../SettingsLayout/Transformators"
@@ -55,6 +56,7 @@ CoreLoader.registerTask({
                 options: {},
             })
             .createSection({ id: "auth-promo", dom: SettingsSectionElement, options: {} })
+            .createSection({ id: "fast-settings", dom: SettingsSectionElement, options: { name: $$("quick_settings") } })
             .createSection({ id: "general", dom: SettingsSectionElement, options: { name: $$("@settings/general") } })
             .getSection("general")
             .createGroup({ id: "main-group", dom: SettingsGroupContainer, options: {} })
@@ -92,13 +94,13 @@ CoreLoader.registerTask({
                     accounts.forEach((account) => {
                         const element = new TwoSidesWrapper(
                             new Align([
-                                new Icon("account_circle", { fontSize: "32px", opacity: 0.5, marginRight: "10px" }),
+                                new Icon("account_circle", { fontSize: "32px", opacity: 0.5, marginRight: "15px" }),
                                 new Align([
                                     new DOM({ new: "div", content: account.name }),
                                     new DOM({
                                         new: "div",
                                         content:
-                                    (account instanceof MonoAPI ? $$("@settings/auth/personal_token") : $$("@settings/auth/monobank_account")),
+                                            (account instanceof MonoAPI ? $$("@settings/auth/personal_token") : $$("@settings/auth/monobank_account")),
                                         style: {
                                             opacity: 0.5,
                                             fontSize: "0.7em",
@@ -132,7 +134,7 @@ CoreLoader.registerTask({
                         ...elements.map((content) => ({ content })),
                         {
                             content: new Align([
-                                new Icon("add", { fontSize: "32px", opacity: 0.5, marginRight: "10px" }),
+                                new Icon("add", { opacity: 0.5, margin: "0 15px 0 5px" }),
                                 new Align([
                                     new DOM({ new: "div", content: $$("@settings/auth/add_account") }),
                                 ], ["column"]),
@@ -143,7 +145,7 @@ CoreLoader.registerTask({
                         },
                         {
                             content: new Align([
-                                new Icon("credit_card", { fontSize: "32px", color: "var(--color-main)", marginRight: "10px" }),
+                                new Icon("credit_card", { color: "var(--color-main)", margin: "0 15px 0 5px" }),
                                 new Align([
                                     new DOM({ new: "div", content: $$("@customization/open") }),
                                 ], ["column"]),
@@ -156,6 +158,33 @@ CoreLoader.registerTask({
                 },
                 options: [],
                 id: "auth-link",
+            })
+
+        layout.getAct("settings").getSection("fast-settings")
+            .createGroup({
+                id: "fast-settings-group", dom: SettingsGroupContainer, options: {},
+            })
+            .getGroup("fast-settings-group")
+            .createItem({
+                async dom() {
+                    return new SwitchLabel(
+                        [
+                            await SettingsStorage.getFlag("offline_mode"), (n) => {
+                                SettingsStorage.setFlag("offline_mode", n)
+                            },
+                        ],
+                        new TwoSidesWrapper(
+                            new Align([
+                                new Icon("signal_wifi_off", { margin: "0 15px 0 5px" }),
+                                new Align([
+                                    new DOM({ new: "div", content: $$("offline_mode") }),
+                                ], ["column"]),
+                            ], ["row", "middle"]),
+                        ),
+                    )
+                },
+                options: [],
+                id: "fast-settings-toggle",
             })
 
         layout.getAct("settings").getSection("recovery-mode-section")

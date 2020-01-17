@@ -36,6 +36,7 @@ import AuthUI from "@App/modules/mono/AuthUI"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
 import StatementStorage from "@App/modules/mono/services/StatementStorage"
 import MonoCorpAPI from "@App/modules/mono/API/clients/MonoCorpAPI"
+import Prompt from "@Environment/Library/DOM/elements/prompt"
 
 
 function compare(a, b, path = "/") {
@@ -82,6 +83,7 @@ const DevUtils = {
     HistoryHints,
     lib: {
         ContentEditable,
+        Prompt,
     },
     CoreLoader,
     SW,

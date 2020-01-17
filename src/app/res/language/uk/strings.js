@@ -333,4 +333,6 @@ export default {
     accept: "приняти",
     continue: "далі",
     search: "пошук",
+    offline_mode: "автономний режим",
+    quick_settings: "опції",
 }

@@ -146,7 +146,7 @@ export default class Auth {
     }
 
     static async updateName(id, name) {
-        const settings = this.findInstanceSettings(id)
+        const settings = await this.findInstanceSettings(id)
         this.updateInstance(id, { ...settings, name: `${name}` })
     }
 

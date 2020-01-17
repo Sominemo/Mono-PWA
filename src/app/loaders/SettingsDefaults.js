@@ -2,11 +2,13 @@ import SettingsCheckProvider from "@Core/Services/Settings/SettingsCheckProvider
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import App from "@Core/Services/app"
 import { CoreLoader, CoreLoaderResult } from "@Core/Init/CoreLoader"
+import { API } from "@App/tools/API"
+import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 
 CoreLoader.registerTask({
     id: "settings-defaults",
     presence: "Set Setings defaults and checkers",
-    task() {
+    async task() {
         SettingsCheckProvider.setRules([
             {
                 name: "miscellaneous_in_settings",
@@ -48,6 +50,15 @@ CoreLoader.registerTask({
                     onfail: async (a, b, c) => { await c(!!a); return true },
                 },
             },
+            {
+                name: "offline_mode",
+                rule: {
+                    default: !window.navigator.onLine,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                    onupdate(a) { API.offlineMode = a },
+                },
+            },
         ], "flags")
 
         SettingsCheckProvider.setRules([
@@ -60,6 +71,8 @@ CoreLoader.registerTask({
                 },
             },
         ])
+
+        API.offlineMode = await SettingsStorage.getFlag("offline_mode")
 
         return new CoreLoaderResult(true, { SettingsCheckProvider })
     },

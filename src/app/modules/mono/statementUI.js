@@ -462,6 +462,8 @@ export default class StatementUI {
             })
         }
 
+        let wheelDelay
+
         gallery = new DOM({
             new: "div",
             content: new DOM({
@@ -480,6 +482,26 @@ export default class StatementUI {
                     event: "touchstart",
                     handler: (...e) => interactionStartHandler(true, ...e),
                     params: { passive: true },
+                },
+                {
+                    event: "wheel",
+                    handler(event) {
+                        const deltaC = (event.deltaY === 0 ? event.deltaX : event.deltaY)
+                        if (deltaC === 0) return
+                        const mouseScroll = Math.abs(deltaC) >= 100
+                        this.scrollBy({
+                            left: (mouseScroll && Date.now() - wheelDelay < 200
+                                ? deltaC * 4 : deltaC),
+                            ...(mouseScroll ? { behavior: "smooth" } : {}),
+                        })
+                        event.preventDefault()
+                        if (mouseScroll) wheelDelay = Date.now()
+                        setTimeout(() => {
+                            if (mouseScroll && Date.now() - wheelDelay < 200) return
+                            calculateCurrent()
+                            scrollTo(cardVisuals[currentSelection])
+                        }, (mouseScroll ? 200 : 0))
+                    },
                 },
             ],
             onRender(ev, el) {
