@@ -28,6 +28,7 @@ import MonoAPI from "./API/clients/MonoAPI"
 import Account from "./API/classes/Account"
 import { cardItemGenerator } from "./functions/cardItemGenerator"
 import CardCustomization from "./controllers/CardCustomization"
+import { statementDownloaderUI } from "./functions/statementDownloader"
 
 export default class StatementUI {
     static async Init() {
@@ -39,6 +40,11 @@ export default class StatementUI {
                     icon: "credit_card",
                     title: $$("@customization/open"),
                     handler() { CardCustomization.cardList(true) },
+                },
+                {
+                    icon: "cloud_download",
+                    title: $$("@download_statement"),
+                    handler() { statementDownloaderUI() },
                 },
             ],
         }
@@ -117,6 +123,7 @@ export default class StatementUI {
 
                         const descriptionArray = []
 
+                        if (item.comment) descriptionArray.push(`👋 ${item.comment}`)
                         descriptionArray.push(item.mcc.title)
 
                         if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {

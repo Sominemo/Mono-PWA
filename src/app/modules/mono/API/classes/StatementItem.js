@@ -14,6 +14,7 @@ export default class StatementItem {
         currencyCode,
         commissionRate,
         cashbackAmount,
+        comment = null,
         balance,
     }, account) {
         if (typeof id !== "string") throw new TypeError("Incorrect ID")
@@ -37,6 +38,7 @@ export default class StatementItem {
         this.commissionRate = commissionRate
         this.cashback = cashback(cashbackAmount, account.cashbackType)
         this.balance = balance
+        this.comment = (comment ? String(comment) : null)
         this.balanceOverdraft = (balance < 0)
     }
 }

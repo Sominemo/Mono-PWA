@@ -4,7 +4,7 @@ import {
     CardList, CardContent, CardTextList, Card,
 } from "@Environment/Library/DOM/object/card"
 import {
-    TwoSidesWrapper, Icon, Title,
+    TwoSidesWrapper, Icon, Title, Preloader,
 } from "@Environment/Library/DOM/object"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
@@ -42,7 +42,8 @@ export default class CardCustomization {
             })
         }
 
-        const cont = new DOM({ new: "div" })
+        const pr = new Preloader({ style: { margin: "auto" } })
+        const cont = new DOM({ new: "div", content: pr })
 
         async function updateList() {
             await getCards()
@@ -103,6 +104,7 @@ export default class CardCustomization {
                 filter: ".side-card-settings-button",
             })
 
+            pr.destructSelf()
             cont.clear(cl)
         }
 
