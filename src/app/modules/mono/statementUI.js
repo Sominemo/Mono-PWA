@@ -192,8 +192,8 @@ export default class StatementUI {
                                     new DOM({
                                         new: "div",
                                         class: ["amount-statement-item", (item.out ? "out" : "in")],
-                                        content: String((item.out ? -1 : 1)
-                                            * printMoney(item.amount, null, true)),
+                                        content: String((item.out ? "-" : "")
+                                            + printMoney(item.amount, null, true)),
                                     }),
                                 ),
                         }))
@@ -485,7 +485,7 @@ export default class StatementUI {
             })
         }
 
-        let wheelDelay
+        let lastT = null
 
         gallery = new DOM({
             new: "div",
@@ -509,20 +509,20 @@ export default class StatementUI {
                 {
                     event: "wheel",
                     handler(event) {
-                        const deltaC = (event.deltaY === 0 ? event.deltaX : event.deltaY)
+                        const deltaC = event.deltaX || (event.shiftKey ? event.deltaY : 0)
                         if (deltaC === 0) return
+                        event.preventDefault()
                         const mouseScroll = Math.abs(deltaC) >= 100
                         this.scrollBy({
-                            left: (mouseScroll && Date.now() - wheelDelay < 200
-                                ? deltaC * 4 : deltaC),
-                            ...(mouseScroll ? { behavior: "smooth" } : {}),
+                            left: (mouseScroll
+                                ? 35 * Math.sign(deltaC) : deltaC),
                         })
-                        event.preventDefault()
-                        if (mouseScroll) wheelDelay = Date.now()
-                        setTimeout(() => {
-                            if (mouseScroll && Date.now() - wheelDelay < 200) return
+                        if (lastT !== null) clearTimeout(lastT)
+                        lastT = setTimeout(() => {
                             calculateCurrent()
-                            scrollTo(cardVisuals[currentSelection])
+                            requestAnimationFrame(() => {
+                                scrollTo(cardVisuals[currentSelection])
+                            })
                         }, (mouseScroll ? 200 : 0))
                     },
                 },

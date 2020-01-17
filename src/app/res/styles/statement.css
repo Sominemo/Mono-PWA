@@ -4,6 +4,7 @@
     position: relative;
     overflow-x: hidden;
     overflow-y: hidden;
+    will-change: scroll-position;
 }
 
 .mono-cards-gallery-scroller {
