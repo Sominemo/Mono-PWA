@@ -4,6 +4,7 @@ import App from "@Core/Services/app"
 import { CoreLoader, CoreLoaderResult } from "@Core/Init/CoreLoader"
 import { API } from "@App/tools/API"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
+import MoneyPrintConfig from "@App/tools/transform/MoneyPrintConfig"
 
 CoreLoader.registerTask({
     id: "settings-defaults",
@@ -59,6 +60,15 @@ CoreLoader.registerTask({
                     onupdate(a) { API.offlineMode = a },
                 },
             },
+            {
+                name: "show_minor_part",
+                rule: {
+                    default: false,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                    onupdate(a) { MoneyPrintConfig.showMinorPart = a },
+                },
+            },
         ], "flags")
 
         SettingsCheckProvider.setRules([
@@ -73,6 +83,7 @@ CoreLoader.registerTask({
         ])
 
         API.offlineMode = await SettingsStorage.getFlag("offline_mode")
+        MoneyPrintConfig.showMinorPart = await SettingsStorage.getFlag("show_minor_part")
 
         return new CoreLoaderResult(true, { SettingsCheckProvider })
     },

@@ -167,21 +167,42 @@ CoreLoader.registerTask({
             .getGroup("fast-settings-group")
             .createItem({
                 async dom() {
-                    return new SwitchLabel(
-                        [
-                            await SettingsStorage.getFlag("offline_mode"), (n) => {
-                                SettingsStorage.setFlag("offline_mode", n)
-                            },
-                        ],
-                        new TwoSidesWrapper(
-                            new Align([
-                                new Icon("signal_wifi_off", { margin: "0 15px 0 5px" }),
-                                new Align([
-                                    new DOM({ new: "div", content: $$("offline_mode") }),
-                                ], ["column"]),
-                            ], ["row", "middle"]),
-                        ),
-                    )
+                    return new CardList([
+                        {
+                            content: new SwitchLabel(
+                                [
+                                    await SettingsStorage.getFlag("offline_mode"), (n) => {
+                                        SettingsStorage.setFlag("offline_mode", n)
+                                    },
+                                ],
+                                new TwoSidesWrapper(
+                                    new Align([
+                                        new Icon("signal_wifi_off", { margin: "0 15px 0 5px" }),
+                                        new Align([
+                                            new DOM({ new: "div", content: $$("offline_mode") }),
+                                        ], ["column"]),
+                                    ], ["row", "middle"]),
+                                ),
+                            ),
+                        },
+                        {
+                            content: new SwitchLabel(
+                                [
+                                    await SettingsStorage.getFlag("show_minor_part"), (n) => {
+                                        SettingsStorage.setFlag("show_minor_part", n)
+                                    },
+                                ],
+                                new TwoSidesWrapper(
+                                    new Align([
+                                        new Icon("attach_money", { margin: "0 15px 0 5px" }),
+                                        new Align([
+                                            new DOM({ new: "div", content: $$("show_minor_part") }),
+                                        ], ["column"]),
+                                    ], ["row", "middle"]),
+                                ),
+                            ),
+                        },
+                    ])
                 },
                 options: [],
                 id: "fast-settings-toggle",

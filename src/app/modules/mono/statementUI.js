@@ -182,7 +182,7 @@ export default class StatementUI {
                                     new DOM({
                                         new: "div",
                                         class: ["amount-statement-item", (item.out ? "out" : "in")],
-                                        content: String((item.out ? -1 : 1) * item.amount.integer),
+                                        content: String((item.out ? -1 : 1) * printMoney(item.amount, null, true)),
                                     }),
                                 ),
                         }))

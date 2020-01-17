@@ -333,4 +333,5 @@ export default {
     search: "поиск",
     offline_mode: "автономный режим",
     quick_settings: "опции",
+    show_minor_part: "показывать копейки",
 }

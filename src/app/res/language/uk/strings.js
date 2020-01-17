@@ -335,4 +335,5 @@ export default {
     search: "пошук",
     offline_mode: "автономний режим",
     quick_settings: "опції",
+    show_minor_part: "показувати копійки",
 }
