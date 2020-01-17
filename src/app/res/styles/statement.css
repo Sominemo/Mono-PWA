@@ -142,9 +142,22 @@
     font-family: "Emoji Font";
 }
 
+@keyframes appear {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 .statement-item-list {
     padding: 15px;
     border-bottom: solid 1.5px var(--color-card-border);
+    animation-name: appear;
+    animation-iteration-count: 1;
+    animation-duration: 1s;
 }
 
 .statement-item-list:last-child {
