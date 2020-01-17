@@ -62,6 +62,7 @@ export default class StatementUI {
             let isLoading = true
             let prevDate = Date.now()
             let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
+            let loadMoreCount = 0
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
@@ -97,6 +98,8 @@ export default class StatementUI {
                     ["center", "row"], { padding: "15px" },
                 )
                 statementBody.render(thisLoader)
+
+                loadMoreCount++
                 window.requestAnimationFrame(async () => {
                     prevDate = fromDate
                     fromDate -= 1000 * 60 * 60 * 24 * 7
@@ -203,7 +206,7 @@ export default class StatementUI {
 
 
                 if (items.length === 0) {
-                    if (!noReplace) {
+                    if (!noReplace || contentCard.classList.contains("originally-null")) {
                         contentCard.classList.add("originally-null")
                         contentCard.clear(
                             new DOM({
@@ -212,7 +215,7 @@ export default class StatementUI {
                                 content: [
                                     new LottieAnimation(require("@Resources/animations/failed.json"),
                                         { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
-                                    new Title($$("@statement/no_operations_for_last_week"), 3, { marginLeft: "5px", marginRight: "5px" }),
+                                    new Title((loadMoreCount > 0 ? $$("@statement/still_nothing") : $$("@statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
                                     new Button({
                                         content: $$("@statement/load_more"),
                                         handler() {
@@ -223,9 +226,21 @@ export default class StatementUI {
                                 ],
                             }),
                         )
+                    } else {
+                        loader = new Align(
+                            new Button({
+                                content: $$("@statement/load_more"),
+                                handler() {
+                                    loadMore()
+                                },
+                            }),
+                            ["center", "row"], { padding: "15px" },
+                        )
+                        statementBody.render(loader)
                     }
                 } else {
                     contentCard.style({ display: "" })
+                    contentCard.classList.remove("originally-null")
                     loader = new Align(
                         new Button({
                             content: $$("@statement/load_more"),
