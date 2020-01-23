@@ -64,7 +64,7 @@
         "workbox-webpack-plugin": "^4.3.1"
     },
     "dependencies": {
-        "axios": "^0.19.0",
+        "axios": "^0.19.2",
         "core-js": "^3.4.1",
         "currency-codes": "^1.5.1",
         "custom-protocol-detection": "^1.0.1",
