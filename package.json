@@ -69,7 +69,7 @@
         "currency-codes": "^1.5.1",
         "custom-protocol-detection": "^1.0.1",
         "git-rev-sync": "^2.0.0",
-        "idb": "^4.0.5",
+        "idb": "^5.0.1",
         "lottie-web": "^5.5.9",
         "mcc": "^2.2.0",
         "node-fetch": "^2.6.0",
