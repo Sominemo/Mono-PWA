@@ -13,5 +13,5 @@ export default function printMoney(money, isfull = null, noCur = false) {
     if (money.currency.number === 978) char = "€"
     if (money.currency.number === 985) char = "zł"
 
-    return `${isfull ? money.string : money.integer}${(noCur ? "" : ` ${char}`)}`
+    return `${isfull || money.number < (10 ** money.currency.digits) ? money.string : money.integer}${(noCur ? "" : ` ${char}`)}`
 }

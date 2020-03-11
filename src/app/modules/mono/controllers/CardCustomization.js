@@ -17,28 +17,20 @@ import loadingPopup from "@App/library/loadingPopup"
 import { cardItemGenerator } from "../functions/cardItemGenerator"
 import StatementStorage from "../services/StatementStorage"
 import { Currency } from "../API/classes/Currency"
+import StatementUI from "../statementUI"
 
 export default class CardCustomization {
     static async cardList(refresh = false) {
         const self = this
-        let cards
+        let visualizationProfiles
         let accounts
-        let settings
 
         async function getCards() {
-            ([accounts, settings] = await Promise.all([
-                await StatementStorage.getCardList(true),
-                await SettingsStorage.get("mono_cards_config") || {},
-            ]))
-            cards = accounts.map((card, i) => {
-                card.params = settings[card.id] || {
-                    id: card.id,
-                    bank: "mono",
-                    look: "black",
-                    cardholder: card.client.name,
-                    currency: card.balance.currency.number,
-                }
-                return card
+            accounts = await StatementStorage.getAccountList(true, true)
+            const config = await StatementUI.cardConfig(accounts)
+            visualizationProfiles = accounts.map((account) => {
+                account.params = config[account.id]
+                return account
             })
         }
 
@@ -47,7 +39,7 @@ export default class CardCustomization {
 
         async function updateList() {
             await getCards()
-            const cl = new CardList(cards.map((card) => ({
+            const cl = new CardList(visualizationProfiles.map((profile) => ({
                 content: new TwoSidesWrapper(
                     new DOM({
                         new: "div",
@@ -62,33 +54,49 @@ export default class CardCustomization {
                             new DOM({
                                 new: "div",
                                 class: ["card-selector"],
-                                content: cardItemGenerator(card.params),
+                                content: cardItemGenerator(profile.params),
                             }),
                             new DOM({
                                 new: "div",
-                                style: { fontSize: "5vmin", marginLeft: ".5em", fontWeight: "300" },
-                                content: printMoney(card.balance),
+                                class: ["mono-card-list-pw", "mono-card-list-pw-size"],
+                                content: `**${profile.cards[0].mask.end} `,
+
                             }),
                         ],
                     }),
                     new DOM({
                         new: "div",
-                        class: ["icon-clicker", "side-card-settings-button"],
-                        content: new Icon("settings"),
-                        events: [
-                            {
-                                event: "click",
-                                handler() {
-                                    self.cardSettings(card.params, () => {
-                                        updateList()
-                                    })
+                        style: { display: "flex", alignItems: "center" },
+                        content: [
+                            new DOM({
+                                new: "div",
+                                style: {
+                                    marginLeft: ".5em", fontWeight: "300", marginRight: "10px",
                                 },
-                            },
+                                class: ["mono-card-list-pw-size"],
+                                content: printMoney(profile.balance),
+
+                            }),
+                            new DOM({
+                                new: "div",
+                                class: ["icon-clicker", "side-card-settings-button"],
+                                content: new Icon("settings"),
+                                events: [
+                                    {
+                                        event: "click",
+                                        handler() {
+                                            self.cardSettings(profile.params, () => {
+                                                updateList()
+                                            })
+                                        },
+                                    },
+                                ],
+                            }),
                         ],
                     }),
                 ),
                 attributes: {
-                    dataCardId: card.id,
+                    dataCardId: profile.id,
                 },
             }
             )))
@@ -128,6 +136,7 @@ export default class CardCustomization {
         async function setBank(newBank) {
             const config = await SettingsStorage.get("mono_cards_config") || {}
             params.bank = newBank
+            delete params.fallback
             config[id] = params
             const l = loadingPopup()
             await SettingsStorage.set("mono_cards_config", config)
@@ -137,6 +146,7 @@ export default class CardCustomization {
         async function setColor(newColor) {
             const config = await SettingsStorage.get("mono_cards_config") || {}
             params.look = newColor
+            delete params.fallback
             config[id] = params
             const l = loadingPopup()
             await SettingsStorage.set("mono_cards_config", config)

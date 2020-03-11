@@ -7,7 +7,9 @@ import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
 import cubicBeizer from "@DOMPath/Animation/Library/Timing/cubicBeizer"
 import { Card } from "@Environment/Library/DOM/object/card"
-import { Preloader, TwoSidesWrapper, Title } from "@Environment/Library/DOM/object"
+import {
+    Preloader, TwoSidesWrapper, Title,
+} from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
 import LottieAnimation from "@App/library/LottieAnimation"
 import { Button } from "@Environment/Library/DOM/object/input"
@@ -19,6 +21,7 @@ import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/W
 import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
 import Sleep from "@Core/Tools/objects/sleep"
+import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -57,8 +60,10 @@ export default class StatementUI {
         WindowManager.newWindow().append(w)
         w.style({ padding: 0 })
         let statementBody
+        let curAccount
 
         const gallery = await this.makeCardGallery(async (account, visual) => {
+            curAccount = account
             let isLoading = true
             let prevDate = Date.now()
             let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
@@ -112,6 +117,7 @@ export default class StatementUI {
             }
 
             genList = (items, noReplace = false) => {
+                if (account !== curAccount) return
                 const toRender = []
 
                 items.forEach((item, i) => {
@@ -226,7 +232,7 @@ export default class StatementUI {
                                 ],
                             }),
                         )
-                    } else {
+                    } else if (!contentCard.classList.contains("originally-null")) {
                         loader = new Align(
                             new Button({
                                 content: $$("@statement/load_more"),
@@ -237,7 +243,7 @@ export default class StatementUI {
                             ["center", "row"], { padding: "15px" },
                         )
                         statementBody.render(loader)
-                    }
+                    } else if (loader) loader.destructSelf()
                 } else {
                     contentCard.style({ display: "" })
                     contentCard.classList.remove("originally-null")
@@ -251,6 +257,104 @@ export default class StatementUI {
                         ["center", "row"], { padding: "15px" },
                     )
                     statementBody.render(loader)
+                }
+
+                if (account.cards[0].type === "platinum" && "fallback" in visual.params) {
+                    const setColor = async (newColor) => {
+                        const config = await SettingsStorage.get("mono_cards_config") || {}
+                        visual.params.look = newColor
+                        delete visual.params.fallback
+                        config[account.id] = visual.params
+                        await SettingsStorage.set("mono_cards_config", config)
+                        Navigation.reload()
+                    }
+                    const colorHint = new WarningConstructor({
+                        type: 2,
+                        content: new DOM({
+                            new: "div",
+                            style: {
+                                display: "flex",
+                                flexDirection: "column",
+                            },
+                            content: [
+                                new Title($$("@statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
+                                new Align(
+                                    [
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #d0d0d0 0%, #6b6b6b 100%)", // grey
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("grey")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #ffe6e5 0%, #ca9695 100%)", // pink
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("pink")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #333333 0%, #000 100%)", // black
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("black")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                    ],
+                                    ["row", "center"],
+                                ),
+                            ],
+                        }),
+                        style: {
+                            margin: "15px",
+                        },
+                    })
+
+                    new SlideInCSS({
+                        renderAwait: true,
+                        duration: 300,
+                        timingFunc: EaseOutCubic,
+                    }).apply(colorHint).then(() => { colorHint.style({ margin: "15px" }) })
+                    Sleep(1000).then(() => {
+                        contentCard.prepend(colorHint)
+                    })
                 }
 
                 SettingsStorage.get("my_cards_hint_shown").then((v) => {
@@ -312,23 +416,44 @@ export default class StatementUI {
         w.render(statementBody)
     }
 
-    static async cardList(accounts) {
+    static detectLook(type) {
+        if (type === "white") return "white"
+        if (type === "yellow") return "yellow"
+        if (type === "iron") return "iron"
+        if (type === "platinum") return "grey"
+        return "black"
+    }
+
+    static async cardConfig(accounts) {
         const settings = await SettingsStorage.get("mono_cards_config") || {}
 
-        const cards = accounts.map((card, i) => {
-            const params = settings[card.id] || {
-                id: card.id,
-                bank: "mono",
-                look: "black",
-                cardholder: card.client.name,
-                currency: card.balance.currency.number,
+        const res = {}
+
+        accounts.forEach((account, i) => {
+            res[account.id] = settings[account.id] || {
+                id: account.id,
+                bank: (account.cards[0].type === "iron" ? "iron" : "mono"),
+                look: this.detectLook(account.cards[0].type),
+                cardholder: account.client.name,
+                currency: account.balance.currency.number,
+                fallback: true,
             }
+        })
+
+        return res
+    }
+
+    static async cardList(accounts) {
+        const settings = await this.cardConfig(accounts)
+
+        const cards = accounts.map((account, i) => {
+            const params = settings[account.id]
 
             const cardVisual = cardItemGenerator(params)
 
             const balanceItem = new DOM({
                 new: "div",
-                content: printMoney(card.balance),
+                content: printMoney(account.balance),
                 class: "mono-card-absolute-balance-number",
             })
 
@@ -369,6 +494,10 @@ export default class StatementUI {
                         name: "updateState",
                         handler: setAmount,
                     },
+                    {
+                        name: "params",
+                        handler: params,
+                    },
                 ],
             })
         })
@@ -385,7 +514,7 @@ export default class StatementUI {
 
         cardVisuals.forEach((e) => e.updateState(true))
         const updateCards = async () => {
-            const ci = await StatementStorage.getCardList(true, false)
+            const ci = await StatementStorage.getAccountList(true, false)
 
             ci.forEach((account) => {
                 const id = cardList.findIndex((e) => e.id === account.id)
@@ -547,7 +676,7 @@ export default class StatementUI {
     }
 
     static async allCardInfo() {
-        const cardList = await StatementStorage.getCardList(true)
+        const cardList = await StatementStorage.getAccountList(true)
 
         const cardVisuals = await this.cardList(cardList)
         return [cardList, cardVisuals]

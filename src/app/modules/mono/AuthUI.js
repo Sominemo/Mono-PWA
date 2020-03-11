@@ -19,6 +19,7 @@ import BRify from "@Core/Tools/transformation/text/BRify"
 import Report from "@Core/Services/report"
 import PWA from "../main/PWA"
 import Auth from "./services/Auth"
+import Flags from "./services/Flags"
 
 class AuthSettings {
     constructor(s = null, options = {}) {
@@ -63,16 +64,20 @@ export default class AuthUI {
             domain: "https://api.monobank.ua",
             type: this.authTypes.DIRECT,
             token,
+            mask: Flags.Auth.NONE,
         }
     }
 
-    static useCorp(userDomain = "https://api.mono.sominemo.com") {
+    static useCorp(userDomain = Flags.AuthConfig.domain,
+        notificationServer = Flags.AuthConfig.notificationServer) {
         const domain = filterURL(userDomain)
         if (!domain) throw new TypeError("String domain expected")
 
         return {
             domain,
             type: this.authTypes.CORP,
+            notificationServer,
+            mask: Flags.Auth.PUSH_SUPPORTED,
         }
     }
 
@@ -304,7 +309,10 @@ export default class AuthUI {
                             content: $$("accept"),
                             handler() {
                                 state.proto = r
-                                state.settings.are = AuthUI.useCorp(domain)
+                                state.settings.are = AuthUI.useCorp(
+                                    domain,
+                                    ("push" in r.server && "api" in r.server.push && "cert" in r.server.push & "name" in r.server.push ? r.server.push : false),
+                                )
                                 ap.close()
                                 p.close()
                             },
@@ -381,7 +389,12 @@ export default class AuthUI {
         const a = await Auth.genInstance({ settings: set, id: 0 })
         try {
             const result = await a.clientInfo()
-            await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
+            if (!result.clientId) throw new Error("Failed to check client info")
+            await Auth.addInstance({
+                ...set,
+                name: result.name,
+                clientId: result.clientId,
+            }, result.raw.accounts, true)
 
             Toast.add($$("@auth/success"))
             state.blockerPopup.close()
@@ -587,10 +600,20 @@ export default class AuthUI {
         })
         state.waitSuccess = async (token) => {
             try {
-                const set = { type: "corp", domain: `${state.settings.are.domain}/request`, token }
+                const set = {
+                    type: "corp",
+                    domain: `${state.settings.are.domain}/request`,
+                    notificationServer: state.settings.are.notificationServer,
+                    mask: Flags.Auth.PUSH_SUPPORTED,
+                    token,
+                }
                 const a = await Auth.genInstance({ settings: set, id: 0 })
                 const result = await a.clientInfo()
-                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
+                await Auth.addInstance({
+                    ...set,
+                    name: result.name,
+                    clientId: result.clientId,
+                }, result.raw.accounts, true)
                 p.close()
                 state.blockerPopup.close()
                 Toast.add($$("@auth/stage/authed"))
@@ -707,11 +730,21 @@ export default class AuthUI {
 
         state.waitSuccess = async (token) => {
             try {
-                const set = { type: "corp", domain: `${state.settings.are.domain}/request`, token }
+                const set = {
+                    type: "corp",
+                    domain: `${state.settings.are.domain}/request`,
+                    notificationServer: state.settings.are.notificationServer,
+                    mask: state.settings.are.mask,
+                    token,
+                }
                 const a = await Auth.genInstance({ settings: set, id: 0 })
 
                 const result = await a.clientInfo()
-                await Auth.addInstance({ ...set, name: result.name }, result.raw.accounts, true)
+                await Auth.addInstance({
+                    ...set,
+                    name: result.name,
+                    clientId: result.clientId,
+                }, result.raw.accounts, true)
 
                 if (p1) p1.close()
                 p.close()

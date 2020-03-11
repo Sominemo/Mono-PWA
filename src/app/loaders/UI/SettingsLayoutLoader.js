@@ -4,7 +4,7 @@ import {
 import { isRecoveryMode } from "@App/debug/recovery"
 import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
 import SettingsLayout from "@Core/Services/Settings/user/layout"
-import { $$ } from "@Core/Services/Language/handler"
+import { $$, $ } from "@Core/Services/Language/handler"
 import Navigation from "@Core/Services/navigation"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import SettingsLayoutManager from "@Core/Services/Settings/user/manager"
@@ -18,9 +18,24 @@ import { CardList } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import CardCustomization from "@App/modules/mono/controllers/CardCustomization"
 import { SwitchLabel } from "@Environment/Library/DOM/object/input"
+import Prompt from "@Environment/Library/DOM/elements/prompt"
+import BRify from "@Core/Tools/transformation/text/BRify"
 import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
 import generateTFSettingsLayout from "../SettingsLayout/Transformators"
+import generateNotificationsSettingsLayout from "../SettingsLayout/Notifications"
+
+function sideLogo(icon, text, moreText) {
+    return new Align([
+        new Icon(icon, { margin: "0 15px 0 5px" }),
+        new Align([
+            new DOM({ new: "div", content: text }),
+            ...(moreText ? [new DOM({
+                new: "div", style: { opacity: "0.6", fontSize: "0.8em" }, content: moreText,
+            })] : []),
+        ], ["column"]),
+    ], ["row", "middle"], { marginRight: "5px" })
+}
 
 
 CoreLoader.registerTask({
@@ -46,9 +61,17 @@ CoreLoader.registerTask({
                 dom: SettingsActContainer,
                 options: { name: $$("@settings/tf") },
             })
+            .createAct({
+                id: "notifications",
+                dom: SettingsActContainer,
+                options: { name: $$("@settings/notifications") },
+            })
 
 
-        layout.getAct("settings")
+        const isPushSupported = "ServiceWorkerRegistration" in window
+            && "pushManager" in ServiceWorkerRegistration.prototype
+
+        const settingsMain = layout.getAct("settings")
             .createSection({
                 id: "recovery-mode-section",
                 display: isRecoveryMode,
@@ -61,9 +84,33 @@ CoreLoader.registerTask({
             .getSection("general")
             .createGroup({ id: "main-group", dom: SettingsGroupContainer, options: {} })
             .getGroup("main-group")
-            .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "about" } }, $$("@about/app")], id: "about-screen-link" })
-            .createItem({ dom: SettingsActLink, options: ["storage", $$("@settings/storage")], id: "storage-link" })
-            .createItem({ dom: SettingsActLink, options: ["language", $$("@settings/language")], id: "language-link" })
+            .createItem({
+                dom: SettingsActLink, options: [() => { Navigation.url = { module: "about" } }, sideLogo("info", $$("@about/app"), $("@settings/descriptions/about_app"))], id: "about-screen-link",
+            })
+            .createItem({ dom: SettingsActLink, options: ["storage", sideLogo("storage", $$("@settings/storage"), $("@settings/descriptions/storage"))], id: "storage-link" })
+            .createItem({ dom: SettingsActLink, options: ["language", sideLogo("translate", $$("@settings/language"), $("@settings/descriptions/language"))], id: "language-link" })
+
+        if ("serviceWorker" in navigator) {
+            settingsMain.createItem({
+                dom: SettingsActLink,
+                options: [
+                    (isPushSupported
+                        ? "notifications"
+                        : () => Prompt({
+                            title: $$("@push/not_supported_title"),
+                            text: BRify($$("@push/not_supported_text")),
+                            buttons: [{ content: $$("close"), handler: "close" }],
+                        })),
+                    sideLogo("notifications",
+                        $$("@settings/notifications"),
+                        (isPushSupported ? $("@settings/descriptions/notifications")
+                            : $("@push/not_supported"))),
+                    !isPushSupported,
+                    !isPushSupported,
+                ],
+                id: "notifications-link",
+            })
+        }
 
         layout.getAct("settings").getSection("auth-promo")
             .createGroup({
@@ -102,8 +149,8 @@ CoreLoader.registerTask({
                                         content:
                                             (account instanceof MonoAPI ? $$("@settings/auth/personal_token") : $$("@settings/auth/monobank_account")),
                                         style: {
-                                            opacity: 0.5,
-                                            fontSize: "0.7em",
+                                            opacity: 0.6,
+                                            fontSize: "0.8em",
                                         },
                                     }),
                                 ], ["column"]),
@@ -175,15 +222,9 @@ CoreLoader.registerTask({
                                         SettingsStorage.setFlag("offline_mode", n)
                                     },
                                 ],
-                                new TwoSidesWrapper(
-                                    new Align([
-                                        new Icon("signal_wifi_off", { margin: "0 15px 0 5px" }),
-                                        new Align([
-                                            new DOM({ new: "div", content: $$("offline_mode") }),
-                                        ], ["column"]),
-                                    ], ["row", "middle"]),
-                                ),
+                                sideLogo("signal_wifi_off", $$("offline_mode"), $("@settings/descriptions/offline_mode")),
                             ),
+
                         },
                         {
                             content: new SwitchLabel(
@@ -192,14 +233,7 @@ CoreLoader.registerTask({
                                         SettingsStorage.setFlag("show_minor_part", n)
                                     },
                                 ],
-                                new TwoSidesWrapper(
-                                    new Align([
-                                        new Icon("attach_money", { margin: "0 15px 0 5px" }),
-                                        new Align([
-                                            new DOM({ new: "div", content: $$("show_minor_part") }),
-                                        ], ["column"]),
-                                    ], ["row", "middle"]),
-                                ),
+                                sideLogo("attach_money", $$("show_minor_part"), $("@settings/descriptions/show_minor_part")),
                             ),
                         },
                     ])
@@ -235,13 +269,15 @@ CoreLoader.registerTask({
             .getSection("miscellaneous")
             .createGroup({ id: "experiments-menus", dom: SettingsGroupContainer, options: {} })
             .getGroup("experiments-menus")
-            .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "flags" } }, $$("experiments")], id: "experiments-menu-link" })
+            .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "flags" } }, sideLogo("category", $$("@experiments"), $("@settings/descriptions/experiments"))], id: "experiments-menu-link" })
 
         generateDBSettingsLayout(layout.getAct("storage"))
 
         generateLanguageList(layout.getAct("language"))
 
         generateTFSettingsLayout(layout.getAct("transformators"))
+
+        generateNotificationsSettingsLayout(layout.getAct("notifications"))
 
         SettingsLayoutManager.applyLayout(layout)
     },

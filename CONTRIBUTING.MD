@@ -17,7 +17,7 @@
 [Pull-запросы](#pull-запросы)
 
 # Связь
-Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/SominemoMono-PWA/)
+Обсуждение и связь осуществляется в [Telegram чате](https://t.me/joinchat/BEBMsBLX6NclKYzGkNlGNw) и [GitHub](https://github.com/Sominemo/Mono-PWA/)
 
 # Тестирование
 

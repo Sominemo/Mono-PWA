@@ -2,6 +2,7 @@ ExpiresActive On
 ExpiresByType text/javascript "access plus 1 week"
 ExpiresByType application/javascript "access plus 1 week"
 ExpiresDefault "access plus 1 week"
+Header add Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
 
 RewriteEngine On
 RewriteBase /

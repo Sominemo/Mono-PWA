@@ -1,11 +1,11 @@
 import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
-import { CoreLoader } from "@Core/Init/CoreLoader"
 import DBTool from "@Core/Tools/db/DBTool"
 import hashCode from "@Core/Tools/transformation/text/hashCode"
 import PWA from "@App/modules/main/PWA"
 import delayAction from "@Core/Tools/objects/delayAction"
+import NotificationManager from "@Core/Services/Push/NotificationManager"
 import MonoAPI from "../API/clients/MonoAPI"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAnonymousAPI from "../API/clients/MonoAnonymousAPI"
@@ -14,6 +14,8 @@ import OfflineCache from "./OfflineCache"
 
 export default class Auth {
     static _instances = new Map()
+
+    static inited = false
 
     static get all() {
         return Array.from(this._instances.values())
@@ -150,17 +152,34 @@ export default class Auth {
         this.updateInstance(id, { ...settings, name: `${name}` })
     }
 
+    static async updatePushEndpoint(id, endpoint) {
+        const settings = await this.findInstanceSettings(id)
+        if (!("notificationServer" in settings)) throw new Error("This instance does not support notifications")
+        settings.notificationServer.endpoint = endpoint
+        this.updateInstance(id, settings)
+    }
+
     static async updateInstance(id, settings) {
         if (id === 0) return
         await (await this.accountsDB()).put({ settings, id })
         this.initInstances()
     }
 
+    static waitList = []
+
+    static get waitListReady() {
+        return Promise.all(this.waitList)
+    }
+
     static async initInstances() {
         const accounts = await (await this.accountsDB()).getAll()
         this._instances.clear()
+        NotificationManager.reset()
         await Promise.all(accounts.map(async (account) => {
             const instance = await this.genInstance(account)
+            if ("push" in instance) {
+                this.waitList.push(instance.push)
+            }
             this._instances.set(account.id, instance)
         }))
 
@@ -169,20 +188,25 @@ export default class Auth {
         }
 
         this._mainInstance = await this.getMainInstance()
-        StatementStorage.syncCardStorageList()
+        this.inited = true
+        StatementStorage.syncAccountStorageList()
         this.updateIcons()
 
         if (PWA.analyticsAllowed) {
             delayAction(() => {
                 const accountsCount = Auth.all.filter(
-                    (obj, pos, arr) => arr.map((mapObj) => mapObj.name)
-                        .indexOf(obj.name) === pos,
+                    (obj, pos, arr) => arr.map((mapObj) => mapObj.clientId)
+                        .indexOf(obj.clientId) === pos,
                 ).length
 
                 window.gtag("set", { user_properties: { bank_accounts_count: accountsCount } })
             })
         }
+
+        this._onInitResolve()
     }
+
+    static onInit = new Promise((resolve) => { Auth._onInitResolve = resolve })
 
     static async addInstance(settings, accountsCache = [], wait = false) {
         const id = hashCode(JSON.stringify(settings))
@@ -219,9 +243,16 @@ export default class Auth {
         let instance
 
         if (settings.type === "corp") {
-            instance = new MonoCorpAPI(settings.token, settings.domain, account.id, settings.name)
+            instance = new MonoCorpAPI(
+                settings.token,
+                settings.domain,
+                settings.clientId,
+                account.id,
+                settings.name,
+                settings.notificationServer || false,
+            )
         } else if (settings.type === "user") {
-            instance = new MonoAPI(settings.token, account.id, settings.name)
+            instance = new MonoAPI(settings.token, settings.clientId, account.id, settings.name)
         } else {
             instance = new MonoAnonymousAPI(account.id)
         }
@@ -252,11 +283,3 @@ export default class Auth {
         return db.OSTool("settings")
     }
 }
-
-CoreLoader.registerTask({
-    id: "auth-loader",
-    presence: "Auth",
-    async task() {
-        await Auth.initInstances()
-    },
-})

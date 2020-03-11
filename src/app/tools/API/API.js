@@ -28,14 +28,16 @@ export default class API {
     static offlineMode = false
 
     constructor({
-        domain, globalTimeout = 0, requestTimeouts = {}, token = null, id = null, name = "Account",
-        noAuthDomain = null,
+        domain, globalTimeout = 0, requestTimeouts = {}, token = null, clientId = null, id = null, name = "Account",
+        noAuthDomain = null, notificationServer = false,
     }) {
         this.domain = domain
         this.noAuthDomain = noAuthDomain || domain
+        this.notificationServer = notificationServer
         this.globalTimeout = globalTimeout
         this.requestTimeouts = requestTimeouts
         this.token = token
+        this.clientId = clientId
         this.id = id
         this.name = name
     }

@@ -1,3 +1,4 @@
+import printMoney from "@App/tools/transform/printMoney"
 import Cashback from "../Cashback"
 import { Currency } from "../Currency"
 import Money from "../Money"
@@ -17,5 +18,9 @@ export default class MoneyCashback extends Cashback {
 
     get sign() {
         return Math.sign(this.amount)
+    }
+
+    get string() {
+        return `💰 ${printMoney(this.object, true)}`
     }
 }

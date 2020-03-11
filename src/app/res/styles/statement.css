@@ -72,6 +72,12 @@
     overflow: hidden;
 }
 
+@media (min-width: 1200px), (min-width: 1200px) {
+    .mono-card-cardholder {
+        font-size: 1em;
+    }
+}
+
 .mono-card-absolute-balance-block {
     margin-top: auto;
     margin-bottom: 8%;
@@ -146,7 +152,6 @@
     0% {
         opacity: 0;
     }
-
     100% {
         opacity: 1;
     }
@@ -246,4 +251,20 @@
 
 .icon-clicker:hover {
     background: rgba(190, 190, 190, 0.2);
+}
+
+.mono-card-list-pw {
+    margin-left: .5em;
+    font-weight: 300;
+    opacity: .4;
+}
+
+.mono-card-list-pw-size {
+    font-size: 5vmin;
+}
+
+@media (min-width: 840px), (min-height: 840px) {
+    .mono-card-list-pw-size {
+        font-size: 2em;
+    }
 }

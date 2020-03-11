@@ -78,11 +78,19 @@ export default class CurrencyUI {
             try {
                 cur = await Auth.instance.currency()
             } catch (e) {
-                cur = parseCurrencyRAW(await OfflineCache.getCurrencies())
-                cache = true
+                try {
+                    cur = parseCurrencyRAW(await OfflineCache.getCurrencies())
+                    cache = true
+                } catch (er) {
+                    cur = undefined
+                }
             }
         } catch (e) {
-            cur = await Auth.instance.currency(true)
+            try {
+                cur = await Auth.instance.currency(true)
+            } catch (er) {
+                cur = undefined
+            }
         }
 
         if (cur !== undefined) {

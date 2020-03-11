@@ -9,9 +9,10 @@ export default class Client {
 
     accounts = []
 
-    constructor(name, accounts, mono = null, raw = {}, online = true) {
+    constructor(name, accounts, clientId, mono = null, raw = {}, online = true) {
         if (typeof name !== "string") throw TypeError("Incorrect name")
 
+        this.clientId = clientId
         this.name = name
         this.accounts = accounts.map((e) => new Account({
             id: e.id,
@@ -19,6 +20,10 @@ export default class Client {
             isOverdraft: (e.balance < 0),
             creditLimit: Money.integer(e.creditLimit, Currency.number(e.currencyCode)),
             cashbackType: e.cashbackType,
+            cards: {
+                masks: e.maskedPan,
+                type: e.type,
+            },
         }, mono))
 
         if (online && PWA.analyticsAllowed) {

@@ -91,7 +91,7 @@ function statementDownloaderUI() {
                     from.setMinutes(0)
                     from.setSeconds(0)
 
-                    const cards = await StatementStorage.getCardList(true, true)
+                    const cards = await StatementStorage.getAccountList(true, true)
                     const ranges = calculateRanges(from, to)
                     const taskCount = cards.length * ranges.length
                     let doneTasks = 0

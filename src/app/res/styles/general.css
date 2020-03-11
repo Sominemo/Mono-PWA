@@ -126,6 +126,12 @@
     padding: 0 10px;
 }
 
+@media (min-width: 900px), (min-height: 900px) {
+    .login-box-center .center-box .auth-title {
+        font-size: 4em;
+    }
+}
+
 .login-box-center .center-box .auth-title+md-button {
     margin: 4vmin 0;
     border-radius: 2em;
@@ -138,7 +144,6 @@
     .login-box-center .bottom-box {
         font-size: 12px;
     }
-    
     .login-box-center .center-box .auth-title+md-button {
         font-size: 7vmin;
         padding: 3vmin 7vmin;

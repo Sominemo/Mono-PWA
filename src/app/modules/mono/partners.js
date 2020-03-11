@@ -33,11 +33,15 @@ export default class PartnersUI {
     static categories = new Map()
 
     static async partnersGetter() {
-        if (API.offlineMode) throw new APIError(0, { type: 1 })
-        const r = await fetch(`${this.domain}${this.partnersMethod}`)
-        const j = await r.json()
-        OfflineCache.savePartners(j)
-        return j
+        try {
+            if (API.offlineMode) throw new APIError(0, { type: 1 })
+            const r = await fetch(`${this.domain}${this.partnersMethod}`)
+            const j = await r.json()
+            OfflineCache.savePartners(j)
+            return j
+        } catch (e) {
+            return []
+        }
     }
 
     static async Init() {

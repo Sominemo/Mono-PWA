@@ -4,7 +4,7 @@ import clientInfo from "./methods/clientInfo"
 import destroyInstance from "./methods/destroyInstance"
 
 export default class MonoAPI extends API {
-    constructor(token, id = null, name = "Mono Account") {
+    constructor(token, clientId, id = null, name = "Mono Account") {
         super({
             domain: "https://api.monobank.ua",
             requestTimeouts: {
@@ -14,6 +14,7 @@ export default class MonoAPI extends API {
             },
             globalTimeout: 0,
             token,
+            clientId,
             id,
             name,
         })
