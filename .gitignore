@@ -6,3 +6,4 @@ yarn-error.log
 /webpack/scripts/config
 .yarn*
 /generated
+wg

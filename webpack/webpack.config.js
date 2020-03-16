@@ -101,6 +101,7 @@ module.exports = (env = {}) => {
             __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
             __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
             __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
+            __TRUSTED_ORIGINS: JSON.stringify(["https://wg.mono.sominemo.com", "https://mono.sominemo.com"]),
         })
 
     const appConfig = {

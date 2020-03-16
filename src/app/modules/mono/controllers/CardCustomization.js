@@ -103,6 +103,8 @@ export default class CardCustomization {
 
             // eslint-disable-next-line no-unused-vars
             const sortable = new Sortable(cl.elementParse.native, {
+                handle: ".icon-clicker",
+                ghostClass: "card-sortable-ghost",
                 animation: 150,
                 async onUpdate(ev) {
                     const newOrder = Array.from(cl.elementParse.native.children).map((el) => el.getAttribute("data-card-id"))

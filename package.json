@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "3.3.0-rc.1",
+    "version": "3.3.0-rc.2",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -42,7 +42,7 @@
         "copy-webpack-plugin": "^5.1.1",
         "css-loader": "^3.2.0",
         "eslint": "^6.8.0",
-        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-airbnb-base": "^14.1.0",
         "eslint-import-resolver-webpack": "^0.12.0",
         "eslint-plugin-import": "^2.18.2",
         "extra-watch-webpack-plugin": "^1.0.3",
@@ -73,7 +73,7 @@
         "lottie-web": "^5.6.6",
         "mcc": "^2.2.0",
         "node-fetch": "^2.6.0",
-        "regenerator-runtime": "^0.13.3",
+        "regenerator-runtime": "^0.13.5",
         "requestidlecallback-polyfill": "^1.0.2",
         "sjcl": "^1.0.8",
         "smoothscroll-polyfill": "^0.4.4",

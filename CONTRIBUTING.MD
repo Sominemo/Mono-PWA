@@ -57,7 +57,7 @@
 Окно с логами будет появляться при каждой новой строчке логов, переграждая весь контент
 
 ## Сброс приложения
-Следуйте [инструкциям](https://temply.procsec.top/help/article/ru/troubleshoot-loading-error), они идентичны к mono PWA.
+Следуйте [инструкциям](https://temply.procsec.top/help/article/ru/troubleshoot-loading-error), они идентичны к Mono PWA.
 
 # Pull-запросы
 В данный репозиторий принимаются pull-запросы, нужны:

@@ -68,6 +68,21 @@ export default class StatementUI {
             let prevDate = Date.now()
             let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
             let loadMoreCount = 0
+            if (!account) {
+                const p = Prompt({
+                    title: $$("@statement/accounts_changed"),
+                    text: $$("@statement/accounts_changed_text"),
+                    buttons: [
+                        {
+                            content: $$("reload"),
+                            handler() {
+                                Navigation.reload()
+                                p.close()
+                            },
+                        },
+                    ],
+                })
+            }
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
