@@ -249,7 +249,7 @@
     align-items: center;
 }
 
-.icon-clicker:hover {
+.mono-card-subj-list:not(.is-dragging) .icon-clicker:hover {
     background: rgba(190, 190, 190, 0.2);
 }
 
@@ -267,4 +267,9 @@
     .mono-card-list-pw-size {
         font-size: 2em;
     }
+}
+
+.mono-card-custom-list {
+    position: relative;
+    transform: translateZ(0);
 }

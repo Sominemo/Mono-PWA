@@ -95,21 +95,29 @@ export default class CardCustomization {
                         ],
                     }),
                 ),
+                classes: ["mono-card-custom-list"],
                 attributes: {
                     dataCardId: profile.id,
                 },
             }
-            )))
+            )), false, { customClass: ["mono-card-subj-list"] })
 
             // eslint-disable-next-line no-unused-vars
             const sortable = new Sortable(cl.elementParse.native, {
                 handle: ".icon-clicker",
                 ghostClass: "card-sortable-ghost",
                 animation: 150,
+                forceFallback: false,
                 async onUpdate(ev) {
                     const newOrder = Array.from(cl.elementParse.native.children).map((el) => el.getAttribute("data-card-id"))
                     await SettingsStorage.set("card_order", newOrder)
                     getCards()
+                },
+                onStart() {
+                    cl.classList.add("is-dragging")
+                },
+                onEnd() {
+                    cl.classList.remove("is-dragging")
                 },
                 filter: ".side-card-settings-button",
             })
