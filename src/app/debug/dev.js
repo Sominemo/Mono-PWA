@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-eval */
 import * as idb from "idb"
 import Language from "@Core/Services/Language/instance"
 import PWA from "@App/modules/main/PWA"
@@ -36,14 +38,42 @@ import AuthUI from "@App/modules/mono/AuthUI"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
 import StatementStorage from "@App/modules/mono/services/StatementStorage"
 import MonoCorpAPI from "@App/modules/mono/API/clients/MonoCorpAPI"
+import Prompt from "@Environment/Library/DOM/elements/prompt"
+import errorToObject from "@Core/Tools/transformation/object/errorToObject"
+import StatementUI from "@App/modules/mono/statementUI"
+import NotificationManager from "@Core/Services/Push/NotificationManager"
 
 
-function compare(a, b, path = "/") {
+function compare(a, b, path = "/", missing = [], same = [], reverse = false) {
     const keys = Object.keys(a)
+    const keysb = Object.keys(b)
     keys.forEach((e) => {
-        if (b[e] === undefined) console.log(path + e)
-        if (typeof b[e] === "object") compare(a[e], b[e], `${path + e}/`)
+        if (b[e] === undefined) {
+            missing.push([b.info.code, path + e])
+            return
+        }
+        if (b.type === "func" || b.type === "funcs") return
+        if (!reverse && a[e] === b[e]) same.push([path + e, a[e]])
+        if (typeof b[e] === "object") compare(a[e], b[e], `${path + e}/`, missing, same)
     })
+
+    keysb.forEach((e) => {
+        if (a[e] === undefined) {
+            missing.push([a.info.code, path + e])
+            return
+        }
+        if (a.type === "func" || a.type === "funcs") return
+        if (typeof a[e] === "object") compare(b[e], a[e], `${path + e}/`, missing, same, true)
+    })
+    if (path !== "/") return
+
+    console.group(`Missing (${missing.length})`)
+    missing.forEach((e) => console.log(...e))
+    console.groupEnd()
+
+    console.groupCollapsed(`Same (${same.length})`)
+    same.forEach((e) => console.log(...e))
+    console.groupEnd()
 }
 
 async function compareLanguages(a, b) {
@@ -82,6 +112,7 @@ const DevUtils = {
     HistoryHints,
     lib: {
         ContentEditable,
+        Prompt,
     },
     CoreLoader,
     SW,
@@ -96,6 +127,33 @@ const DevUtils = {
     Auth,
     AuthUI,
     StatementStorage,
+    StatementUI,
+    NotificationManager,
+}
+
+const CmdCollection = {
+    restart(opt) {
+        if (opt === "r") window.location.hash = "#recoveryMode"
+        if (opt === "std") window.location.hash = ""
+        window.location.reload()
+    },
+}
+
+async function CmdRunner() {
+    try {
+        const cmd = prompt("Enter JS snippet")
+        if (cmd === null) return
+        if (cmd[0] !== "#") {
+            const r = JSON.stringify(await eval(cmd))
+            prompt(r, r)
+            return
+        }
+
+        if (cmd.substr(1).split(" ")[0] in CmdCollection) CmdCollection[cmd.substr(1).split(" ")[0]](...cmd.split(" ").slice(1))
+    } catch (e) {
+        const r = JSON.stringify(e instanceof Error ? errorToObject(e) : e)
+        prompt(r, r)
+    }
 }
 
 CoreLoader.registerTask({
@@ -104,5 +162,47 @@ CoreLoader.registerTask({
     task() {
         global.idb = idb
         global.dev = DevUtils
+        global.run = {}
+        Object.defineProperty(global.run, "cmd", { get: CmdRunner })
+
+        let t = null
+        let count = 0
+
+        function func(event) {
+            count = event.touches.length
+            if (count !== 3) { clearTimeout(t); t = null }
+        }
+
+        function func2(event) {
+            count = event.touches.length
+            if (count === 0) {
+                CmdRunner()
+                document.removeEventListener("touchend", func2, true)
+            }
+        }
+
+        document.addEventListener("touchstart", (event) => {
+            count = event.touches.length
+            if (count !== 3) {
+                clearTimeout(t)
+                t = null
+                return
+            }
+
+            if (t === null) {
+                t = setTimeout(() => {
+                    document.removeEventListener("touchend", func, true)
+                    document.removeEventListener("touchcancel", func, true)
+                    document.removeEventListener("touchleave", func, true)
+                    if (count === 3) {
+                        document.addEventListener("touchend", func2, true)
+                    }
+                }, 2000)
+            }
+
+            document.addEventListener("touchend", func, true)
+            document.addEventListener("touchcancel", func, true)
+            document.addEventListener("touchleave", func, true)
+        }, true)
     },
 })

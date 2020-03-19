@@ -32,7 +32,7 @@ SettingsStorage.getFlag("deny_analytics").then((ev) => {
                 gtag("config", __PACKAGE_ANALYTICS)
                 return new CoreLoaderResult("GA inited")
             } catch (e) {
-                return new CoreLoaderWarning("Failed to init GA", e)
+                throw new CoreLoaderWarning("Failed to init GA", e)
             }
         },
     })

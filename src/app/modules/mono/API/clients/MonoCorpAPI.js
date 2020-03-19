@@ -2,11 +2,14 @@ import { API } from "@App/tools/API"
 import currency from "./methods/currency"
 import clientInfo from "./methods/clientInfo"
 import destroyInstance from "./methods/destroyInstance"
+import Auth from "../../services/Auth"
+import MonoNotificationClusterController from "../../services/Push/MonoNotificationClusterController"
 
 export default class MonoCorpAPI extends API {
-    constructor(token, domain, id = null, name = "Mono Account") {
+    constructor(token, domain, clientId, id = null, name = "Mono Account", notificationServer = false, directDomain = "https://api.monobank.ua") {
         if (typeof token !== "string") throw new TypeError("String token expected")
         if (typeof domain !== "string") throw new TypeError("String domain expected")
+
         super({
             domain,
             requestTimeouts: {
@@ -17,9 +20,24 @@ export default class MonoCorpAPI extends API {
             },
             globalTimeout: 0,
             token,
+            clientId,
             id,
             name,
+            noAuthDomain: directDomain,
+            notificationServer,
         })
+
+        const updateEndpoint = (endpoint) => {
+            Auth.updatePushEndpoint(id, endpoint)
+        }
+
+        if (notificationServer) {
+            this.push = MonoNotificationClusterController.register({
+                token,
+                ...notificationServer,
+                updateEndpoint,
+            })
+        }
     }
 
     get authed() {

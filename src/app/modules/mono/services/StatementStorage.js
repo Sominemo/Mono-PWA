@@ -15,7 +15,7 @@ export default class StatementStorage {
             .sort((a, b) => b.time - a.time)
     }
 
-    static async syncCardStorageList() {
+    static async syncAccountStorageList() {
         let _db = null
         const dbTool = await this.statementDB()
 
@@ -26,7 +26,7 @@ export default class StatementStorage {
             }
             return (await _db)[1]
         }
-        const res = await Promise.all([this.getCardList(), dbTool.getTablesList()])
+        const res = await Promise.all([this.getAccountList(), dbTool.getTablesList()])
         await Promise.all(res[0].map(async (e) => {
             if (!res[1].includes(e)) {
                 await (await db()).createObjectStore(e, {
@@ -42,19 +42,42 @@ export default class StatementStorage {
         await Promise.all(res[1].map(async (e) => (await db()).deleteObjectStore(e)))
     }
 
-    static async getCardList(objects = false, preferOffline = true) {
+    static async getAccountList(objects = false, preferOffline = true) {
         const cardList = new Map()
         await Promise.all(Auth.authed.map(async (account) => {
             const ci = await account.clientInfo({ preferOffline })
             ci.accounts.forEach((e) => {
                 if (!(e.client instanceof MonoAPI
                     && cardList.get(e.id) && cardList.get(e.id).client instanceof MonoCorpAPI)) {
-                    cardList.set(e.id, (objects ? e : e.id))
+                    cardList.set(e.id, e)
                 }
             })
         }))
 
-        return Array.from(cardList.values())
+        const order = await SettingsStorage.get("card_order") || []
+        const accounts = Array.from(cardList.values())
+
+        let list = [...order.map((el) => {
+            const ind = accounts.findIndex((em) => em && em.id === el)
+            if (ind !== -1) {
+                const acc = accounts[ind]
+                delete accounts[ind]
+                return acc
+            }
+            return undefined
+        }), ...accounts].filter((e) => e !== undefined)
+
+        if (order.length === 0) {
+            list = list.sort(
+                (a, b) => {
+                    if (a.id < b.id) return -1
+                    if (a.id > b.id) return 1
+                    return 0
+                },
+            )
+        }
+
+        return (objects ? list : list.map((e) => e.id))
     }
 
     static async addItems(id, data) {

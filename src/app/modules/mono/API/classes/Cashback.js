@@ -9,4 +9,8 @@ export default class Cashback {
     get object() {
         return this.amount
     }
+
+    get string() {
+        return `🎁 ${this.amount}`
+    }
 }

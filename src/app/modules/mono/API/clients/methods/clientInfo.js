@@ -27,5 +27,5 @@ export default async function clientInfo({ preferOffline = false } = {}) {
         await Auth.updateName(this.id, data.name)
         self = Auth.getInstanceByID(this.id)
     }
-    return new Client(data.name, data.accounts, self, data, online)
+    return new Client(data.name, data.accounts, data.clientId, self, data, online)
 }

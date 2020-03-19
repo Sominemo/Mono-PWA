@@ -8,7 +8,7 @@ import loadingPopup from "@App/library/loadingPopup"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import Toast from "@Environment/Library/DOM/elements/toast"
 import Sleep from "@Core/Tools/objects/sleep"
-import { APIError } from "@App/tools/API"
+import { APIError, API } from "@App/tools/API"
 import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
 import reflect from "@Core/Tools/objects/reflect"
 import SlideOut from "@Environment/Library/Animations/slideOut"
@@ -33,10 +33,15 @@ export default class PartnersUI {
     static categories = new Map()
 
     static async partnersGetter() {
-        const r = await fetch(`${this.domain}${this.partnersMethod}`)
-        const j = await r.json()
-        OfflineCache.savePartners(j)
-        return j
+        try {
+            if (API.offlineMode) throw new APIError(0, { type: 1 })
+            const r = await fetch(`${this.domain}${this.partnersMethod}`)
+            const j = await r.json()
+            OfflineCache.savePartners(j)
+            return j
+        } catch (e) {
+            return []
+        }
     }
 
     static async Init() {

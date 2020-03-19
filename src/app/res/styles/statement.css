@@ -4,6 +4,7 @@
     position: relative;
     overflow-x: hidden;
     overflow-y: hidden;
+    will-change: scroll-position;
 }
 
 .mono-cards-gallery-scroller {
@@ -69,6 +70,12 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+@media (min-width: 1200px), (min-width: 1200px) {
+    .mono-card-cardholder {
+        font-size: 1em;
+    }
 }
 
 .mono-card-absolute-balance-block {
@@ -141,9 +148,21 @@
     font-family: "Emoji Font";
 }
 
+@keyframes appear {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .statement-item-list {
     padding: 15px;
     border-bottom: solid 1.5px var(--color-card-border);
+    animation-name: appear;
+    animation-iteration-count: 1;
+    animation-duration: 1s;
 }
 
 .statement-item-list:last-child {
@@ -173,11 +192,9 @@
     0% {
         opacity: 1;
     }
-
     50% {
         opacity: .3;
     }
-
     100% {
         opacity: 1;
     }
@@ -193,4 +210,66 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.card-selector {
+    width: 15vmin;
+    height: 10vmin;
+    margin: 1vmin;
+}
+
+.card-selector .mono-card .mono-card-cardholder {
+    font-size: 0.1ch;
+    padding-bottom: 3%;
+}
+
+.card-selector .mono-card {
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0 3vmin;
+    border-radius: 1vmin;
+}
+
+.card-selector .mono-card .mono-card-bank-image {
+    margin-top: 5%;
+}
+
+.card-selector .mono-card .mono-card-bank-image svg {
+    float: left;
+}
+
+.icon-clicker {
+    border-radius: 2em;
+    background: transparent;
+    transition: background .2s;
+    cursor: pointer;
+    width: var(--size-icon-default);
+    height: var(--size-icon-default);
+    padding: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mono-card-subj-list:not(.is-dragging) .icon-clicker:hover {
+    background: rgba(190, 190, 190, 0.2);
+}
+
+.mono-card-list-pw {
+    margin-left: .5em;
+    font-weight: 300;
+    opacity: .4;
+}
+
+.mono-card-list-pw-size {
+    font-size: 5vmin;
+}
+
+@media (min-width: 840px), (min-height: 840px) {
+    .mono-card-list-pw-size {
+        font-size: 2em;
+    }
+}
+
+.mono-card-custom-list {
+    position: relative;
+    transform: translateZ(0);
 }

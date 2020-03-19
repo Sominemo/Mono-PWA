@@ -6,4 +6,8 @@ export default class MilesCashback extends Cashback {
 
         super(amount / 100, type)
     }
+
+    get string() {
+        return `✈ ${this.amount}mi`
+    }
 }

@@ -6,6 +6,7 @@ export default async function currency(burst = false) {
         methodID: "bank/currency",
         settings: (burst ? this.constructor.flags.skip | this.constructor.flags.resendOnFlood
             : this.constructor.flags.resendOnFlood),
+        useAuth: false,
     })
 
 

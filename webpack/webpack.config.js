@@ -59,6 +59,17 @@ const builder = {
     pack: require(path.join(__root, "package.json")),
 }
 
+const resolveAlias = {
+    "@DOMPath": path.join(PATHS.core, "DOM"),
+    "@Resources": PATHS.resources,
+    "@EnvResources": PATHS.envResources,
+    "@Generated": PATHS.generated,
+    "@App": PATHS.app,
+    "@Core": PATHS.core,
+    "@Environment": PATHS.environment,
+    "@Themes": PATHS.themesGenerated,
+}
+
 module.exports = (env = {}) => {
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
 
@@ -79,7 +90,21 @@ module.exports = (env = {}) => {
             .on("unlink", cb)
     }
 
-    return {
+    const definePlugin =
+        new webpack.DefinePlugin({
+            __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
+            __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
+            __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
+            __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
+            __PACKAGE_CHANGELOG: JSON.stringify([]),
+            __PACKAGE_WG: JSON.stringify(!!env.WG),
+            __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
+            __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
+            __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
+            __TRUSTED_ORIGINS: JSON.stringify(["https://wg.mono.sominemo.com", "https://mono.sominemo.com"]),
+        })
+
+    const appConfig = {
         watch: !!env.watch,
         performance: { hints: false },
         optimization: {
@@ -117,33 +142,12 @@ module.exports = (env = {}) => {
                 ],
             } : {}),
         },
-
-        ...(env.LOCAL ? {
-            devServer: {
-                contentBase: PATHS.localBuild,
-                compress: true,
-                port: 8080,
-                host: "0.0.0.0",
-                historyApiFallback: {
-                    index: "/",
-                },
-            },
-        } : {}),
         resolve: {
-            alias: {
-                "@DOMPath": path.join(PATHS.core, "DOM"),
-                "@Resources": PATHS.resources,
-                "@EnvResources": PATHS.envResources,
-                "@Generated": PATHS.generated,
-                "@App": PATHS.app,
-                "@Core": PATHS.core,
-                "@Environment": PATHS.environment,
-                "@Themes": PATHS.themesGenerated,
-            },
+            alias: resolveAlias
         },
-        entry: [
-            path.join(PATHS.core, "Init", "index.js"),
-        ],
+        entry: {
+            index: path.join(PATHS.core, "Init", "index.js"),
+        },
         ...(!PROD || env.makeMaps ? { devtool: "source-map" } : {}),
         output: {
             path: PATHS.build,
@@ -201,9 +205,6 @@ module.exports = (env = {}) => {
         },
         plugins: [
             new BitBarWebpackProgressPlugin(),
-            new CleanWebpackPlugin({
-                cleanStaleWebpackAssets: false,
-            }),
             new CopyWebpackPlugin([
                 { from: path.join(PATHS.resources, ".well-known"), to: path.join(PATHS.build, ".well-known") },
                 { from: path.join(PATHS.resources, "template.htaccess"), to: path.join(PATHS.build, ".htaccess"), toType: "file" },
@@ -257,17 +258,27 @@ module.exports = (env = {}) => {
                         sizes: [44, 50, 96, 100, 128, 150, 192, 256, 384, 512],
                         destination: path.join(".assets", "icons"),
                     },
+                    {
+                        src: path.join(PATHS.resources, "images", "logo", (env.WG ? "mask_wg.png" : (env.LOCAL ? "mask_local.png" : "mask.png"))),
+                        size: '1024x1024',
+                        purpose: 'maskable'
+                    }
                 ],
             }),
             new workboxPlugin.GenerateSW({
                 swDest: "sw.js",
+                importScripts: [
+                    "sw-push.js"
+                ],
                 clientsClaim: true,
                 skipWaiting: true,
                 exclude: [/\.htaccess$/, /language\/.+$/],
-                navigateFallback: "/",
-                navigateFallbackBlacklist: [/^\/\.well-known/, /^\/\.assets/, /^\/favicon\.ico$/, /^\/sw\.js$/],
+                navigateFallback: "/index.html",
+                navigateFallbackDenylist: [/^\/\.well-known/, /^\/\.assets/, /^\/favicon\.ico$/, /^\/sw\.js$/],
                 directoryIndex: "index.html",
                 offlineGoogleAnalytics: env.ANALYTICS,
+                maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
+                disableDevLogs: true,
                 runtimeCaching: [
                     {
                         urlPattern: /language/,
@@ -279,29 +290,100 @@ module.exports = (env = {}) => {
                     },
                     {
                         urlPattern: new RegExp("^https://fonts.gstatic.com/"),
-                        handler: "CacheFirst",
+                        handler: "StaleWhileRevalidate",
                     },
                     {
                         urlPattern: new RegExp("^https://fonts.googleapis.com/"),
-                        handler: "CacheFirst",
+                        handler: "StaleWhileRevalidate",
                     },
                     {
                         urlPattern: new RegExp("\\?imagecache$"),
-                        handler: "CacheFirst",
+                        handler: "StaleWhileRevalidate",
                     },
                 ],
             }),
-            new webpack.DefinePlugin({
-                __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
-                __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
-                __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
-                __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
-                __PACKAGE_CHANGELOG: JSON.stringify([]),
-                __PACKAGE_WG: JSON.stringify(!!env.WG),
-                __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
-                __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
-                __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
-            }),
+            definePlugin
         ],
     }
+
+    const SWPushConfig = {
+        target: "webworker",
+        watch: !!env.watch,
+        performance: { hints: false },
+
+        ...(env.LOCAL ? {
+            devServer: {
+                contentBase: PATHS.localBuild,
+                compress: true,
+                port: 443,
+                host: "0.0.0.0",
+                historyApiFallback: {
+                    index: "/",
+                },
+                public: "pc.my",
+                hot: false,
+                inline: false,
+                liveReload: false,
+                https: {
+                    key: fs.readFileSync(path.join(__dirname, "scripts", "ssl", "server.key")),
+                    cert: fs.readFileSync(path.join(__dirname, "scripts", "ssl", "server.crt")),
+                },
+            },
+        } : {}),
+        optimization: {
+            namedChunks: true,
+            runtimeChunk: false,
+            splitChunks: {},
+            ...(PROD ? {
+                minimizer: [
+                    new TerserPlugin({
+                        parallel: true,
+                        sourceMap: true,
+                        cache: true,
+                    }),
+                ],
+            } : {}),
+        },
+        resolve: {
+            alias: resolveAlias
+        },
+        entry: {
+            swscript: path.join(PATHS.app, "modules", "mono", "services", "Push", "SWScript.js"),
+        },
+        ...(!PROD || env.makeMaps ? { devtool: "source-map" } : {}),
+        output: {
+            path: PATHS.build,
+            chunkFilename: "sw-push.[id].js",
+            filename: "sw-push.js",
+            publicPath: "/",
+        },
+        mode: (PROD ? "production" : "development"),
+
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    use: {
+                        loader: "babel-loader",
+                        options: {
+                            presets: ["@babel/preset-env"],
+                            babelrc: true,
+                        },
+                    },
+                },
+                {
+                    test: /\.(png|jpg|gif|svg)$/,
+                    loader: ["url-loader"],
+                },
+            ],
+        },
+        plugins: [
+            new CleanWebpackPlugin({
+                cleanStaleWebpackAssets: false,
+            }),
+            definePlugin
+        ]
+    }
+
+    return [SWPushConfig, appConfig]
 }

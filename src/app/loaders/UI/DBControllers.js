@@ -7,6 +7,7 @@ import OfflineCache from "@App/modules/mono/services/OfflineCache"
 import StatementStorage from "@App/modules/mono/services/StatementStorage"
 import Auth from "@App/modules/mono/services/Auth"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
+import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 
 CoreLoader.registerTask({
     id: "db-presence",
@@ -171,6 +172,34 @@ CoreLoader.registerTask({
                             reject()
                         }
                     }),
+                },
+            ],
+        })
+
+        DBUserPresence.registerNewPresence({
+            id: "CardSettings",
+            name: $$("@settings/storage/dbs/card_settings"),
+            description: $$("@settings/storage/dbs/card_settings/description"),
+            icon: "credit_card",
+            size: async () => {
+                const db = await Promise.all([SettingsStorage.get("card_order"), SettingsStorage.get("mono_cards_config")])
+                const res = db.reduce((pr, cur) => pr + (cur ? JSON.stringify(cur).length : 0), 0)
+                return res
+            },
+            config: {
+                changeable: false,
+                display: true,
+            },
+            actions: [
+                {
+                    name: $$("@settings/storage/actions/clear"),
+                    handler: () => DBUserPresence.get("CardSettings").functions.find((e) => e.name === "clear").handler(),
+                },
+            ],
+            functions: [
+                {
+                    name: "clear",
+                    handler: () => Promise.all([SettingsStorage.delete("card_order"), SettingsStorage.delete("mono_cards_config")]),
                 },
             ],
         })

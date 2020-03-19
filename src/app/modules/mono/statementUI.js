@@ -2,13 +2,14 @@ import { WindowContainer } from "@Environment/Library/DOM/buildBlock"
 import WindowManager from "@Core/Services/SimpleWindowManager"
 import Navigation from "@Core/Services/navigation"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import { SVG } from "@Environment/Library/DOM/basic"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import printMoney from "@App/tools/transform/printMoney"
 import cubicBeizer from "@DOMPath/Animation/Library/Timing/cubicBeizer"
 import { Card } from "@Environment/Library/DOM/object/card"
-import { Preloader, TwoSidesWrapper, Title } from "@Environment/Library/DOM/object"
+import {
+    Preloader, TwoSidesWrapper, Title,
+} from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
 import LottieAnimation from "@App/library/LottieAnimation"
 import { Button } from "@Environment/Library/DOM/object/input"
@@ -16,7 +17,11 @@ import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import Report from "@Core/Services/report"
-import { Currency } from "./API/classes/Currency"
+import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
+import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
+import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
+import Sleep from "@Core/Tools/objects/sleep"
+import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -24,10 +29,29 @@ import MilesCashback from "./API/classes/cashbacks/MilesCashback"
 import Auth from "./services/Auth"
 import MonoAPI from "./API/clients/MonoAPI"
 import Account from "./API/classes/Account"
+import { cardItemGenerator } from "./functions/cardItemGenerator"
+import CardCustomization from "./controllers/CardCustomization"
+import { statementDownloaderUI } from "./functions/statementDownloader"
 
 export default class StatementUI {
     static async Init() {
         Navigation.updateTitle($$("@statement"))
+
+        Navigation.Current = {
+            navMenu: [
+                {
+                    icon: "credit_card",
+                    title: $$("@customization/open"),
+                    handler() { CardCustomization.cardList(true) },
+                },
+                {
+                    icon: "cloud_download",
+                    title: $$("@download_statement"),
+                    handler() { statementDownloaderUI() },
+                },
+            ],
+        }
+
         if (!Auth.isAnyAuthed) {
             Navigation.url = { module: "auth" }
             return
@@ -36,11 +60,29 @@ export default class StatementUI {
         WindowManager.newWindow().append(w)
         w.style({ padding: 0 })
         let statementBody
+        let curAccount
 
         const gallery = await this.makeCardGallery(async (account, visual) => {
+            curAccount = account
             let isLoading = true
             let prevDate = Date.now()
             let fromDate = prevDate - 1000 * 60 * 60 * 24 * 7
+            let loadMoreCount = 0
+            if (!account) {
+                const p = Prompt({
+                    title: $$("@statement/accounts_changed"),
+                    text: $$("@statement/accounts_changed_text"),
+                    buttons: [
+                        {
+                            content: $$("reload"),
+                            handler() {
+                                Navigation.reload()
+                                p.close()
+                            },
+                        },
+                    ],
+                })
+            }
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
@@ -60,7 +102,7 @@ export default class StatementUI {
             let genList
             const contentCard = new Card(
                 new Preloader({ style: { margin: "auto" } }),
-                { style: { display: "flex" } },
+                { style: { display: "flex", flexDirection: "column" } },
             )
             statementBody.clear(contentCard)
 
@@ -76,6 +118,8 @@ export default class StatementUI {
                     ["center", "row"], { padding: "15px" },
                 )
                 statementBody.render(thisLoader)
+
+                loadMoreCount++
                 window.requestAnimationFrame(async () => {
                     prevDate = fromDate
                     fromDate -= 1000 * 60 * 60 * 24 * 7
@@ -88,6 +132,7 @@ export default class StatementUI {
             }
 
             genList = (items, noReplace = false) => {
+                if (account !== curAccount) return
                 const toRender = []
 
                 items.forEach((item, i) => {
@@ -102,6 +147,7 @@ export default class StatementUI {
 
                         const descriptionArray = []
 
+                        if (item.comment) descriptionArray.push(`👋 ${item.comment}`)
                         descriptionArray.push(item.mcc.title)
 
                         if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
@@ -167,7 +213,8 @@ export default class StatementUI {
                                     new DOM({
                                         new: "div",
                                         class: ["amount-statement-item", (item.out ? "out" : "in")],
-                                        content: String((item.out ? -1 : 1) * item.amount.integer),
+                                        content: String((item.out ? "-" : "")
+                                            + printMoney(item.amount, null, true)),
                                     }),
                                 ),
                         }))
@@ -180,7 +227,7 @@ export default class StatementUI {
 
 
                 if (items.length === 0) {
-                    if (!noReplace) {
+                    if (!noReplace || contentCard.classList.contains("originally-null")) {
                         contentCard.classList.add("originally-null")
                         contentCard.clear(
                             new DOM({
@@ -189,7 +236,7 @@ export default class StatementUI {
                                 content: [
                                     new LottieAnimation(require("@Resources/animations/failed.json"),
                                         { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
-                                    new Title($$("@statement/no_operations_for_last_week"), 3, { marginLeft: "5px", marginRight: "5px" }),
+                                    new Title((loadMoreCount > 0 ? $$("@statement/still_nothing") : $$("@statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
                                     new Button({
                                         content: $$("@statement/load_more"),
                                         handler() {
@@ -200,9 +247,21 @@ export default class StatementUI {
                                 ],
                             }),
                         )
-                    }
+                    } else if (!contentCard.classList.contains("originally-null")) {
+                        loader = new Align(
+                            new Button({
+                                content: $$("@statement/load_more"),
+                                handler() {
+                                    loadMore()
+                                },
+                            }),
+                            ["center", "row"], { padding: "15px" },
+                        )
+                        statementBody.render(loader)
+                    } else if (loader) loader.destructSelf()
                 } else {
                     contentCard.style({ display: "" })
+                    contentCard.classList.remove("originally-null")
                     loader = new Align(
                         new Button({
                             content: $$("@statement/load_more"),
@@ -214,6 +273,134 @@ export default class StatementUI {
                     )
                     statementBody.render(loader)
                 }
+
+                if (account.cards[0].type === "platinum" && "fallback" in visual.params) {
+                    const setColor = async (newColor) => {
+                        const config = await SettingsStorage.get("mono_cards_config") || {}
+                        visual.params.look = newColor
+                        delete visual.params.fallback
+                        config[account.id] = visual.params
+                        await SettingsStorage.set("mono_cards_config", config)
+                        Navigation.reload()
+                    }
+                    const colorHint = new WarningConstructor({
+                        type: 2,
+                        content: new DOM({
+                            new: "div",
+                            style: {
+                                display: "flex",
+                                flexDirection: "column",
+                            },
+                            content: [
+                                new Title($$("@statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
+                                new Align(
+                                    [
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #d0d0d0 0%, #6b6b6b 100%)", // grey
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("grey")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #ffe6e5 0%, #ca9695 100%)", // pink
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("pink")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                        new DOM({
+                                            new: "div",
+                                            style: {
+                                                width: "36px",
+                                                height: "36px",
+                                                borderRadius: "50%",
+                                                background: "linear-gradient(45deg, #333333 0%, #000 100%)", // black
+                                                margin: "0 10px",
+                                                cursor: "pointer",
+                                            },
+                                            events: [
+                                                {
+                                                    event: "click",
+                                                    handler() {
+                                                        setColor("black")
+                                                    },
+                                                },
+                                            ],
+                                        }),
+                                    ],
+                                    ["row", "center"],
+                                ),
+                            ],
+                        }),
+                        style: {
+                            margin: "15px",
+                        },
+                    })
+
+                    new SlideInCSS({
+                        renderAwait: true,
+                        duration: 300,
+                        timingFunc: EaseOutCubic,
+                    }).apply(colorHint).then(() => { colorHint.style({ margin: "15px" }) })
+                    Sleep(1000).then(() => {
+                        contentCard.prepend(colorHint)
+                    })
+                }
+
+                SettingsStorage.get("my_cards_hint_shown").then((v) => {
+                    if (v) return
+                    const warning = new WarningConstructorButton({
+                        type: 3,
+                        title: $$("@statement/hint_customize"),
+                        content: $$("@statement/hint_customize_text"),
+                        icon: "credit_card",
+                        button: {
+                            content: $$("@statement/open"),
+                            handler() {
+                                CardCustomization.cardList(true)
+                            },
+                        },
+                        style: {
+                            margin: "15px",
+                        },
+                    })
+
+                    new SlideInCSS({
+                        renderAwait: true,
+                        duration: 300,
+                        timingFunc: EaseOutCubic,
+                    }).apply(warning).then(() => { warning.style({ margin: "15px" }) })
+
+                    Sleep(1000).then(() => {
+                        contentCard.prepend(warning)
+                        SettingsStorage.set("my_cards_hint_shown", true)
+                    })
+                })
 
                 isLoading = false
             }
@@ -244,58 +431,44 @@ export default class StatementUI {
         w.render(statementBody)
     }
 
-    static cardItemGenerator({
-        bank = "mono", look = "black", cardholder = "", currency = null,
-    }) {
-        const bankImg = this.bankImg(bank)
-        const [cardBG, invert] = this.cardBG(look)
-        const cardDecoration = this.cardDecoration(currency)
-        const cardSign = String(cardholder)
+    static detectLook(type) {
+        if (type === "white") return "white"
+        if (type === "yellow") return "yellow"
+        if (type === "iron") return "iron"
+        if (type === "platinum") return "grey"
+        return "black"
+    }
 
-        return new DOM({
-            new: "div",
-            class: ["mono-card", ...(cardDecoration === null ? [] : ["mono-card-decorator", cardDecoration]), ...(invert ? ["mono-card-inverted"] : [])],
-            style: {
-                background: cardBG,
-            },
-            content: [
-                new DOM({
-                    new: "div",
-                    class: "mono-card-bank-image",
-                    content: bankImg,
-                    style: {
-                        filter: (invert ? "brightness(0)" : ""),
-                    },
-                }),
-                new DOM({
-                    new: "div",
-                    class: "mono-card-cardholder",
-                    content: cardSign,
-                    style: {
-                        filter: (invert ? "brightness(0)" : ""),
-                    },
-                }),
-            ],
+    static async cardConfig(accounts) {
+        const settings = await SettingsStorage.get("mono_cards_config") || {}
+
+        const res = {}
+
+        accounts.forEach((account, i) => {
+            res[account.id] = settings[account.id] || {
+                id: account.id,
+                bank: (account.cards[0].type === "iron" ? "iron" : "mono"),
+                look: this.detectLook(account.cards[0].type),
+                cardholder: account.client.name,
+                currency: account.balance.currency.number,
+                fallback: true,
+            }
         })
+
+        return res
     }
 
     static async cardList(accounts) {
-        const settings = await SettingsStorage.get("mono_cards_config") || {}
+        const settings = await this.cardConfig(accounts)
 
-        const cards = accounts.map((card, i) => {
-            const params = settings[card.id]
-                || {
-                    bank: "mono",
-                    look: "black",
-                    cardholder: card.client.name,
-                    currency: card.balance.currency,
-                }
+        const cards = accounts.map((account, i) => {
+            const params = settings[account.id]
 
-            const cardVisual = this.cardItemGenerator(params)
+            const cardVisual = cardItemGenerator(params)
 
             const balanceItem = new DOM({
                 new: "div",
-                content: printMoney(card.balance),
+                content: printMoney(account.balance),
                 class: "mono-card-absolute-balance-number",
             })
 
@@ -336,18 +509,15 @@ export default class StatementUI {
                         name: "updateState",
                         handler: setAmount,
                     },
+                    {
+                        name: "params",
+                        handler: params,
+                    },
                 ],
             })
         })
 
         return cards
-    }
-
-    static async allCardInfo() {
-        const cardList = await StatementStorage.getCardList(true)
-
-        const cardVisuals = await this.cardList(cardList)
-        return [cardList, cardVisuals]
     }
 
     static async makeCardGallery(callback = () => { }) {
@@ -359,7 +529,7 @@ export default class StatementUI {
 
         cardVisuals.forEach((e) => e.updateState(true))
         const updateCards = async () => {
-            const ci = await StatementStorage.getCardList(true, false)
+            const ci = await StatementStorage.getAccountList(true, false)
 
             ci.forEach((account) => {
                 const id = cardList.findIndex((e) => e.id === account.id)
@@ -459,6 +629,8 @@ export default class StatementUI {
             })
         }
 
+        let lastT = null
+
         gallery = new DOM({
             new: "div",
             content: new DOM({
@@ -477,6 +649,26 @@ export default class StatementUI {
                     event: "touchstart",
                     handler: (...e) => interactionStartHandler(true, ...e),
                     params: { passive: true },
+                },
+                {
+                    event: "wheel",
+                    handler(event) {
+                        const deltaC = event.deltaX || (event.shiftKey ? event.deltaY : 0)
+                        if (deltaC === 0) return
+                        event.preventDefault()
+                        const mouseScroll = Math.abs(deltaC) >= 100
+                        this.scrollBy({
+                            left: (mouseScroll
+                                ? 35 * Math.sign(deltaC) : deltaC),
+                        })
+                        if (lastT !== null) clearTimeout(lastT)
+                        lastT = setTimeout(() => {
+                            calculateCurrent()
+                            requestAnimationFrame(() => {
+                                scrollTo(cardVisuals[currentSelection])
+                            })
+                        }, (mouseScroll ? 200 : 0))
+                    },
                 },
             ],
             onRender(ev, el) {
@@ -498,36 +690,11 @@ export default class StatementUI {
         return gallery
     }
 
-    static bankImg(bank) {
-        let img = require("@Resources/images/banklogos/mono.svg")
-        if (bank === "iron") img = require("@Resources/images/banklogos/iron.svg")
-        return new SVG(img)
-    }
+    static async allCardInfo() {
+        const cardList = await StatementStorage.getAccountList(true)
 
-    static cardBG(look) {
-        let gradient = "linear-gradient(45deg, #333333 0%, #000 100%)"
-        let invert = false
-        if (look === "grey") {
-            gradient = "linear-gradient(45deg, #d8d8d8 0%, #9d9d9d 100%)"
-            invert = true
-        } else
-        if (look === "pink") {
-            gradient = "linear-gradient(45deg, #ffe6e5 0%, #ca9695 100%)"
-            invert = true
-        }
-
-        return [gradient, invert]
-    }
-
-    static cardDecoration(currency) {
-        let decoration = null
-        if (currency instanceof Currency) {
-            if (currency.number === 840) decoration = "--card-green-sideline"; else
-            if (currency.number === 978) decoration = "--card-red-sideline"; else
-            if (currency.number === 985) decoration = "--card-blue-sideline"
-        }
-
-        return decoration
+        const cardVisuals = await this.cardList(cardList)
+        return [cardList, cardVisuals]
     }
 }
 

@@ -63,6 +63,12 @@ if (isRecoveryMode()) {
 
     window.addEventListener("error", (e) => {
         OutputRecovery((e.message ? `${e.message} on ${e.filename}:${e.lineno}:${e.colno}` : "ERROR: No debug info available"))
+        if (e.stack) OutputRecovery(e.stack)
+    })
+
+    window.addEventListener("unhandledrejection", (e) => {
+        OutputRecovery((e.reason.message ? `${e.reason.message} on ${e.reason.filename}:${e.reason.lineno}:${e.reason.colno}` : "ERROR (in promise): No debug info available"))
+        if (e.reason.stack) OutputRecovery(e.reason.stack)
     })
 }
 
