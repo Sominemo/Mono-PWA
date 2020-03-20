@@ -373,7 +373,7 @@ export default class StatementUI {
                 }
 
                 SettingsStorage.get("my_cards_hint_shown").then((v) => {
-                    if (v) return
+                    if (v || curAccount !== account) return
                     const warning = new WarningConstructorButton({
                         type: 3,
                         title: $$("@statement/hint_customize"),

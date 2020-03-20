@@ -5,7 +5,7 @@ import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import Navigation from "@Core/Services/navigation"
 import { Title, Icon } from "@Environment/Library/DOM/object"
 import { Card, CardContent } from "@Environment/Library/DOM/object/card"
-import { $$ } from "@Core/Services/Language/handler"
+import { $$, $ } from "@Core/Services/Language/handler"
 import Design from "@Core/Services/design"
 import { Button, SwitchLabel } from "@Environment/Library/DOM/object/input"
 import App from "@Core/Services/app"
@@ -65,10 +65,6 @@ export default class FlagsUI {
         if (__PACKAGE_ANALYTICS) {
             if (!PWA.isWG) {
                 exps.push({
-                    title: "Отказаться от сбора данных",
-                    about: `Отключить сервис Google Analytics и прекратить сбор деперсонифицированных данных,
-которые используются для улучшения опыта использования (подробнее в меню "О программе" › "Дисклеймер").
-Данная настройка включается автоматически, если в браузере включены Do Not Track запросы`,
                     id: "deny_analytics",
                 })
             }
@@ -76,14 +72,9 @@ export default class FlagsUI {
 
         if (App.debug) {
             exps.push({
-                title: "Показать меню «Эксперименты» в меню",
-                about: "Добавляет эту страницу в меню настроек",
                 id: "miscellaneous_in_settings",
             })
             exps.push({
-                title: "Навигация с помощью клавиши TAB",
-                about: `Симуляция навигации по приложению, где нажатие на TAB равноценно
-переходу к следующему элементу, а нажатие Enter — клику по элементу`,
                 id: "enable_tab_navigation",
             })
         }
@@ -134,13 +125,13 @@ export default class FlagsUI {
                 new DOM({
                     new: "div",
                     content: [
-                        new DOM({ new: "div", content: title, style: { fontWeight: "500", fontSize: "20px" } }),
+                        new DOM({ new: "div", content: title || $(`@experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "20px" } }),
                         new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } }),
                     ],
                     id: `flag-id-${id}`,
                 }),
             ),
-            new CardContent(about),
+            new CardContent(about || $(`@experiments/about/${id}/about`)),
         ])
     }
 }
