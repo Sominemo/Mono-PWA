@@ -1,19 +1,16 @@
 {
     "name": "mono-pwa",
-    "version": "3.3.1",
+    "version": "3.3.2",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
         "branch": "master"
     },
     "scripts": {
-        "build": "webpack --config webpack/webpack.config.js --env.ANALYTICS",
+        "build": "webpack --config webpack/webpack.config.js --env.PRODUCTION --env.ANALYTICS",
         "local": "webpack-dev-server --config webpack/webpack.config.js --env.LOCAL --env.watch",
         "wg": "webpack --config webpack/webpack.config.js --env.WG --env.ANALYTICS --env.watch",
-        "major": "webpack --config webpack/webpack.config.js --env.major --env.ANALYTICS",
-        "minor": "webpack --config webpack/webpack.config.js --env.minor --env.ANALYTICS",
-        "patch": "webpack --config webpack/webpack.config.js --env.patch --env.ANALYTICS",
-        "build-debug": "webpack --config  webpack/webpack.config.js --env.makeMaps --env.ANALYTICS",
+        "build-debug": "webpack --config  webpack/webpack.config.js --env.PRODUCTION --env.ANALYTICS --env.DEBUG",
         "ci": "webpack --config webpack/webpack.config.js --env.CI",
         "test": "echo \"No tests specified\""
     },

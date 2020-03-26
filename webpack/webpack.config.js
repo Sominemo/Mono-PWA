@@ -16,7 +16,6 @@ const mccCodes = require("mcc/emojiMap")
 
 const __root = process.cwd()
 
-const PROD = process.env.NODE_ENV === "production"
 const DOWNLOAD_LANG_PACKS = false
 
 const PATHS = {
@@ -71,9 +70,11 @@ const resolveAlias = {
 }
 
 module.exports = (env = {}) => {
+    const PROD = !!env.PRODUCTION
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
-
     const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
+
+    if(PROD) console.log("-- PRODUCTION BUILD --")
 
     if (env.watch && !env.CI) {
         const cb = () => {
@@ -148,7 +149,7 @@ module.exports = (env = {}) => {
         entry: {
             index: path.join(PATHS.core, "Init", "index.js"),
         },
-        ...(!PROD || env.makeMaps ? { devtool: "source-map" } : {}),
+        ...(!PROD || env.DEBUG ? { devtool: "source-map" } : {}),
         output: {
             path: PATHS.build,
             chunkFilename: "[id].js",
@@ -165,6 +166,7 @@ module.exports = (env = {}) => {
                         options: {
                             presets: ["@babel/preset-env"],
                             babelrc: true,
+                            compact: true,
                         },
                     },
                 },
@@ -213,20 +215,6 @@ module.exports = (env = {}) => {
                 { from: path.join(PATHS.resources, "images", "logo", "ios"), to: path.join(PATHS.build, ".assets", "icons", "ios") },
                 { from: path.join(PATHS.resources, "animations"), to: path.join(PATHS.build, ".assets", "animations") },
             ]),
-            new WebpackAutoInject({
-                SILENT: true,
-                SHORT: "MONO",
-                components: {
-                    InjectAsComment: false,
-                    InjectByTag: false,
-                    AutoIncreaseVersion: true,
-                },
-                componentsOptions: {
-                    AutoIncreaseVersion: {
-                        runInWatchMode: false,
-                    },
-                },
-            }),
             new HtmlWebpackPlugin({
                 title: "monobank",
                 favicon: path.join(PATHS.resources, "images", "logo", "favicon.ico"),

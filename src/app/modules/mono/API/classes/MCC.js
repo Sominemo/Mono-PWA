@@ -1,6 +1,7 @@
 /* global __MCC_CODES_EMOJI */
 
 import mcc from "mcc"
+import mccLocal from "@Resources/datasets/MCC-Localize-Dataset/mcc-loc.json"
 
 const emojiFallback = "\uD83D\uDCB3"
 
@@ -27,6 +28,12 @@ export default class MCC {
         }
 
         this.title = irsDescription || usdaDescription || combinedDescription || editedDescription
+
+        const textCode = String(code).padStart(4, "0")
+        const locMccData = mccLocal[textCode]
+        if (locMccData.uk && locMccData.uk.length > 0) this.ukTitle = locMccData.uk
+        if (locMccData.ru && locMccData.ru.length > 0) this.ruTitle = locMccData.ru
+
         this.id = id
         this.code = code
 

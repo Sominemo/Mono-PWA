@@ -22,6 +22,7 @@ import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
 import Sleep from "@Core/Tools/objects/sleep"
 import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
+import LanguageCore from "@Core/Services/Language/core"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -148,7 +149,10 @@ export default class StatementUI {
                         const descriptionArray = []
 
                         if (item.comment) descriptionArray.push(`👋 ${item.comment}`)
-                        descriptionArray.push(item.mcc.title)
+                        descriptionArray.push(
+                            (LanguageCore.language.info.code === "ru" ? item.mcc.ruTitle : item.mcc.ukTitle)
+                            || item.mcc.title,
+                        )
 
                         if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
                             if (item.cashback instanceof MoneyCashback) {
