@@ -191,7 +191,7 @@ export default class MonoAuth {
                     },
                 },
                 {
-                    name() { return $$("@p4/partners") },
+                    name() { return $$("p4/partners") },
                     icon: "store",
                     id: "partners",
                     handler: () => {

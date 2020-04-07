@@ -17,7 +17,7 @@ import { ContextMenu } from "@Environment/Library/DOM/elements"
 import Auth from "./services/Auth"
 
 const lastChangelog = {
-    version: "3.3.0",
+    version: "4.0.0-dev1",
     get link() {
         return `https://sominemo.com/mono/help/release/${LanguageCore.language.info.code}/${this.version}`
     },
@@ -25,7 +25,7 @@ const lastChangelog = {
 
 export default class MenuUI {
     static async Init() {
-        Navigation.updateTitle($$("@menu"))
+        Navigation.updateTitle($$("menu"))
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
 
@@ -76,8 +76,8 @@ export default class MenuUI {
             if (lastSeen === lastChangelog.version) return
 
             const tip = new Tip({
-                title: $$("@menu/app_upgraded"),
-                sub: $$("@menu/see_whats_new"),
+                title: $$("menu/app_upgraded"),
+                sub: $$("menu/see_whats_new"),
                 icon: "new_releases",
                 async onclick() {
                     window.open(lastChangelog.link, "_blank")

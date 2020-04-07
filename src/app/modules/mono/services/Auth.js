@@ -13,12 +13,12 @@ import StatementStorage from "./StatementStorage"
 import OfflineCache from "./OfflineCache"
 
 export default class Auth {
-    static _instances = new Map()
+    static #instances = new Map()
 
     static inited = false
 
     static get all() {
-        return Array.from(this._instances.values())
+        return Array.from(this.#instances.values())
     }
 
     static get authed() {
@@ -45,11 +45,11 @@ export default class Auth {
             return self.all[0]
         }
 
-        if (this._mainInstance === null) return fallback()
-        return this.getInstanceByID(this._mainInstance) || fallback()
+        if (this.#mainInstance === null) return fallback()
+        return this.getInstanceByID(this.#mainInstance) || fallback()
     }
 
-    static _mainInstance = null
+    static #mainInstance = null
 
     static updateIcons() {
         if (this.isAnyAuthed) {
@@ -102,7 +102,7 @@ export default class Auth {
                     },
                 },
                 {
-                    name() { return $$("@p4/partners") },
+                    name() { return $$("p4/partners") },
                     icon: "store",
                     id: "partners",
                     handler: () => {
@@ -130,13 +130,13 @@ export default class Auth {
     }
 
     static async setMainInstance(id) {
-        if (this._instances.get(id)) {
+        if (this.#instances.get(id)) {
             (await this.accountSettingsDB()).put({ name: "default", value: id })
         }
     }
 
     static async resetMainInstance(id) {
-        if (this._instances.get(id)) {
+        if (this.#instances.get(id)) {
             (await this.accountSettingsDB()).delete("default")
         }
     }
@@ -173,21 +173,21 @@ export default class Auth {
 
     static async initInstances() {
         const accounts = await (await this.accountsDB()).getAll()
-        this._instances.clear()
+        this.#instances.clear()
         NotificationManager.reset()
         await Promise.all(accounts.map(async (account) => {
             const instance = await this.genInstance(account)
             if ("push" in instance) {
                 this.waitList.push(instance.push)
             }
-            this._instances.set(account.id, instance)
+            this.#instances.set(account.id, instance)
         }))
 
-        if (this._instances.size === 0) {
-            this._instances.set(0, await this.genInstance({ settings: { type: "anon" }, id: 0 }))
+        if (this.#instances.size === 0) {
+            this.#instances.set(0, await this.genInstance({ settings: { type: "anon" }, id: 0 }))
         }
 
-        this._mainInstance = await this.getMainInstance()
+        this.#mainInstance = await this.getMainInstance()
         this.inited = true
         StatementStorage.syncAccountStorageList()
         this.updateIcons()
@@ -203,10 +203,12 @@ export default class Auth {
             })
         }
 
-        this._onInitResolve()
+        this.onInitResolve()
     }
 
-    static onInit = new Promise((resolve) => { Auth._onInitResolve = resolve })
+    static onInitResolve = () => { }
+
+    static onInit = new Promise((resolve) => { this.onInitResolve = resolve })
 
     static async addInstance(settings, accountsCache = [], wait = false) {
         const id = hashCode(JSON.stringify(settings))
@@ -235,7 +237,7 @@ export default class Auth {
     }
 
     static getInstanceByID(id) {
-        return this._instances.get(id)
+        return this.#instances.get(id)
     }
 
     static async genInstance(account) {
@@ -260,7 +262,7 @@ export default class Auth {
         return instance
     }
 
-    static _db = new DBTool("AuthStorage", 1, {
+    static db = new DBTool("AuthStorage", 1, {
         upgrade(db, oldVersion, newVersion, transaction) {
             if (oldVersion === 0) {
                 db.createObjectStore("accounts", {
@@ -274,12 +276,12 @@ export default class Auth {
     })
 
     static async accountsDB() {
-        const db = await this._db.onReady()
+        const db = await this.db.onReady()
         return db.OSTool("accounts")
     }
 
     static async accountSettingsDB() {
-        const db = await this._db.onReady()
+        const db = await this.db.onReady()
         return db.OSTool("settings")
     }
 }

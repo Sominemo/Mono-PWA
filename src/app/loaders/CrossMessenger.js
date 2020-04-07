@@ -4,7 +4,7 @@ import Listeners from "@Core/Services/Listeners"
 import Auth from "@App/modules/mono/services/Auth"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import { CoreLoader, CoreLoaderSkip, CoreLoaderResult } from "@Core/Init/CoreLoader"
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import DBTool from "@Core/Tools/db/DBTool"
 import ObjectStoreTool from "@Core/Tools/db/ObjectStoreTool"
 

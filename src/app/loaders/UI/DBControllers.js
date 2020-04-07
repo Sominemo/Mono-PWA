@@ -1,6 +1,6 @@
 import DBUserPresence from "@Core/Services/DBUserPresence"
 import { $$ } from "@Core/Services/Language/handler"
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import download from "@App/tools/interaction/download"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
@@ -15,8 +15,8 @@ CoreLoader.registerTask({
     task() {
         DBUserPresence.registerNewPresence({
             id: "LogData",
-            name: $$("@settings/storage/dbs/logs"),
-            description: $$("@settings/storage/dbs/logs/description"),
+            name: $$("settings/storage/dbs/logs"),
+            description: $$("settings/storage/dbs/logs/description"),
             icon: "description",
             quota: () => (1024 ** 2) * 15,
             size: async () => {
@@ -32,11 +32,11 @@ CoreLoader.registerTask({
             },
             actions: [
                 {
-                    name: $$("@settings/storage/actions/clear"),
+                    name: $$("settings/storage/actions/clear"),
                     handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "clear").handler(),
                 },
                 {
-                    name: $$("@settings/storage/actions/export"),
+                    name: $$("settings/storage/actions/export"),
                     handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "export").handler(),
                 },
             ],
@@ -73,8 +73,8 @@ CoreLoader.registerTask({
 
         DBUserPresence.registerNewPresence({
             id: "OfflineCache",
-            name: $$("@settings/storage/dbs/offline_cache"),
-            description: $$("@settings/storage/dbs/offline_cache/description"),
+            name: $$("settings/storage/dbs/offline_cache"),
+            description: $$("settings/storage/dbs/offline_cache/description"),
             icon: "offline_pin",
             size: async () => {
                 const db = await OfflineCache.DBConnection()
@@ -87,7 +87,7 @@ CoreLoader.registerTask({
             },
             actions: [
                 {
-                    name: $$("@settings/storage/actions/clear"),
+                    name: $$("settings/storage/actions/clear"),
                     handler: () => DBUserPresence.get("OfflineCache").functions.find((e) => e.name === "clear").handler(),
                 },
             ],
@@ -113,11 +113,11 @@ CoreLoader.registerTask({
 
         DBUserPresence.registerNewPresence({
             id: "Accounts",
-            name: $$("@settings/storage/dbs/accounts"),
-            description: $$("@settings/storage/dbs/accounts/description"),
+            name: $$("settings/storage/dbs/accounts"),
+            description: $$("settings/storage/dbs/accounts/description"),
             icon: "account_circle",
             size: async () => {
-                const db = await Auth._db.onReady()
+                const db = await Auth.db.onReady()
                 const res = await db.getDBSize()
                 return res
             },
@@ -127,12 +127,12 @@ CoreLoader.registerTask({
             },
             actions: [
                 {
-                    name: $$("@settings/storage/actions/log_out"),
+                    name: $$("settings/storage/actions/log_out"),
                     handler: () => new Promise((resolve, reject) => {
                         try {
                             const p = Prompt({
-                                title: $$("@settings/storage/actions/log_out"),
-                                text: $$("@settings/storage/actions/log_out/you_will_log_out"),
+                                title: $$("settings/storage/actions/log_out"),
+                                text: $$("settings/storage/actions/log_out/you_will_log_out"),
                                 buttons: [
                                     {
                                         content: $$("close"),
@@ -164,7 +164,7 @@ CoreLoader.registerTask({
                     handler: () => new Promise(async (resolve, reject) => {
                         try {
                             await Promise.all(Auth.all.map((e) => Auth.destroyInstance(e.id)))
-                            const db = await Auth._db.onReady()
+                            const db = await Auth.db.onReady()
                             await db.OSTool("accounts").clear()
                             await Auth.initInstances()
                             resolve()
@@ -178,8 +178,8 @@ CoreLoader.registerTask({
 
         DBUserPresence.registerNewPresence({
             id: "CardSettings",
-            name: $$("@settings/storage/dbs/card_settings"),
-            description: $$("@settings/storage/dbs/card_settings/description"),
+            name: $$("settings/storage/dbs/card_settings"),
+            description: $$("settings/storage/dbs/card_settings/description"),
             icon: "credit_card",
             size: async () => {
                 const db = await Promise.all([SettingsStorage.get("card_order"), SettingsStorage.get("mono_cards_config")])
@@ -192,7 +192,7 @@ CoreLoader.registerTask({
             },
             actions: [
                 {
-                    name: $$("@settings/storage/actions/clear"),
+                    name: $$("settings/storage/actions/clear"),
                     handler: () => DBUserPresence.get("CardSettings").functions.find((e) => e.name === "clear").handler(),
                 },
             ],
@@ -206,8 +206,8 @@ CoreLoader.registerTask({
 
         DBUserPresence.registerNewPresence({
             id: "StatementCache",
-            name: $$("@settings/storage/dbs/statement_cache"),
-            description: $$("@settings/storage/dbs/statement_cache/description"),
+            name: $$("settings/storage/dbs/statement_cache"),
+            description: $$("settings/storage/dbs/statement_cache/description"),
             icon: "account_balance_wallet",
             size: async () => {
                 const db = await (await StatementStorage.statementDB()).onReady()
@@ -220,7 +220,7 @@ CoreLoader.registerTask({
             },
             actions: [
                 {
-                    name: $$("@settings/storage/actions/clear"),
+                    name: $$("settings/storage/actions/clear"),
                     handler: () => DBUserPresence.get("StatementCache").functions.find((e) => e.name === "clear").handler(),
                 },
             ],

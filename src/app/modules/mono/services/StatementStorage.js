@@ -16,15 +16,15 @@ export default class StatementStorage {
     }
 
     static async syncAccountStorageList() {
-        let _db = null
+        let dbConnection = null
         const dbTool = await this.statementDB()
 
         const db = async () => {
-            if (!_db) {
+            if (!dbConnection) {
                 dbTool.request.close()
-                _db = this.upgradeDB()
+                dbConnection = this.upgradeDB()
             }
-            return (await _db)[1]
+            return (await dbConnection)[1]
         }
         const res = await Promise.all([this.getAccountList(), dbTool.getTablesList()])
         await Promise.all(res[0].map(async (e) => {
@@ -111,18 +111,18 @@ export default class StatementStorage {
                     },
                 })
                 if (nonUpgrade) resolve(dbTool)
-                this._db = dbTool
+                this.#db = dbTool
             } catch (e) {
                 reject()
             }
         })
     }
 
-    static _db = null
+    static #db = null
 
     static async statementDB(connection = false) {
-        if (this._db === null) await this.upgradeDB(await SettingsStorage.get("statement_db_version"), true)
-        const db = await this._db.onReady()
-        return (connection ? this._db : db)
+        if (this.#db === null) await this.upgradeDB(await SettingsStorage.get("statement_db_version"), true)
+        const db = await this.#db.onReady()
+        return (connection ? this.#db : db)
     }
 }

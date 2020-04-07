@@ -1,4 +1,4 @@
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import StatementItem from "./StatementItem"
 
 export default class Statement {

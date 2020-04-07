@@ -16,7 +16,7 @@ export default function generateTFSettingsLayout(act) {
         section = act.createSection({
             id: sectionName,
             options: {
-                name: $$("@settings/tf/tf_instances"),
+                name: $$("settings/tf/tf_instances"),
             },
             dom: SettingsSectionElement,
         }).getSection(sectionName)
@@ -34,7 +34,7 @@ export default function generateTFSettingsLayout(act) {
             return new DOM({
                 new: "div",
                 content: [
-                    new IconSide((el.unlocked ? "lock_open" : "enhanced_encryption"), (el.unlocked ? $$("@settings/tf/unlocked") : $$("@settings/tf/locked"))),
+                    new IconSide((el.unlocked ? "lock_open" : "enhanced_encryption"), (el.unlocked ? $$("settings/tf/unlocked") : $$("settings/tf/locked"))),
                 ],
             })
         }
@@ -49,9 +49,9 @@ export default function generateTFSettingsLayout(act) {
 
         lockContainer = new DOM({ new: "div", content: gen(), onRender: updateStatus })
 
-        const description = (typeof el.__tfRegistryDescription__ === "function"
-            ? String(el.__tfRegistryDescription__())
-            : (el.__tfRegistryDescription__ === null ? "" : String(el.__tfRegistryDescription__))).trim()
+        const description = (typeof el.tfRegistryDescription === "function"
+            ? String(el.tfRegistryDescription())
+            : (el.tfRegistryDescription === null ? "" : String(el.tfRegistryDescription))).trim()
 
         section
             .createGroup({
@@ -94,7 +94,7 @@ export default function generateTFSettingsLayout(act) {
         section = act.createSection({
             id: sectionName,
             options: {
-                name: $$("@settings/tf/tf_methods"),
+                name: $$("settings/tf/tf_methods"),
             },
             dom: SettingsSectionElement,
         }).getSection(sectionName)

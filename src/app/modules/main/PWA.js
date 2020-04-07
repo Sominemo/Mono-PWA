@@ -14,6 +14,7 @@ import AlignedContent from "@Environment/Library/DOM/object/AlignedContent"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import { SettingsActLink } from "@Environment/Library/DOM/settings"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
+import FlagsUI from "./flags"
 
 export default class PWA extends App {
     static get isWG() {
@@ -28,7 +29,7 @@ export default class PWA extends App {
     static analyticsDenyCache = false
 
     static InitAboutScreen() {
-        Navigation.updateTitle($$("@about/app"))
+        Navigation.updateTitle($$("about/app"))
         const w = new WindowContainer()
         WindowManager.newWindow().append(w)
 
@@ -39,7 +40,7 @@ export default class PWA extends App {
             Navigation.url = { module: "flags" }
         }
 
-        w.render(new Title($$("@about/app")))
+        w.render(new Title($$("about/app")))
         w.render(new Card(
             new AlignedContent([
                 new DOM({
@@ -62,34 +63,41 @@ export default class PWA extends App {
             ]),
         ))
 
-        w.render(new Card(new CardList(
+        const infocard = new Card(new CardList(
             [
                 {
                     content: new SettingsActLink([
                         () => this.disclaimer(),
-                        $$("@about/disclaimer_title")]),
+                        $$("about/disclaimer_title")]),
                     disableWrapper: true,
                 },
-                { content: new SettingsActLink(["transformators", $$("@settings/tf")]), disableWrapper: true },
+                { content: new SettingsActLink(["transformators", $$("settings/tf")]), disableWrapper: true },
             ],
-        )))
+        ))
+        w.render(infocard)
 
         w.render(new Card(new CardList(
             [
-                { content: new TwoSidesWrapper($$("@about/build_date"), this.buildDate) },
-                { content: new TwoSidesWrapper($$("@about/branch"), this.branch) },
-                ...(this.debug ? [{ content: new TwoSidesWrapper($$("@about/debug"), this.debug.toString()) }] : []),
+                { content: new TwoSidesWrapper($$("about/build_date"), this.buildDate) },
+                { content: new TwoSidesWrapper($$("about/branch"), this.branch) },
+                ...(this.debug ? [{ content: new TwoSidesWrapper($$("about/debug"), this.debug.toString()) }] : []),
                 ...(this.isWG ? [{ content: new TwoSidesWrapper("Work Group build", "true") }] : []),
                 ...("Windows" in window ? [{ content: new TwoSidesWrapper("WinRT", "true") }] : []),
             ],
             {}, true,
         )))
+
+        // if (__PACKAGE_ANALYTICS) {
+        if (!PWA.isWG) {
+            w.render(FlagsUI.renderSwitch(null, null, "deny_analytics"))
+        }
+        // }
     }
 
     static disclaimer() {
         Prompt({
-            title: $$("@about/disclaimer_title"),
-            text: $$("@about/disclaimer"),
+            title: $$("about/disclaimer_title"),
+            text: $$("about/disclaimer"),
             buttons: [
                 {
                     content: $$("close"),

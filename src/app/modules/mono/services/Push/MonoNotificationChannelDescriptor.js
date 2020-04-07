@@ -8,7 +8,7 @@ export default class MonoNotificationChannelDescriptor extends NotificationChann
         if (mode === "statement") {
             const accounts = await StatementStorage.getAccountList(true, true)
             const cur = accounts.find((account) => account.id === value)
-            if (!cur) return `${$("@push/i/statement/unknown_account")} ${value}`
+            if (!cur) return `${$("push/i/statement/unknown_account")} ${value}`
 
             return `${cur.cards.map((card) => `**${card.mask.end}`).join(", ")} ${cur.balance.currency.code} ${ucFirst(cur.cards[0].type)}`
         }

@@ -1,4 +1,4 @@
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import CriticalLoadErrorListener from "@Core/Services/CriticalLoadErrorListener"
 

@@ -16,7 +16,7 @@ import tryToOpenProtocol from "custom-protocol-detection"
 import { Align } from "@Environment/Library/DOM/style"
 import { $$ } from "@Core/Services/Language/handler"
 import BRify from "@Core/Tools/transformation/text/BRify"
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import PWA from "../main/PWA"
 import Auth from "./services/Auth"
 import Flags from "./services/Flags"
@@ -24,26 +24,28 @@ import Flags from "./services/Flags"
 class AuthSettings {
     constructor(s = null, options = {}) {
         if (typeof s !== "object") throw new TypeError("Object expected")
-        this._settings = s
-        this._options = options
+        this.#settings = s
+        this.#options = options
     }
 
-    _settings = null
+    #settings = null
+
+    #options = null
 
     get are() {
         // eslint-disable-next-line no-use-before-define
-        return (this._settings === null ? AuthUI.getDefault() : this._settings)
+        return (this.#settings === null ? AuthUI.getDefault() : this.#settings)
     }
 
     set are(s) {
         if (typeof s !== "object") throw new TypeError("Object expected")
-        this._settings = s
-        if (this.isDefault) this._options.warningsList.defaultsChanged.destructSelf()
-        else this._options.warnings.render(this._options.warningsList.defaultsChanged)
+        this.#settings = s
+        if (this.isDefault) this.#options.warningsList.defaultsChanged.destructSelf()
+        else this.#options.warnings.render(this.#options.warningsList.defaultsChanged)
     }
 
     get isDefault() {
-        return this._settings === null
+        return this.#settings === null
     }
 }
 
@@ -88,7 +90,7 @@ export default class AuthUI {
         if (state === null) {
             const warningsList = {
                 defaultsChanged: new WarningConstructor({
-                    content: $$("@auth/login_params_changed"),
+                    content: $$("auth/login_params_changed"),
                     icon: "info",
                     type: 3,
                     style: { textAlign: "start" },
@@ -121,16 +123,16 @@ export default class AuthUI {
                             new DOM({
                                 new: "div",
                                 class: ["auth-title"],
-                                content: $$("@auth/login_promo"),
+                                content: $$("auth/login_promo"),
                             }),
                             new Button({
-                                content: $$("@auth/log_in"),
+                                content: $$("auth/log_in"),
                                 handler() { AuthUI.continue(state) },
                             }),
                             state.warnings,
                             new DOM({
                                 new: "div",
-                                content: $$("@about/disclaimer_title"),
+                                content: $$("about/disclaimer_title"),
                                 style: {
                                     fontSize: ".7em",
                                     opacity: ".7",
@@ -152,14 +154,14 @@ export default class AuthUI {
                         class: ["bottom-box"],
                         content: [
                             new Button({
-                                content: new IconSide("chevron_right", $$("@auth/skip_step")),
+                                content: new IconSide("chevron_right", $$("auth/skip_step")),
                                 type: ["clean", "round"],
                                 async handler() {
                                     if (await cancel()) p.close()
                                 },
                             }),
                             new Button({
-                                content: new IconSide("chevron_right", $$("@auth/settings")),
+                                content: new IconSide("chevron_right", $$("auth/settings")),
                                 type: ["clean", "round"],
                                 handler() { AuthUI.settings(state) },
                             }),
@@ -180,31 +182,31 @@ export default class AuthUI {
 
     static settings(state) {
         const p = Prompt({
-            title: $$("@auth/settings"),
+            title: $$("auth/settings"),
             text: new Card(
                 new CardList([
                     {
                         handler() { AuthUI.setToken(state); p.close() },
                         content: new IconSide("vpn_key",
                             [
-                                new Title($$("@auth/settings/token"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("@auth/settings/token/description") }),
+                                new Title($$("auth/settings/token"), 4, { margin: 0 }),
+                                new DOM({ new: "div", content: $$("auth/settings/token/description") }),
                             ], { style: { marginRight: "15px" } }),
                     },
                     {
                         handler() { AuthUI.setDomain(state); p.close() },
                         content: new IconSide("domain",
                             [
-                                new Title($$("@auth/settings/domain"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("@auth/settings/domain/description") }),
+                                new Title($$("auth/settings/domain"), 4, { margin: 0 }),
+                                new DOM({ new: "div", content: $$("auth/settings/domain/description") }),
                             ], { style: { marginRight: "15px" } }),
                     },
                     {
                         handler() { AuthUI.resetState(state); p.close() },
                         content: new IconSide("history",
                             [
-                                new Title($$("@auth/settings/revert"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("@auth/settings/revert/description") }),
+                                new Title($$("auth/settings/revert"), 4, { margin: 0 }),
+                                new DOM({ new: "div", content: $$("auth/settings/revert/description") }),
                             ], { style: { marginRight: "15px" } }),
                     },
                 ], true),
@@ -227,10 +229,10 @@ export default class AuthUI {
 
 
         p = Prompt({
-            title: $$("@auth/settings/token/title"),
+            title: $$("auth/settings/token/title"),
             text: [
                 new ContentEditable({
-                    placeholder: $$("@auth/settings/token/token"),
+                    placeholder: $$("auth/settings/token/token"),
                     change(v) { value = v },
                     onEnter(v, ev, el) {
                         ev.preventDefault()
@@ -242,8 +244,8 @@ export default class AuthUI {
                 new Card(new CardContent(
                     new IconSide("vpn_key",
                         [
-                            new Title($$("@auth/settings/token"), 4, { margin: 0 }),
-                            new DOM({ new: "div", content: $$("@auth/settings/token/description") }),
+                            new Title($$("auth/settings/token"), 4, { margin: 0 }),
+                            new DOM({ new: "div", content: $$("auth/settings/token/description") }),
                         ], { style: { marginRight: "15px" } }),
                 ), { style: { margin: "10px 0" } }),
             ],
@@ -274,25 +276,25 @@ export default class AuthUI {
                 if (r.proto.version !== 1) throw new Error("Unsupported protocol version")
 
                 const ap = Prompt({
-                    title: $$("@auth/settings/domain/proto_detected"),
+                    title: $$("auth/settings/domain/proto_detected"),
                     text: new CardTextList([
                         new ContentEditable({
-                            placeholder: $$("@auth/settings/domain/name"),
+                            placeholder: $$("auth/settings/domain/name"),
                             editable: false,
                             content: r.implementation.name,
                         }),
                         new ContentEditable({
-                            placeholder: $$("@auth/settings/domain/author"),
+                            placeholder: $$("auth/settings/domain/author"),
                             editable: false,
                             content: r.implementation.author,
                         }),
                         new ContentEditable({
-                            placeholder: $$("@auth/settings/domain/proto_ver"),
+                            placeholder: $$("auth/settings/domain/proto_ver"),
                             editable: false,
                             content: `${r.proto.version}.${r.proto.patch}`,
                         }),
                         new Button({
-                            content: $$("@auth/settings/domain/visit_homepage"),
+                            content: $$("auth/settings/domain/visit_homepage"),
                             handler() {
                                 window.open(r.implementation.homepage, "_target")
                             },
@@ -320,17 +322,17 @@ export default class AuthUI {
                     ],
                 })
             } catch (e) {
-                Toast.add($$("@auth/settings/domain/unsupported_server"))
+                Toast.add($$("auth/settings/domain/unsupported_server"))
             }
 
             l.close()
         }
 
         p = Prompt({
-            title: $$("@auth/settings/domain/title"),
+            title: $$("auth/settings/domain/title"),
             text: [
                 new ContentEditable({
-                    placeholder: $$("@auth/settings/domain/url"),
+                    placeholder: $$("auth/settings/domain/url"),
                     change(v) { domain = v },
                     onEnter(v, ev, el) {
                         ev.preventDefault()
@@ -348,8 +350,8 @@ export default class AuthUI {
                 new Card(new CardContent(
                     new IconSide("domain",
                         [
-                            new Title($$("@auth/settings/domain"), 4, { margin: 0 }),
-                            new DOM({ new: "div", content: $$("@auth/settings/domain/description") }),
+                            new Title($$("auth/settings/domain"), 4, { margin: 0 }),
+                            new DOM({ new: "div", content: $$("auth/settings/domain/description") }),
                         ], { style: { marginRight: "15px" } }),
                 ), { style: { margin: "10px 0" } }),
             ],
@@ -379,7 +381,7 @@ export default class AuthUI {
         } else if (state.settings.are.type === AuthUI.authTypes.CORP) {
             this.corpUI(state)
         } else {
-            Toast.add($$("@auth/unknown_auth_method"))
+            Toast.add($$("auth/unknown_auth_method"))
         }
     }
 
@@ -396,12 +398,12 @@ export default class AuthUI {
                 clientId: result.clientId,
             }, result.raw.accounts, true)
 
-            Toast.add($$("@auth/success"))
+            Toast.add($$("auth/success"))
             state.blockerPopup.close()
             Navigation.defaultScreen()
         } catch (e) {
             Report.write(e)
-            Toast.add($$("@auth/fail"))
+            Toast.add($$("auth/fail"))
         }
         l.close()
     }
@@ -437,7 +439,7 @@ export default class AuthUI {
                         l.close()
                     })
             } catch (e) {
-                Toast.add($$("@auth/login_data_fetch_fail"))
+                Toast.add($$("auth/login_data_fetch_fail"))
                 l.close()
             }
         }
@@ -447,18 +449,18 @@ export default class AuthUI {
                 const r = await (await fetch(`${state.settings.are.domain}/check-proto`)).json()
                 state.proto = r
             } catch (e) {
-                Toast.add($$("@auth/login_data_fetch_fail"))
+                Toast.add($$("auth/login_data_fetch_fail"))
             }
         }
 
         if ("proto" in state && "message" in state.proto.server) {
             const mcp = Prompt({
-                title: `${$$("@auth/settings/domain/server_message")} ${state.settings.are.domain}`,
+                title: `${$$("auth/settings/domain/server_message")} ${state.settings.are.domain}`,
                 text: [
                     new DOM({ new: "div", content: BRify(state.proto.server.message.text) }),
                     ...("link" in state.proto.server.message ? [
                         new Button({
-                            content: $$("@auth/settings/domain/see_link"),
+                            content: $$("auth/settings/domain/see_link"),
                             handler() {
                                 window.open(state.proto.server.message.link, "_target")
                             },
@@ -537,7 +539,7 @@ export default class AuthUI {
             text: [
                 new DOM({
                     new: "div",
-                    content: (force ? $$("@auth/stage/link") : $$("@auth/stage/opening")),
+                    content: (force ? $$("auth/stage/link") : $$("auth/stage/opening")),
                     style: {
                         fontWeight: "500",
                         fontSize: "20px",
@@ -546,29 +548,29 @@ export default class AuthUI {
                 }),
                 new DOM({
                     new: "div",
-                    content: (force ? $$("@auth/stage/copied") : $$("@auth/stage/auto_link")),
+                    content: (force ? $$("auth/stage/copied") : $$("auth/stage/auto_link")),
                     style: {
                         marginBottom: "15px",
                     },
                 }),
                 new ContentEditable({
                     content: state.roll.url,
-                    placeholder: $$("@auth/stage/link"),
+                    placeholder: $$("auth/stage/link"),
                 }),
                 new Card(
                     new CardList([
                         {
                             content: new IconSide("link",
                                 [
-                                    new Title($$("@auth/stage/instructions/follow"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("@auth/stage/instructions/follow/description") }),
+                                    new Title($$("auth/stage/instructions/follow"), 4, { margin: 0 }),
+                                    new DOM({ new: "div", content: $$("auth/stage/instructions/follow/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                         {
                             content: new IconSide("perm_device_information",
                                 [
-                                    new Title($$("@auth/stage/instructions/permissions"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("@auth/stage/instructions/permissions/description") }),
+                                    new Title($$("auth/stage/instructions/permissions"), 4, { margin: 0 }),
+                                    new DOM({ new: "div", content: $$("auth/stage/instructions/permissions/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                     ], true),
@@ -577,7 +579,7 @@ export default class AuthUI {
             ],
             buttons: [
                 {
-                    content: $$("@auth/stage/open"),
+                    content: $$("auth/stage/open"),
                     handler() { window.open(state.roll.url, "_blank") },
                 },
                 {
@@ -588,7 +590,7 @@ export default class AuthUI {
                     },
                 },
                 {
-                    content: $$("@auth/stage/cancel"),
+                    content: $$("auth/stage/cancel"),
                     handler() {
                         p.close()
                         state.waitSuccess = () => { }
@@ -616,18 +618,18 @@ export default class AuthUI {
                 }, result.raw.accounts, true)
                 p.close()
                 state.blockerPopup.close()
-                Toast.add($$("@auth/stage/authed"))
+                Toast.add($$("auth/stage/authed"))
 
                 Navigation.defaultScreen()
             } catch (e) {
-                Toast.add($$("@auth/stage/error"))
+                Toast.add($$("auth/stage/error"))
                 p.close()
             }
         }
 
         state.waitError = (e) => {
             p.close()
-            Toast.add((e === -1 ? $$("@auth/stage/error") : $$("@auth/stage/timeout")))
+            Toast.add((e === -1 ? $$("auth/stage/error") : $$("auth/stage/timeout")))
         }
     }
 
@@ -686,22 +688,22 @@ export default class AuthUI {
                         {
                             content: new IconSide("camera_enhance",
                                 [
-                                    new Title($$("@auth/stage/instructions/scan"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("@auth/stage/instructions/scan/description") }),
+                                    new Title($$("auth/stage/instructions/scan"), 4, { margin: 0 }),
+                                    new DOM({ new: "div", content: $$("auth/stage/instructions/scan/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                         {
                             content: new IconSide("link",
                                 [
-                                    new Title($$("@auth/stage/instructions/follow"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("@auth/stage/instructions/follow/description") }),
+                                    new Title($$("auth/stage/instructions/follow"), 4, { margin: 0 }),
+                                    new DOM({ new: "div", content: $$("auth/stage/instructions/follow/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                         {
                             content: new IconSide("perm_device_information",
                                 [
-                                    new Title($$("@auth/stage/instructions/permissions"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("@auth/stage/instructions/permissions/description") }),
+                                    new Title($$("auth/stage/instructions/permissions"), 4, { margin: 0 }),
+                                    new DOM({ new: "div", content: $$("auth/stage/instructions/permissions/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                     ], true),
@@ -710,14 +712,14 @@ export default class AuthUI {
             ],
             buttons: [
                 {
-                    content: $$("@auth/stage/link"),
+                    content: $$("auth/stage/link"),
                     handler() {
                         p.close()
                         self.showLink(state, true)
                     },
                 },
                 {
-                    content: $$("@auth/stage/cancel"),
+                    content: $$("auth/stage/cancel"),
                     handler() {
                         p.close()
                         state.waitSuccess = () => { }
@@ -749,7 +751,7 @@ export default class AuthUI {
                 if (p1) p1.close()
                 p.close()
                 state.blockerPopup.close()
-                Toast.add($$("@auth/stage/authed"))
+                Toast.add($$("auth/stage/authed"))
                 Navigation.defaultScreen()
             } catch (e) {
                 state.waitError(-1)
@@ -758,7 +760,7 @@ export default class AuthUI {
 
         state.waitError = (e) => {
             p.close()
-            Toast.add((e === -1 ? $$("@auth/stage/error") : $$("@auth/stage/timeout")))
+            Toast.add((e === -1 ? $$("auth/stage/error") : $$("auth/stage/timeout")))
         }
     }
 }

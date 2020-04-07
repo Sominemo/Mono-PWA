@@ -11,6 +11,7 @@ import NotificationManager from "@Core/Services/Push/NotificationManager"
 import Navigation from "@Core/Services/navigation"
 import delayAction from "@Core/Tools/objects/delayAction"
 import Auth from "@App/modules/mono/services/Auth"
+import Tip from "@App/library/Tip"
 
 
 export default function generateNotificationsSettingsLayout(act) {
@@ -35,14 +36,14 @@ export default function generateNotificationsSettingsLayout(act) {
         .getGroup(groupName)
         .createItem({
             id: "notifications-explain-text",
-            options: [$("@settings/notifications/info")],
+            options: [$("settings/notifications/info")],
             dom: CardContent,
         })
 
     const sectionList = act.createSection({
         id: sectionNameList,
         options: {
-            name: $$("@settings/notifications/list"),
+            name: $$("settings/notifications/list"),
         },
         dom: SettingsSectionElement,
     }).getSection(sectionNameList)
@@ -84,8 +85,8 @@ export default function generateNotificationsSettingsLayout(act) {
                 if (sources.length === 0) {
                     l.close()
                     return new WarningConstructor({
-                        title: $$("@settings/notifications/empty"),
-                        content: $$("@settings/notifications/empty_info"),
+                        title: $$("settings/notifications/empty"),
+                        content: $$("settings/notifications/empty_info"),
                         icon: "notification_important",
                         type: 1,
                     })
@@ -100,7 +101,7 @@ export default function generateNotificationsSettingsLayout(act) {
     const sectionPushURL = act.createSection({
         id: "notifications-push-url-section",
         options: {
-            name: $$("@settings/notifications/push_service"),
+            name: $$("settings/notifications/push_service"),
         },
         dom: SettingsSectionElement,
     }).getSection("notifications-push-url-section")
@@ -124,10 +125,25 @@ export default function generateNotificationsSettingsLayout(act) {
 
                 const current = services.findIndex((e) => e.value === NotificationManager.service)
 
+                if (services.length === 0) {
+                    const tip = new Tip({
+                        title: $$("settings/notifications/no_push_services_hint_title"),
+                        sub: $$("settings/notifications/no_push_services_hint_body"),
+                        icon: "live_help",
+                        async onclick() {
+                            window.open(
+                                $$("settings/notifications/no_push_services_hint_link"),
+                                "_blank",
+                            )
+                        },
+                    })
+                    return tip
+                }
+
                 return new CardContent(
                     new SelectInput(
                         {
-                            placeholder: $$("@settings/notifications/push_service_url"),
+                            placeholder: $$("settings/notifications/push_service_url"),
                             options: services,
                             defaultOption: current,
                             emptySelection: false,

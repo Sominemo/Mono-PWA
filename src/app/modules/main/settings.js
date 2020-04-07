@@ -12,13 +12,13 @@ import { CoreLoader } from "@Core/Init/CoreLoader"
 
 export default class SettingsUI {
     static async Init() {
-        Navigation.updateTitle($$("@settings"))
+        Navigation.updateTitle($$("settings"))
         const w = new WindowContainer()
         const l = SettingsLayoutManager.layout
 
         try {
             if (!(l instanceof SettingsLayout)) {
-                throw new TypeError(`Incorrect Settings Layout applied of type ${typeof this._layout}`)
+                throw new TypeError(`Incorrect Settings Layout applied of type ${typeof l}`)
             }
 
             const path = Navigation.parse.params
@@ -30,11 +30,11 @@ export default class SettingsUI {
                 w.render(new Title("Oops!"))
                 w.render(new Card(new CardList([
                     {
-                        content: $$("@settings/errors/no_page"),
+                        content: $$("settings/errors/no_page"),
                     },
 
                     {
-                        content: $$("@settings/actions/go_main"),
+                        content: $$("settings/actions/go_main"),
                         handler() { Navigation.url = { module: "settings" } },
                         style: {
                             background: Design.getVar("color-accent"),
@@ -52,11 +52,11 @@ export default class SettingsUI {
             w.render(new Title($$("unexpected_error")))
             w.render(new Card(new CardList([
                 {
-                    content: $$("@settings/errors/layout_failed"),
+                    content: $$("settings/errors/layout_failed"),
                 },
 
                 {
-                    content: $$("@settings/actions/open_about"),
+                    content: $$("settings/actions/open_about"),
                     handler() { Navigation.url = { module: "about" } },
                     style: {
                         background: Design.getVar("color-accent"),

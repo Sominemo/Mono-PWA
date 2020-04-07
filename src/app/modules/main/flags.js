@@ -12,6 +12,7 @@ import App from "@Core/Services/app"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import { SVG } from "@Environment/Library/DOM/basic"
 import { CoreLoader } from "@Core/Init/CoreLoader"
+import delayAction from "@Core/Tools/objects/delayAction"
 import PWA from "./PWA"
 
 export default class FlagsUI {
@@ -36,22 +37,22 @@ export default class FlagsUI {
         }
         w.render(new Title($$("experiments")))
         w.render(new Card([
-            new Title($$("@experiments/warning"), 3, {}, new Icon("warning",
+            new Title($$("experiments/warning"), 3, {}, new Icon("warning",
                 {
                     marginRight: ".2em",
                     fontSize: "1.5em",
                     color: Design.getVar("color-attention"),
                 })),
-            new CardContent($$("@experiments/harmful_actions")),
+            new CardContent($$("experiments/harmful_actions")),
             new CardContent([
                 new Button({
-                    content: $$("@experiments/reload_page"),
+                    content: $$("experiments/reload_page"),
                     handler() {
                         window.location.reload()
                     },
                 }),
                 new Button({
-                    content: $$("@experiments/reset_flags"),
+                    content: $$("experiments/reset_flags"),
                     type: ["light"],
                     handler() {
                         SettingsStorage.reset("flags")
@@ -79,7 +80,7 @@ export default class FlagsUI {
             })
         }
 
-        w.render(new Title($$("@experiments/list"), 2))
+        w.render(new Title($$("experiments/list"), 2))
         exps.forEach(async (e) => {
             const re = await this.renderSwitch(e.title, e.about, e.id)
             return w.render(re)
@@ -109,29 +110,35 @@ export default class FlagsUI {
                         fontFamily: Design.getVar("font-accent"),
                         fontSize: "20px",
                     },
-                    content: $$("@experiments/no_exps_placeholder"),
+                    content: $$("experiments/no_exps_placeholder"),
                 }),
             ],
         }))
     }
 
-    static async renderSwitch(title, about, id) {
-        const r = await SettingsStorage.getFlag(id)
+    static renderSwitch(title, about, id) {
+        const sw = new SwitchLabel(
+            [0, (n) => {
+                SettingsStorage.setFlag(id, n)
+            }, { locked: true }],
+            new DOM({
+                new: "div",
+                content: [
+                    new DOM({ new: "div", content: title || $(`experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "20px" } }),
+                    new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } }),
+                ],
+                id: `flag-id-${id}`,
+            }),
+        )
+
+        delayAction(async () => {
+            const r = await SettingsStorage.getFlag(id)
+            sw.switch.changeState(!!r)
+            sw.switch.changeLock(false)
+        })
         return new Card([
-            new SwitchLabel(
-                [r, (n) => {
-                    SettingsStorage.setFlag(id, n)
-                }],
-                new DOM({
-                    new: "div",
-                    content: [
-                        new DOM({ new: "div", content: title || $(`@experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "20px" } }),
-                        new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } }),
-                    ],
-                    id: `flag-id-${id}`,
-                }),
-            ),
-            new CardContent(about || $(`@experiments/about/${id}/about`)),
+            sw,
+            new CardContent(about || $(`experiments/about/${id}/about`)),
         ])
     }
 }

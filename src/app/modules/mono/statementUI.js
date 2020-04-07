@@ -16,7 +16,7 @@ import { Button } from "@Environment/Library/DOM/object/input"
 import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
 import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
@@ -36,18 +36,18 @@ import { statementDownloaderUI } from "./functions/statementDownloader"
 
 export default class StatementUI {
     static async Init() {
-        Navigation.updateTitle($$("@statement"))
+        Navigation.updateTitle($$("statement"))
 
         Navigation.Current = {
             navMenu: [
                 {
                     icon: "credit_card",
-                    title: $$("@customization/open"),
+                    title: $$("customization/open"),
                     handler() { CardCustomization.cardList(true) },
                 },
                 {
                     icon: "cloud_download",
-                    title: $$("@download_statement"),
+                    title: $$("download_statement"),
                     handler() { statementDownloaderUI() },
                 },
             ],
@@ -71,8 +71,8 @@ export default class StatementUI {
             let loadMoreCount = 0
             if (!account) {
                 const p = Prompt({
-                    title: $$("@statement/accounts_changed"),
-                    text: $$("@statement/accounts_changed_text"),
+                    title: $$("statement/accounts_changed"),
+                    text: $$("statement/accounts_changed_text"),
                     buttons: [
                         {
                             content: $$("reload"),
@@ -87,8 +87,8 @@ export default class StatementUI {
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
-                        title: $$("@statement/warning"),
-                        text: $("@statement/requests_throttling"),
+                        title: $$("statement/warning"),
+                        text: $("statement/requests_throttling"),
                         buttons: [
                             {
                                 content: $$("close"),
@@ -240,9 +240,9 @@ export default class StatementUI {
                                 content: [
                                     new LottieAnimation(require("@Resources/animations/failed.json"),
                                         { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
-                                    new Title((loadMoreCount > 0 ? $$("@statement/still_nothing") : $$("@statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
+                                    new Title((loadMoreCount > 0 ? $$("statement/still_nothing") : $$("statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
                                     new Button({
-                                        content: $$("@statement/load_more"),
+                                        content: $$("statement/load_more"),
                                         handler() {
                                             contentCard.clear()
                                             loadMore()
@@ -254,7 +254,7 @@ export default class StatementUI {
                     } else if (!contentCard.classList.contains("originally-null")) {
                         loader = new Align(
                             new Button({
-                                content: $$("@statement/load_more"),
+                                content: $$("statement/load_more"),
                                 handler() {
                                     loadMore()
                                 },
@@ -268,7 +268,7 @@ export default class StatementUI {
                     contentCard.classList.remove("originally-null")
                     loader = new Align(
                         new Button({
-                            content: $$("@statement/load_more"),
+                            content: $$("statement/load_more"),
                             handler() {
                                 loadMore()
                             },
@@ -296,7 +296,7 @@ export default class StatementUI {
                                 flexDirection: "column",
                             },
                             content: [
-                                new Title($$("@statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
+                                new Title($$("statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
                                 new Align(
                                     [
                                         new DOM({
@@ -380,11 +380,11 @@ export default class StatementUI {
                     if (v || curAccount !== account) return
                     const warning = new WarningConstructorButton({
                         type: 3,
-                        title: $$("@statement/hint_customize"),
-                        content: $$("@statement/hint_customize_text"),
+                        title: $$("statement/hint_customize"),
+                        content: $$("statement/hint_customize_text"),
                         icon: "credit_card",
                         button: {
-                            content: $$("@statement/open"),
+                            content: $$("statement/open"),
                             handler() {
                                 CardCustomization.cardList(true)
                             },

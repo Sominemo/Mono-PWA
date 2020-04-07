@@ -45,18 +45,18 @@ function statementDownloaderUI() {
     let to = new Date()
     let from = dateShift(-92 * 86400000, to)
     const p = Prompt({
-        title: $$("@download_statement"),
+        title: $$("download_statement"),
         text: [
-            new CardContent($$("@download_statement/description")),
+            new CardContent($$("download_statement/description")),
             new DateInput({
                 iconName: "calendar_today",
-                placeholder: $$("@download_statement/from"),
+                placeholder: $$("download_statement/from"),
                 content: from,
                 onchange(e) { from = e },
             }),
             new DateInput({
                 iconName: "date_range",
-                placeholder: $$("@download_statement/to"),
+                placeholder: $$("download_statement/to"),
                 content: to,
                 onchange(e) { to = e },
             }),
@@ -68,15 +68,15 @@ function statementDownloaderUI() {
                 type: "light",
             },
             {
-                content: $$("@download_statement/download"),
+                content: $$("download_statement/download"),
                 async handler() {
                     if (from.getTime() >= to.getTime()) {
-                        Toast.add($$("@download_statement/incorrect_range"))
+                        Toast.add($$("download_statement/incorrect_range"))
                         return
                     }
                     const offMode = await SettingsStorage.getFlag("offline_mode")
                     if (offMode) {
-                        Toast.add($$("@download_statement/disable_offline_mode"))
+                        Toast.add($$("download_statement/disable_offline_mode"))
                         return
                     }
                     const l = loadingPopup()
@@ -113,7 +113,7 @@ function statementDownloaderUI() {
                         const text = new DOM({
                             new: "div",
                             content: [
-                                $$("@download_statement/working"),
+                                $$("download_statement/working"),
                                 progressBar,
                             ],
                             style: {

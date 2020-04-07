@@ -9,12 +9,12 @@
         [
             "@babel/preset-env",
             {
-                "targets": {
-                    "browsers": {
-                        "ie": "11"
-                    }
-                },
-                "useBuiltIns": true
+                "targets": ">5% in UA",
+                "useBuiltIns": "usage",
+                "corejs": {
+                    "version": 3,
+                    "proposals": true
+                }
             }
         ]
     ]
