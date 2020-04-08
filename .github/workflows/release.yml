@@ -28,8 +28,9 @@ jobs:
       - name: Build
         env:
           PRERELEASE: "${{ github.event.release.prerelease }}"
+          CHANGELOG: ${{ github.event.release.html_url }}
         run: |
-          if [[ $PRERELEASE == "true" ]]; then yarn run wg; else yarn run build; fi
+          if [[ $PRERELEASE == "true" ]]; then yarn run wg --env.CHANGELOG="$CHANGELOG"; else yarn run build; fi
       - name: Test
         run: |
           yarn test

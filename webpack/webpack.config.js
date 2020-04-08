@@ -28,6 +28,11 @@ const PATHS = {
     public: "https://mono.sominemo.com/",
 }
 
+const trustedOrigins = [
+    "https://wg.mono.sominemo.com",
+    "https://mono.sominemo.com",
+]
+
 PATHS.app = path.join(PATHS.source, "app")
 PATHS.core = path.join(PATHS.source, "core")
 PATHS.environment = path.join(PATHS.source, "environment")
@@ -39,8 +44,6 @@ PATHS.language = path.join(PATHS.resources, "language")
 PATHS.themes = [
     path.join(PATHS.resources, "styles", "themes"),
 ]
-
-// Own scripts
 
 if (!fs.existsSync(PATHS.generated)) {
     fs.mkdirSync(PATHS.generated)
@@ -71,10 +74,11 @@ const resolveAlias = {
 
 module.exports = (env = {}) => {
     const PROD = !!env.PRODUCTION
+    const CHANGELOG = env.CHANGELOG || null
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
     const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
 
-    if(PROD) console.log("-- PRODUCTION BUILD --")
+    if (PROD) console.log("-- PRODUCTION BUILD --")
 
     if (env.watch && !env.CI) {
         const cb = () => {
@@ -97,12 +101,12 @@ module.exports = (env = {}) => {
             __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
             __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
             __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
-            __PACKAGE_CHANGELOG: JSON.stringify([]),
+            __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
             __PACKAGE_WG: JSON.stringify(!!env.WG),
             __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
             __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
             __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
-            __TRUSTED_ORIGINS: JSON.stringify(["https://wg.mono.sominemo.com", "https://mono.sominemo.com"]),
+            __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
         })
 
     const appConfig = {
