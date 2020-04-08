@@ -29,7 +29,7 @@ jobs:
         env:
           PRERELEASE: "${{ github.event.release.prerelease }}"
         run: |
-          if [[ PREPELEASE == true ]]; then yarn run wg; else yarn run build; fi
+          if [[ $PRERELEASE == "true" ]]; then yarn run wg; else yarn run build; fi
       - name: Test
         run: |
           yarn test
