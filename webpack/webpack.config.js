@@ -23,7 +23,7 @@ const PATHS = {
     source: path.join(__root, "src"),
     build: path.join(__root, "build"),
     localBuild: path.join(__root, "local_build"),
-    wgBuild: path.join(__root, "wg_build", "build"),
+    wgBuild: path.join(__root, "build"),
     generated: path.join(__root, "generated"),
     public: "https://mono.sominemo.com/",
 }

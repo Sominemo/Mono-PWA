@@ -1,4 +1,4 @@
-name: Build CI
+name: Build
 
 on: [push]
 
@@ -12,18 +12,23 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v1
-    - uses: snickerbockers/submodules-init@v4
-      name: Init Git submodules
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Start GitHub Action
+      uses: actions/checkout@v1
+    - name: Init Git submodules
+      uses: snickerbockers/submodules-init@v4
+    - name: Install Node ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
+    - name: Install Dependencies
       run: |
         npm i yarn --no-save
         yarn install --frozen-lockfile
+    - name: Build
+      run: |
         yarn run ci
-        yarn test
       env:
-        CI: true
+        CI: 1
+    - name: Test
+      run: |
+        yarn test
