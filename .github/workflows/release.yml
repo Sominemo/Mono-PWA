@@ -27,10 +27,9 @@ jobs:
           yarn install --frozen-lockfile
       - name: Build
         env:
-          PRERELEASE: "${{ !github.event.release.prerelease }}"
+          PRERELEASE: "${{ github.event.release.prerelease }}"
         run: |
-          echo $PRERELEASE
-          if [[ PREPELEASE -eq 1 ]]; then yarn run wg; else yarn run build; fi
+          if [[ PREPELEASE == true ]]; then yarn run wg; else yarn run build; fi
       - name: Test
         run: |
           yarn test
@@ -59,6 +58,7 @@ jobs:
           ref: "${{ github.event.release.tag_name }}"
           auto_merge: "false"
           inititial_status: pending
+          environment: production
           description: "Release publication"
       - uses: chrnorm/deployment-action@releases/v1
         name: Request Pre-Release Deployment
@@ -70,5 +70,6 @@ jobs:
           ref: "${{ github.event.release.tag_name }}"
           auto_merge: "false"
           inititial_status: pending
+          environment: wg
           description: "Pre-Release publication"
 
