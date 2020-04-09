@@ -12,9 +12,9 @@ import WindowManager from "@Core/Services/SimpleWindowManager"
 import getCounter from "@Core/Tools/objects/counter"
 import AlignedContent from "@Environment/Library/DOM/object/AlignedContent"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import { SettingsActLink } from "@Environment/Library/DOM/settings"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import FlagsUI from "./flags"
+import { SettingsActLink } from "./settings"
 
 export default class PWA extends App {
     static get isWG() {

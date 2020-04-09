@@ -1,7 +1,7 @@
 import DOM from "@DOMPath/DOM/Classes/dom"
 import { $$ } from "@Core/Services/Language/handler"
 import IconSide from "@Environment/Library/DOM/object/iconSide"
-import { SettingsSectionElement, SettingsGroupContainer } from "@Environment/Library/DOM/settings"
+import { SettingsSectionElement, SettingsGroupContainer } from "@App/modules/main/settings"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import TransformatorsRegistry from "@Core/Services/Transformators/TransformatorsRegistry"
 

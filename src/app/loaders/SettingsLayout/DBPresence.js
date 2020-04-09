@@ -2,10 +2,11 @@ import fileSizeForHuman from "@Core/Tools/transformation/text/fileSizeForHuman"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import { $$, $ } from "@Core/Services/Language/handler"
 import IconSide from "@Environment/Library/DOM/object/iconSide"
-import { SettingsSectionElement, SettingsGroupContainer } from "@Environment/Library/DOM/settings"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import { Button } from "@Environment/Library/DOM/object/input"
 import DBUserPresence from "@Core/Services/DBUserPresence"
+import { SettingsSectionElement, SettingsGroupContainer } from "@App/modules/main/settings"
+
 
 export default function generateDBSettingsLayout(act) {
     const list = DBUserPresence.getAll()

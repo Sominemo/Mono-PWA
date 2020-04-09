@@ -2,7 +2,7 @@ import LanguageCore from "@Core/Services/Language/core"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import reloadToast from "@App/tools/interaction/reloadToast"
-import { SettingsSectionElement, SettingsGroupContainer } from "@Environment/Library/DOM/settings"
+import { SettingsSectionElement, SettingsGroupContainer } from "@App/modules/main/settings"
 import { RadioLabel } from "@Environment/Library/DOM/object/input"
 import Design from "@Core/Services/design"
 

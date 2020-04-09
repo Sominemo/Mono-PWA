@@ -1,6 +1,6 @@
 import {
     SettingsActContainer, SettingsSectionElement, SettingsGroupContainer, SettingsActLink,
-} from "@Environment/Library/DOM/settings"
+} from "@App/modules/main/settings"
 import { isRecoveryMode } from "@App/debug/recovery"
 import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
 import SettingsLayout from "@Core/Services/Settings/user/layout"
