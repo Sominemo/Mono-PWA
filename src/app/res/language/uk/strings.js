@@ -14,6 +14,7 @@ export default {
         choose_platinum_color: "оберіть колір вашої платинової карти",
         accounts_changed: "помилка списку рахунків",
         accounts_changed_text: "схоже, список рахунків було оновлено. Перезавантажте для застосування змін",
+        operation: "операція",
     },
     customization: {
         open: "мої картки",

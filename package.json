@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "4.0.0-dev.4",
+    "version": "4.0.0-dev.5",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -12,6 +12,7 @@
         "build": "webpack --config webpack/webpack.config.js --env.PRODUCTION --env.ANALYTICS",
         "build-debug": "webpack --config  webpack/webpack.config.js --env.PRODUCTION --env.ANALYTICS --env.DEBUG",
         "ci": "webpack --config webpack/webpack.config.js --env.CI",
+        "update-emojis": "node webpack/scripts/updateEmojis",
         "test": "echo \"No tests specified\""
     },
     "repository": "git+https://github.com/SominemoMono-PWA.git",

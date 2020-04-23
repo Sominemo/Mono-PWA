@@ -13,36 +13,13 @@ const fecha = require("fecha")
 const fs = require("fs-extra")
 const chokidar = require("chokidar")
 const mccCodes = require("mcc/emojiMap")
-
-const __root = process.cwd()
+const PATHS = require(path.join(__dirname, "paths"))
 
 const DOWNLOAD_LANG_PACKS = false
-
-const PATHS = {
-    root: __root,
-    source: path.join(__root, "src"),
-    build: path.join(__root, "build"),
-    localBuild: path.join(__root, "local_build"),
-    wgBuild: path.join(__root, "build"),
-    generated: path.join(__root, "generated"),
-    public: "https://mono.sominemo.com/",
-}
 
 const trustedOrigins = [
     "https://wg.mono.sominemo.com",
     "https://mono.sominemo.com",
-]
-
-PATHS.app = path.join(PATHS.source, "app")
-PATHS.core = path.join(PATHS.source, "core")
-PATHS.environment = path.join(PATHS.source, "environment")
-PATHS.themesGenerated = path.join(PATHS.generated, "themes")
-
-PATHS.resources = path.join(PATHS.app, "res")
-PATHS.envResources = path.join(PATHS.environment, "res")
-PATHS.language = path.join(PATHS.resources, "language")
-PATHS.themes = [
-    path.join(PATHS.resources, "styles", "themes"),
 ]
 
 if (!fs.existsSync(PATHS.generated)) {
@@ -58,7 +35,7 @@ const mccEmojiMap = mccEmoji(mccCodes)
 PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
 
 const builder = {
-    pack: require(path.join(__root, "package.json")),
+    pack: require(path.join(PATHS.root, "package.json")),
 }
 
 const resolveAlias = {

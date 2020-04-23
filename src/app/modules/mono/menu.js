@@ -3,7 +3,7 @@ import WindowManager from "@Core/Services/SimpleWindowManager"
 import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import { Title } from "@Environment/Library/DOM/object"
+import { Title, Icon } from "@Environment/Library/DOM/object"
 import { Card, CardList } from "@Environment/Library/DOM/object/card"
 import IconSide from "@Environment/Library/DOM/object/iconSide"
 import Tip from "@App/library/Tip"
@@ -14,6 +14,8 @@ import LanguageCore from "@Core/Services/Language/core"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import Sleep from "@Core/Tools/objects/sleep"
 import { ContextMenu } from "@Environment/Library/DOM/elements"
+import icons from "@Resources/datasets/Emoji-To-MD-Icon/dataset"
+import DOM from "@DOMPath/DOM/Classes/dom"
 import Auth from "./services/Auth"
 import PWA from "../main/PWA"
 
@@ -71,6 +73,29 @@ export default class MenuUI {
                 }
             }), true),
         ))
+
+        Array.from(Object.values(icons)).forEach((e) => {
+            w.render(
+                new DOM({
+                    new: "div",
+                    style: {
+                        display: "inline-flex",
+                        width: "42px",
+                        height: "42px",
+                        minWidth: "42px",
+                        minHeight: "42px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "5px",
+                        background: e.color,
+                        borderRadius: "50%",
+                    },
+                    content: [
+                        new Icon(e.icon, { fontSize: "23px" }),
+                    ],
+                }),
+            )
+        })
 
         delayAction(async () => {
             const lastSeen = await SettingsStorage.getFlag("changelog_seen")

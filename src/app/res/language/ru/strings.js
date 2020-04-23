@@ -14,6 +14,7 @@ export default {
         choose_platinum_color: "выберите цвет вашей платиновой карты",
         accounts_changed: "ошибка списка счетов",
         accounts_changed_text: "похоже, список счетов был изменён. Перегрузите для применения изменений",
+        operation: "операция",
     },
     customization: {
         open: "мои карты",

@@ -145,7 +145,10 @@
     border-radius: 50%;
     line-height: 1;
     font-size: 1.3em;
-    font-family: "Emoji Font";
+}
+
+.statement-item-category>md-icon {
+    font-size: 23px;
 }
 
 @keyframes appear {
@@ -185,7 +188,21 @@
 .statement-item-descr {
     font-size: .8em;
     color: #aeaeae;
-    font-family: var(--font-main), "Emoji Font";
+    display: flex;
+    align-items: center;
+}
+
+.statement-item-descr>md-icon {
+    font-size: inherit;
+    margin: 0 .25em;
+}
+
+.statement-item-descr>md-icon:nth-child(1), .statement-item-descr>div+md-icon {
+    margin-left: 0;
+}
+
+.statement-item-descr>md-icon:nth-child(1), .statement-item-descr>md-icon+div {
+    margin-left: 0;
 }
 
 @keyframes updating {

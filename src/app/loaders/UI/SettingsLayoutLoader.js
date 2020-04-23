@@ -172,6 +172,7 @@ CoreLoader.registerTask({
                                     cursor: "pointer",
                                     display: "flex",
                                 },
+                                class: ["clickable-square"],
                             }),
                         )
                         elements.push(element)

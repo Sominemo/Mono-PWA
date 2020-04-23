@@ -69,6 +69,14 @@ CoreLoader.registerTask({
                     onupdate(a) { MoneyPrintConfig.showMinorPart = a },
                 },
             },
+            {
+                name: "enable_tab_navigation",
+                rule: {
+                    default: false,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                },
+            },
         ], "flags")
 
         SettingsCheckProvider.setRules([
