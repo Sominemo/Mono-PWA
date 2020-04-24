@@ -148,27 +148,27 @@ export default class StatementUI {
 
                         const descriptionArray = []
 
-                        if (item.comment) descriptionArray.push([new Icon("chat_bubble"), new DOM({ new: "span", content: `${item.comment}` })])
+                        if (item.comment) descriptionArray.push([new Icon("chat_bubble"), new DOM({ type: "t", new: `${item.comment}` })])
                         descriptionArray.push([
                             new DOM({
-                                new: "span",
-                                content: (LanguageCore.language.info.code === "ru" ? item.mcc.ruTitle : item.mcc.ukTitle)
+                                type: "t",
+                                new: (LanguageCore.language.info.code === "ru" ? item.mcc.ruTitle : item.mcc.ukTitle)
                                     || item.mcc.title,
                             }),
                         ])
 
                         if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
                             if (item.cashback instanceof MoneyCashback) {
-                                if (!item.cashback.object.isZero) descriptionArray.push([new Icon("account_balance_wallet"), new DOM({ new: "span", content: `${(item.cashback.sign === -1 ? "-" : "") + printMoney(item.cashback.object, true)}` })])
+                                if (!item.cashback.object.isZero) descriptionArray.push([new Icon("account_balance_wallet"), new DOM({ type: "t", new: `${(item.cashback.sign === -1 ? "-" : "") + printMoney(item.cashback.object, true)}` })])
                             } else if (item.cashback instanceof MilesCashback) {
-                                descriptionArray.push([new Icon("flight"), new DOM({ new: "span", content: `${item.cashback.amount} mi` })])
+                                descriptionArray.push([new Icon("flight"), new DOM({ type: "t", new: `${item.cashback.amount} mi` })])
                             } else {
-                                descriptionArray.push([new Icon("assistant"), new DOM({ new: "span", content: `${item.cashback.amount} ${item.cashback.type}` })])
+                                descriptionArray.push([new Icon("assistant"), new DOM({ type: "t", new: `${item.cashback.amount} ${item.cashback.type}` })])
                             }
                         }
 
                         if (!item.commissionRate.isZero) {
-                            descriptionArray.push([new Icon("remove_circle"), new DOM({ new: "span", content: `${item.commissionRate.string}` })])
+                            descriptionArray.push([new Icon("remove_circle"), new DOM({ type: "t", new: `${item.commissionRate.string}` })])
                         }
 
                         const description = descriptionArray.reduce(
@@ -176,7 +176,7 @@ export default class StatementUI {
                                 ...[...a,
                                     ...(ind + 1 === descriptionArray.length
                                         ? []
-                                        : [new DOM({ new: "div", content: "|", style: { margin: "0 0.25em" } })]),
+                                        : [new DOM({ type: "t", new: " | " })]),
                                 ],
                             ), [],
                         )

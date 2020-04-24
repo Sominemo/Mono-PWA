@@ -1,17 +1,89 @@
 /* eslint-disable no-restricted-globals */
-/* global registration, clients, __PACKAGE_APP_NAME, __PACKAGE_BUILD_TIME */
-import hashCode from "@Core/Tools/transformation/text/hashCode"
-import printMoney from "@App/tools/transform/printMoney"
-import MoneyPrintConfig from "@App/tools/transform/MoneyPrintConfig"
-import Money from "../../API/classes/Money"
-import { Currency } from "../../API/classes/Currency"
-import MCC from "../../API/classes/MCC"
-import cashback from "../../API/parsers/cashback"
+/* global registration, clients, __PACKAGE_APP_NAME, __PACKAGE_BUILD_TIME,
+__MCC_CODES_EMOJI, __CC_SHRUNK_DATASET */
 
-MoneyPrintConfig.showMinorPart = true
+const emojiMCCDataset = __MCC_CODES_EMOJI
+const ccDataset = __CC_SHRUNK_DATASET
 
 // eslint-disable-next-line no-unused-vars
 const compileTime = __PACKAGE_BUILD_TIME
+
+function hashCode(str) {
+    let hash = 0
+    let i
+    let chr
+    if (str.length === 0) return hash
+    for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i)
+        hash = ((hash << 5) - hash) + chr
+        hash |= 0
+    }
+    return hash
+}
+
+function getMCCEmoji(code) {
+    return emojiMCCDataset[String(code).padStart(4, "0")]
+}
+
+function getCur(expression, code = false) {
+    const expr = String(expression).padStart(3, "0")
+    const field = (code ? "code" : "number")
+    const info = ccDataset.find((v) => (v[field] === expression))
+    if (!info) {
+        return {
+            code: expr,
+            number: 0,
+            digits: 2,
+            currency: `#${expr}`,
+            countries: [],
+        }
+    }
+
+    return {
+        code: info.code,
+        number: Number.parseInt(info.number, 10),
+        digits: info.digits,
+        currency: info.currency,
+        countries: info.countries,
+    }
+}
+
+class Money {
+    constructor(value, cur) {
+        this.cur = cur
+        this.full = Math.floor(value / cur.digits)
+        this.dec = value - this.full * (100 ** cur.digits)
+    }
+
+    get print() {
+        let char = this.cur.code
+
+        if (this.cur.number === 980) char = "₴"
+        if (this.cur.number === 840) char = "$"
+        if (this.cur.number === 978) char = "€"
+        if (this.cur.number === 985) char = "zł"
+
+        return `${this.full}.${String(this.dec).padStart(this.cur.digits, "0")} ${char}`
+    }
+}
+
+function cashback(amount, type) {
+    const currency = getCur(type, true)
+    if (currency.number === 0) {
+        return {
+            type: "money",
+            amount: new Money(amount, currency),
+            print() {
+                return `👛 ${this.amount.print}`
+            },
+        }
+    }
+
+    if (type === "Miles") return { type: "miles", amount }
+    if (type === "None") return { type: "none", amount }
+    return { type: "cashback", amount }
+}
+
 
 const badges = {
     m: require("@Resources/images/badges/m.png").default,
@@ -185,36 +257,36 @@ self.addEventListener("push", async (event) => {
         if (!("account" in data && "item" in data)) throw new Error("Incorrect statement-item Payload")
 
 
-        const amount = Money.integer(
+        const amount = new Money(
             Math.abs(data.item.amount),
-            Currency.number(data.account.currencyCode),
+            getCur(data.account.currencyCode),
         )
-        const operationAmount = Money.integer(
+        const operationAmount = new Money(
             Math.abs(data.item.operationAmount),
-            Currency.number(data.item.currencyCode),
+            getCur(data.item.currencyCode),
         )
-        const balance = Money.integer(
+        const balance = new Money(
             Math.abs(data.item.balance),
-            Currency.number(data.account.currencyCode),
+            getCur(data.account.currencyCode),
         )
 
         const operationCashback = cashback(data.item.cashbackAmount, data.account.cashbackType)
 
-        const spentPart = printMoney(amount)
-            + (data.account.currencyCode !== data.item.currencyCode ? ` (${printMoney(operationAmount)})` : "")
+        const spentPart = operationAmount.print
+            + (data.account.currencyCode !== data.item.currencyCode ? ` (${operationAmount.print})` : "")
             + (operationCashback.amount > 0 ? ` ${operationCashback.string}` : "")
 
         const commentPart = data.item.description + ("comment" in data.item ? `\n👋 ${data.item.comment}` : "")
 
 
-        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${printMoney(balance)}`
+        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${operationAmount.print}`
 
         const content = `${commentPart}\n${balancePart}`
 
         let emoji
         if (data.item.mcc === 4829) {
             emoji = data.item.amount < 0 ? "💳👉" : "💳👈"
-        } else emoji = new MCC(data.item.mcc).emoji
+        } else emoji = getMCCEmoji(data.item.mcc)
 
         console.log(amount, operationAmount, balance)
 

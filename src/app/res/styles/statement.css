@@ -188,13 +188,12 @@
 .statement-item-descr {
     font-size: .8em;
     color: #aeaeae;
-    display: flex;
-    align-items: center;
 }
 
 .statement-item-descr>md-icon {
     font-size: inherit;
     margin: 0 .25em;
+    vertical-align: middle;
 }
 
 .statement-item-descr>md-icon:nth-child(1), .statement-item-descr>div+md-icon {

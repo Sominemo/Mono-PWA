@@ -13,6 +13,7 @@ const fecha = require("fecha")
 const fs = require("fs-extra")
 const chokidar = require("chokidar")
 const mccCodes = require("mcc/emojiMap")
+const cc = require("currency-codes/data")
 const PATHS = require(path.join(__dirname, "paths"))
 
 const DOWNLOAD_LANG_PACKS = false
@@ -29,9 +30,11 @@ if (!fs.existsSync(PATHS.generated)) {
 const makeLangMap = require(path.join(__dirname, "scripts", "languageList"))
 const makeThemesMap = require(path.join(__dirname, "scripts", "themesList"))
 const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
+const ccSW = require(path.join(__dirname, "scripts", "ccSW"))
 makeLangMap(PATHS.language, PATHS.generated)
 makeThemesMap(PATHS.themes, PATHS.generated)
 const mccEmojiMap = mccEmoji(mccCodes)
+const ccSWMap = ccSW(cc)
 PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
 
 const builder = {
@@ -72,18 +75,26 @@ module.exports = (env = {}) => {
             .on("unlink", cb)
     }
 
+    const mainDefine = {
+        __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
+        __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
+        __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
+        __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
+        __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
+        __PACKAGE_WG: JSON.stringify(!!env.WG),
+        __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
+        __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
+        __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
+        __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
+    }
+
     const definePlugin =
+        new webpack.DefinePlugin(mainDefine)
+
+    const definePluginSW =
         new webpack.DefinePlugin({
-            __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
-            __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
-            __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
-            __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
-            __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
-            __PACKAGE_WG: JSON.stringify(!!env.WG),
-            __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
-            __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
-            __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
-            __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
+            ...mainDefine,
+            __CC_SHRUNK_DATASET: JSON.stringify(ccSWMap),
         })
 
     const appConfig = {
@@ -93,17 +104,20 @@ module.exports = (env = {}) => {
             namedChunks: true,
             runtimeChunk: false,
             splitChunks: {
+                automaticNameDelimiter: '.',
                 cacheGroups: {
-                    vendor: {
+                    /*vendor: {
                         test: /node_modules/,
                         chunks: "initial",
                         name: "vendor",
                         enforce: true,
-                    },
+                        reuseExistingChunk: true,
+                    },*/
                     ...(DOWNLOAD_LANG_PACKS ? {
                         language: {
                             test: /language[\\/].+[\\/]/,
                             enforce: true,
+                            reuseExistingChunk: true,
                             name(module, chunks) {
                                 const packageName = module.context
                                     .match(/language[\\/](.*?)([\\/]|$)/)[1]
@@ -350,7 +364,7 @@ module.exports = (env = {}) => {
             new CleanWebpackPlugin({
                 cleanStaleWebpackAssets: false,
             }),
-            definePlugin
+            definePluginSW
         ]
     }
 

@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "4.0.0-dev.5",
+    "version": "4.0.0-dev.6",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
