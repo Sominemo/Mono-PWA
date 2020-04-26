@@ -8,6 +8,29 @@ const ccDataset = __CC_SHRUNK_DATASET
 // eslint-disable-next-line no-unused-vars
 const compileTime = __PACKAGE_BUILD_TIME
 
+function report(...data) {
+    console.log(...data)
+    return new Promise(
+        (resolve, reject) => {
+            const dbOpenReq = indexedDB.open("ReportData")
+
+            dbOpenReq.onsuccess = (dbOpen) => {
+                const db = dbOpen.target.result
+                const request = db.transaction(["report-fallback-log"], "readwrite").objectStore("report-fallback-log")
+                    .add({
+                        log: data, time: Date.now(), tags: ["sw"], session: "webworker",
+                    })
+                request.onsuccess = resolve
+                request.onerror = reject
+            }
+
+            dbOpenReq.onerror = reject
+            dbOpenReq.onblocked = reject
+            dbOpenReq.onupgradeneeded = reject
+        },
+    )
+}
+
 function hashCode(str) {
     let hash = 0
     let i
@@ -26,44 +49,41 @@ function getMCCEmoji(code) {
 }
 
 function getCur(expression, code = false) {
-    const expr = String(expression).padStart(3, "0")
     const field = (code ? "code" : "number")
     const info = ccDataset.find((v) => (v[field] === expression))
     if (!info) {
         return {
-            code: expr,
+            code: String(expression),
             number: 0,
             digits: 2,
-            currency: `#${expr}`,
-            countries: [],
         }
     }
 
     return {
         code: info.code,
-        number: Number.parseInt(info.number, 10),
+        number: info.number,
         digits: info.digits,
-        currency: info.currency,
-        countries: info.countries,
     }
 }
 
 class Money {
     constructor(value, cur) {
         this.cur = cur
-        this.full = Math.floor(value / cur.digits)
-        this.dec = value - this.full * (100 ** cur.digits)
+        this.minus = value < 0
+        value = Math.abs(value)
+        this.full = Math.floor(value / (10 ** cur.digits))
+        this.dec = value - this.full * (10 ** cur.digits)
     }
 
     get print() {
         let char = this.cur.code
 
         if (this.cur.number === 980) char = "₴"
-        if (this.cur.number === 840) char = "$"
-        if (this.cur.number === 978) char = "€"
-        if (this.cur.number === 985) char = "zł"
+        else if (this.cur.number === 840) char = "$"
+        else if (this.cur.number === 978) char = "€"
+        else if (this.cur.number === 985) char = "zł"
 
-        return `${this.full}.${String(this.dec).padStart(this.cur.digits, "0")} ${char}`
+        return `${(this.minus ? "-" : "")}${this.full}.${String(this.dec).padStart(this.cur.digits, "0")} ${char}`
     }
 }
 
@@ -167,9 +187,9 @@ function actionInterpreter(action, event) {
 }
 
 self.addEventListener("push", async (event) => {
-    console.log("Push recieved", event)
+    report("Push recieved", event)
     if (!(self.Notification && self.Notification.permission === "granted")) {
-        console.log("No Notification permission")
+        report("No Notification permission")
         return
     }
 
@@ -288,8 +308,6 @@ self.addEventListener("push", async (event) => {
             emoji = data.item.amount < 0 ? "💳👉" : "💳👈"
         } else emoji = getMCCEmoji(data.item.mcc)
 
-        console.log(amount, operationAmount, balance)
-
         registration.showNotification(
             `${emoji} ${spentPart}`,
             {
@@ -304,7 +322,6 @@ self.addEventListener("push", async (event) => {
 
 
 self.addEventListener("notificationclick", (clickEvent) => {
-    console.log(clickEvent)
     if (!clickEvent.notification.data) return
 
     if (clickEvent.action in clickEvent.notification.data.actionDescriptor) {

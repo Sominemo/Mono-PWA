@@ -4,7 +4,7 @@ import Listeners from "@Core/Services/Listeners"
 import Auth from "@App/modules/mono/services/Auth"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import { CoreLoader, CoreLoaderSkip, CoreLoaderResult } from "@Core/Init/CoreLoader"
-import Report from "@Core/Services/reportOld"
+import { Report } from "@Core/Services/Report"
 import DBTool from "@Core/Tools/db/DBTool"
 import ObjectStoreTool from "@Core/Tools/db/ObjectStoreTool"
 
@@ -49,7 +49,7 @@ async function messageListener(m) {
                 await Promise.all(m.data.flags.map((item) => flags.put(item)))
             }
         } catch (e) {
-            Report.error(e)
+            Report.add(e, ["crossMessaging.commandError"])
             top.postMessage({ type: "error", info: String(e), command: m.data }, m.origin)
         }
 

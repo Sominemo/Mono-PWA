@@ -16,7 +16,7 @@ import tryToOpenProtocol from "custom-protocol-detection"
 import { Align } from "@Environment/Library/DOM/style"
 import { $$ } from "@Core/Services/Language/handler"
 import BRify from "@Core/Tools/transformation/text/BRify"
-import Report from "@Core/Services/reportOld"
+import { Report } from "@Core/Services/Report"
 import PWA from "../main/PWA"
 import Auth from "./services/Auth"
 import Flags from "./services/Flags"
@@ -375,7 +375,7 @@ export default class AuthUI {
     }
 
     static async continue(state) {
-        Report.write(state.settings.are)
+        Report.add(state.settings.are, ["auth.settings"])
         if (state.settings.are.type === AuthUI.authTypes.DIRECT) {
             this.directUI(state)
         } else if (state.settings.are.type === AuthUI.authTypes.CORP) {
@@ -402,7 +402,7 @@ export default class AuthUI {
             state.blockerPopup.close()
             Navigation.defaultScreen()
         } catch (e) {
-            Report.write(e)
+            Report.add(e, ["auth.direct.fail"])
             Toast.add($$("auth/fail"))
         }
         l.close()

@@ -1,17 +1,17 @@
-import Report from "@Core/Services/reportOld"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import CriticalLoadErrorListener from "@Core/Services/CriticalLoadErrorListener"
+import { Report } from "@Core/Services/Report"
 
 const states = [
     [
-        { badge: "DONE", color: "#4caf50", text: "#ffffff" },
-        { badge: "SKIP", color: "#0095ff;", text: "#ffffff" },
+        { badge: "done" },
+        { badge: "skip" },
     ],
     [
-        { badge: "STOP", color: "#f44336", text: "#ffffff" },
+        { badge: "stop" },
     ],
     [
-        { badge: "WARN", color: "#ff9800", text: "#ffffff" },
+        { badge: "warn" },
     ],
 ]
 
@@ -19,9 +19,10 @@ CoreLoader.addDoneListener((loaded) => {
     if (loaded.result === false) return
     const out = []
     const current = states[loaded.result.state][loaded.result.type]
-    out.push(`%c ${current.badge} %c ${loaded.name}${(loaded.result.answer && loaded.result.answer !== true ? `: ${String(loaded.result.answer)}` : "")}`, `background: ${current.color}; color:${current.text}`, "")
+
     if (loaded.result.data) out.push(loaded.result.data)
-    Report.writeNoTrace(...out)
+
+    Report.add([`${loaded.name}${(loaded.result.answer && loaded.result.answer !== true ? `: ${String(loaded.result.answer)}` : "")}`, ...out], [`core.${current.badge}`])
     if (loaded.result.state === 1) {
         CriticalLoadErrorListener.listener(loaded.result.data || `${loaded.name}: ${loaded.result.answer}`, false)
     }

@@ -16,7 +16,7 @@ import { Button } from "@Environment/Library/DOM/object/input"
 import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
-import Report from "@Core/Services/reportOld"
+import { Report } from "@Core/Services/Report"
 import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
 import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
@@ -237,7 +237,7 @@ export default class StatementUI {
                                 ),
                         }))
                     } catch (e) {
-                        Report.error("Failed to render statement item", e, JSON.parse(JSON.stringify(item)))
+                        Report.add([e, JSON.parse(JSON.stringify(item))], ["statement.renderError"])
                     }
                 })
 

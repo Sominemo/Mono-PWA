@@ -1,5 +1,5 @@
 import Axios from "axios"
-import Report from "@Core/Services/reportOld"
+import { Report } from "@Core/Services/Report"
 import APIError from "./APIError"
 
 export default class API {
@@ -206,7 +206,7 @@ export default class API {
             } else {
                 errorObject = new APIError(-1, { type: 1 })
                 self.lastRequests[request.methodID] = originalTimestamp || 0
-                Report.write("Error", error.message)
+                Report.add(error.message, ["api.error"])
             }
 
             if ((this.floodError(errorObject)

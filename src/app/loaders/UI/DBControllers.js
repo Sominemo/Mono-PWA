@@ -1,6 +1,6 @@
 import DBUserPresence from "@Core/Services/DBUserPresence"
 import { $$ } from "@Core/Services/Language/handler"
-import Report from "@Core/Services/reportOld"
+import { ReportStorage } from "@Core/Services/Report"
 import download from "@App/tools/interaction/download"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
@@ -14,13 +14,13 @@ CoreLoader.registerTask({
     presence: "Register DBs",
     task() {
         DBUserPresence.registerNewPresence({
-            id: "LogData",
+            id: "ReportData",
             name: $$("settings/storage/dbs/logs"),
             description: $$("settings/storage/dbs/logs/description"),
             icon: "description",
             quota: () => (1024 ** 2) * 15,
             size: async () => {
-                const db = await Report.DBConnection()
+                const db = await ReportStorage.DBConnection()
                 const res = await db.getDBSize()
                 return res
             },
@@ -33,20 +33,20 @@ CoreLoader.registerTask({
             actions: [
                 {
                     name: $$("settings/storage/actions/clear"),
-                    handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "clear").handler(),
+                    handler: () => DBUserPresence.get("ReportData").functions.find((e) => e.name === "clear").handler(),
                 },
                 {
                     name: $$("settings/storage/actions/export"),
-                    handler: () => DBUserPresence.get("LogData").functions.find((e) => e.name === "export").handler(),
+                    handler: () => DBUserPresence.get("ReportData").functions.find((e) => e.name === "export").handler(),
                 },
             ],
             functions: [
                 {
                     name: "clear",
                     handler: () => new Promise(async (resolve, reject) => {
-                        const db = await Report.DBConnection()
+                        const db = await ReportStorage.DBOS()
                         try {
-                            await db.OSTool("console-output").clear()
+                            await db.clear()
                             resolve()
                         } catch (e) {
                             reject()
@@ -56,7 +56,7 @@ CoreLoader.registerTask({
                 {
                     name: "export",
                     async handler() {
-                        const db = JSON.stringify(await Report.allLog())
+                        const db = JSON.stringify(await ReportStorage.export())
 
                         download([db], "text/plain", "app-log.json")
                     },
@@ -64,7 +64,7 @@ CoreLoader.registerTask({
                 {
                     name: "auto-clean",
                     async handler() {
-                        const db = (await Report.DBConnection()).OSTool("console-output")
+                        const db = await ReportStorage.DBOS()
                         await db.clearPercent(0.5)
                     },
                 },
