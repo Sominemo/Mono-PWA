@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 /* global registration, clients, __PACKAGE_APP_NAME, __PACKAGE_BUILD_TIME,
 __MCC_CODES_EMOJI, __CC_SHRUNK_DATASET */
+import errorToObject from "@Core/Tools/transformation/object/errorToObject"
 
 const emojiMCCDataset = __MCC_CODES_EMOJI
 const ccDataset = __CC_SHRUNK_DATASET
@@ -16,9 +17,9 @@ function report(...data) {
 
             dbOpenReq.onsuccess = (dbOpen) => {
                 const db = dbOpen.target.result
-                const request = db.transaction(["report-fallback-log"], "readwrite").objectStore("report-fallback-log")
+                const request = db.transaction(["log"], "readwrite").objectStore("log")
                     .add({
-                        log: data, time: Date.now(), tags: ["sw"], session: "webworker",
+                        log: errorToObject(data), time: Date.now(), tags: ["sw"], session: "webworker",
                     })
                 request.onsuccess = resolve
                 request.onerror = reject
@@ -75,7 +76,7 @@ class Money {
         this.dec = value - this.full * (10 ** cur.digits)
     }
 
-    get print() {
+    toString() {
         let char = this.cur.code
 
         if (this.cur.number === 980) char = "₴"
@@ -89,19 +90,46 @@ class Money {
 
 function cashback(amount, type) {
     const currency = getCur(type, true)
-    if (currency.number === 0) {
-        return {
+    let obj = {}
+
+    if (currency.number !== 0) {
+        obj = {
             type: "money",
-            amount: new Money(amount, currency),
-            print() {
-                return `👛 ${this.amount.print}`
+            amount,
+            mamount: new Money(amount, currency),
+            toString() {
+                return `👛 ${obj.mamount}`
+            },
+        }
+    } else
+
+    if (type === "Miles") {
+        obj = {
+            type: "miles",
+            amount,
+            toString() {
+                return `✈ ${obj.amount}`
+            },
+        }
+    } else
+    if (type === "None") {
+        obj = {
+            type: "none",
+            amount,
+            toString() {
+                return `✨ ${obj.amount}`
+            },
+        }
+    } else {
+        obj = {
+            type: "cashback",
+            amount,
+            toString() {
+                return `✨ ${obj.amount}`
             },
         }
     }
-
-    if (type === "Miles") return { type: "miles", amount }
-    if (type === "None") return { type: "none", amount }
-    return { type: "cashback", amount }
+    return obj
 }
 
 
@@ -292,14 +320,14 @@ self.addEventListener("push", async (event) => {
 
         const operationCashback = cashback(data.item.cashbackAmount, data.account.cashbackType)
 
-        const spentPart = operationAmount.print
-            + (data.account.currencyCode !== data.item.currencyCode ? ` (${operationAmount.print})` : "")
-            + (operationCashback.amount > 0 ? ` ${operationCashback.string}` : "")
+        const spentPart = operationAmount
+            + (data.account.currencyCode !== data.item.currencyCode ? ` (${amount})` : "")
+            + (operationCashback.amount > 0 ? ` ${operationCashback}` : "")
 
         const commentPart = data.item.description + ("comment" in data.item ? `\n👋 ${data.item.comment}` : "")
 
 
-        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${operationAmount.print}`
+        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${balance}`
 
         const content = `${commentPart}\n${balancePart}`
 

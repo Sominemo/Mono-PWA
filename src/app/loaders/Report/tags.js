@@ -42,6 +42,10 @@ const tags = [
     new ReportTag(
         "dummy",
         {
+            badge: {
+                sign: "\t",
+                print: true,
+            },
             db: false,
         },
     ),

@@ -8,6 +8,7 @@ import StatementStorage from "@App/modules/mono/services/StatementStorage"
 import Auth from "@App/modules/mono/services/Auth"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
+import size from "@Core/Tools/objects/size"
 
 CoreLoader.registerTask({
     id: "db-presence",
@@ -22,7 +23,7 @@ CoreLoader.registerTask({
             size: async () => {
                 const db = await ReportStorage.DBConnection()
                 const res = await db.getDBSize()
-                return res
+                return res + size(localStorage.getItem(ReportStorage.lsItemName) || "")
             },
             config: {
                 changeable: true,
@@ -47,6 +48,7 @@ CoreLoader.registerTask({
                         const db = await ReportStorage.DBOS()
                         try {
                             await db.clear()
+                            localStorage.removeItem(ReportStorage.lsItemName)
                             resolve()
                         } catch (e) {
                             reject()
@@ -64,6 +66,7 @@ CoreLoader.registerTask({
                 {
                     name: "auto-clean",
                     async handler() {
+                        localStorage.removeItem(ReportStorage.lsItemName)
                         const db = await ReportStorage.DBOS()
                         await db.clearPercent(0.5)
                     },
