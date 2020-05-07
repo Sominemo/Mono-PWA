@@ -1,4 +1,4 @@
-import { Nav } from "@Environment/Library/DOM/buildBlock"
+import { Nav, Scaffold } from "@Environment/Library/DOM/buildBlock"
 import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
 
@@ -10,12 +10,7 @@ Nav.constantNavMenu = [
             Navigation.url = { module: "settings" }
         },
     },
-    {
-        icon: "info",
-        title: $$("about/app"),
-        handler() {
-            Navigation.url = { module: "about" }
-        },
-    },
-
 ]
+
+Scaffold.enableAccessibilitySign = $$("enable_accessibility")
+Scaffold.skipNavSign = $$("skip_nav")

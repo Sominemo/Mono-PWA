@@ -24,6 +24,7 @@ import generateDBSettingsLayout from "../SettingsLayout/DBPresence"
 import generateLanguageList from "../SettingsLayout/LanguageList"
 import generateTFSettingsLayout from "../SettingsLayout/Transformators"
 import generateNotificationsSettingsLayout from "../SettingsLayout/Notifications"
+import generatePrivacyLayout from "../SettingsLayout/Privacy"
 
 function sideLogo(icon, text, moreText) {
     return new Align([
@@ -66,6 +67,11 @@ CoreLoader.registerTask({
                 dom: SettingsActContainer,
                 options: { name: $$("settings/notifications") },
             })
+            .createAct({
+                id: "privacy",
+                dom: SettingsActContainer,
+                options: { name: $$("settings/privacy") },
+            })
 
 
         const isPushSupported = "ServiceWorkerRegistration" in window
@@ -84,11 +90,6 @@ CoreLoader.registerTask({
             .getSection("general")
             .createGroup({ id: "main-group", dom: SettingsGroupContainer, options: {} })
             .getGroup("main-group")
-            .createItem({
-                dom: SettingsActLink, options: [() => { Navigation.url = { module: "about" } }, sideLogo("info", $$("about/app"), $("settings/descriptions/about_app"))], id: "about-screen-link",
-            })
-            .createItem({ dom: SettingsActLink, options: ["storage", sideLogo("storage", $$("settings/storage"), $("settings/descriptions/storage"))], id: "storage-link" })
-            .createItem({ dom: SettingsActLink, options: ["language", sideLogo("translate", $$("settings/language"), $("settings/descriptions/language"))], id: "language-link" })
 
         if ("serviceWorker" in navigator) {
             settingsMain.createItem({
@@ -111,6 +112,14 @@ CoreLoader.registerTask({
                 id: "notifications-link",
             })
         }
+
+        settingsMain
+            .createItem({ dom: SettingsActLink, options: ["storage", sideLogo("storage", $$("settings/storage"), $("settings/descriptions/storage"))], id: "storage-link" })
+            .createItem({ dom: SettingsActLink, options: ["language", sideLogo("translate", $$("settings/language"), $("settings/descriptions/language"))], id: "language-link" })
+            .createItem({ dom: SettingsActLink, options: ["privacy", sideLogo("https", $$("settings/privacy"), $("settings/privacy/info"))], id: "privacy-link" })
+            .createItem({
+                dom: SettingsActLink, options: [() => { Navigation.url = { module: "about" } }, sideLogo("info", $$("about/app"), $("settings/descriptions/about_app"))], id: "about-screen-link",
+            })
 
         layout.getAct("settings").getSection("auth-promo")
             .createGroup({
@@ -273,12 +282,10 @@ CoreLoader.registerTask({
             .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "flags" } }, sideLogo("category", $$("experiments"), $("settings/descriptions/experiments"))], id: "experiments-menu-link" })
 
         generateDBSettingsLayout(layout.getAct("storage"))
-
         generateLanguageList(layout.getAct("language"))
-
         generateTFSettingsLayout(layout.getAct("transformators"))
-
         generateNotificationsSettingsLayout(layout.getAct("notifications"))
+        generatePrivacyLayout(layout.getAct("privacy"))
 
         SettingsLayoutManager.applyLayout(layout)
     },

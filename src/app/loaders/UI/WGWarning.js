@@ -1,3 +1,4 @@
+/* global __PACKAGE_FEEDBACK */
 import Toast from "@Environment/Library/DOM/elements/toast"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import { CoreLoader, CoreLoaderSkip, CoreLoaderResult } from "@Core/Init/CoreLoader"
@@ -27,7 +28,7 @@ CoreLoader.registerTask({
                     {
                         content: "Telegram",
                         handler() {
-                            window.open("tg://join?invite=BEBMsBLX6NclKYzGkNlGNw", "_blank")
+                            window.open(__PACKAGE_FEEDBACK, "_blank")
                             SettingsStorage.setFlag("wg_warning_seen", true)
                             w.close()
                         },

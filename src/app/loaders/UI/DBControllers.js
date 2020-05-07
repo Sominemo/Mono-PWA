@@ -1,6 +1,6 @@
 import DBUserPresence from "@Core/Services/DBUserPresence"
 import { $$ } from "@Core/Services/Language/handler"
-import { ReportStorage } from "@Core/Services/Report"
+import { ReportStorage, Report } from "@Core/Services/Report"
 import download from "@App/tools/interaction/download"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import OfflineCache from "@App/modules/mono/services/OfflineCache"
@@ -9,6 +9,10 @@ import Auth from "@App/modules/mono/services/Auth"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import size from "@Core/Tools/objects/size"
+import PWA from "@App/modules/main/PWA"
+import delayAction from "@Core/Tools/objects/delayAction"
+import Axios from "axios"
+import errorToObject from "@Core/Tools/transformation/object/errorToObject"
 
 CoreLoader.registerTask({
     id: "db-presence",
@@ -54,6 +58,37 @@ CoreLoader.registerTask({
                             reject()
                         }
                     }),
+                },
+                {
+                    name: "send",
+                    handler(error = null) {
+                        return new Promise((resolve, reject) => {
+                            delayAction(async () => {
+                                try {
+                                    const db = JSON.stringify(
+                                        await ReportStorage.export({ currentOnly: true }),
+                                    )
+
+                                    const log = {
+                                        error: (error === null ? `Manual report ${Report.session.id}` : errorToObject(error)),
+                                        report: db,
+                                        v: `${PWA.version}/${PWA.branch}/${PWA.buildDate}`,
+                                    }
+
+                                    resolve(
+                                        await Axios({
+                                            method: "post",
+                                            url: "https://sominemo.com/mono/help/report/beacon",
+                                            data: log,
+                                        }),
+                                    )
+                                } catch (e) {
+                                    Report.add(e, ["report.storage.error"])
+                                    reject(e)
+                                }
+                            })
+                        })
+                    },
                 },
                 {
                     name: "export",

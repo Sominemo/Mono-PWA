@@ -1,4 +1,4 @@
-/* global __PACKAGE_WG, __PACKAGE_ANALYTICS */
+/* global __PACKAGE_ANALYTICS */
 
 import App from "@Core/Services/app"
 import { SVG } from "@Environment/Library/DOM/basic"
@@ -13,12 +13,11 @@ import getCounter from "@Core/Tools/objects/counter"
 import AlignedContent from "@Environment/Library/DOM/object/AlignedContent"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
-import FlagsUI from "./flags"
 import { SettingsActLink } from "./settings"
 
 export default class PWA extends App {
     static get isWG() {
-        return __PACKAGE_WG
+        return this.buildFlag("wg")
     }
 
     static get analyticsAllowed() {
@@ -80,18 +79,11 @@ export default class PWA extends App {
             [
                 { content: new TwoSidesWrapper($$("about/build_date"), this.buildDate) },
                 { content: new TwoSidesWrapper($$("about/branch"), this.branch) },
-                ...(this.debug ? [{ content: new TwoSidesWrapper($$("about/debug"), this.debug.toString()) }] : []),
-                ...(this.isWG ? [{ content: new TwoSidesWrapper("Work Group build", "true") }] : []),
+                { content: new TwoSidesWrapper($$("about/build_flags"), this.buildFlags.join(", ")) },
                 ...("Windows" in window ? [{ content: new TwoSidesWrapper("WinRT", "true") }] : []),
             ],
             {}, true,
         )))
-
-        // if (__PACKAGE_ANALYTICS) {
-        if (!PWA.isWG) {
-            w.render(FlagsUI.renderSwitch(null, null, "deny_analytics"))
-        }
-        // }
     }
 
     static disclaimer() {

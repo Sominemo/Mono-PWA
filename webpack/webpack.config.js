@@ -52,13 +52,28 @@ const resolveAlias = {
     "@Themes": PATHS.themesGenerated,
 }
 
+const buildFlags = []
+
 module.exports = (env = {}) => {
     const PROD = !!env.PRODUCTION
     const CHANGELOG = env.CHANGELOG || null
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
     const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
 
-    if (PROD) console.log("-- PRODUCTION BUILD --")
+    if (PROD) {
+        console.log("-- PRODUCTION BUILD --")
+        buildFlags.push("prod")
+    } else {
+        env.DEBUG = true
+    }
+
+    if (env.CI) {
+        buildFlags.push("ci")
+    }
+    if (env.WG) buildFlags.push("wg")
+    if (env.DEBUG) buildFlags.push("debug")
+    if (env.LOCAL) buildFlags.push("local")
+    if (env.ANALYTICS) buildFlags.push("analytics")
 
     if (env.watch && !env.CI) {
         const cb = () => {
@@ -75,15 +90,18 @@ module.exports = (env = {}) => {
             .on("unlink", cb)
     }
 
+    const feedbackLink = "tg://join?invite=BEBMsBLX6NclKYzGkNlGNw"
+
     const mainDefine = {
         __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
         __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
         __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
         __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
+        __PACKAGE_BUILD_FLAGS: JSON.stringify(buildFlags),
         __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
-        __PACKAGE_WG: JSON.stringify(!!env.WG),
         __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
         __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
+        __PACKAGE_FEEDBACK: JSON.stringify(feedbackLink),
         __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
         __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
     }
@@ -144,7 +162,7 @@ module.exports = (env = {}) => {
         entry: {
             index: path.join(PATHS.core, "Init", "index.js"),
         },
-        ...(!PROD || env.DEBUG ? { devtool: "source-map" } : {}),
+        ...(env.DEBUG ? { devtool: "source-map" } : {}),
         output: {
             path: PATHS.build,
             chunkFilename: "[id].js",

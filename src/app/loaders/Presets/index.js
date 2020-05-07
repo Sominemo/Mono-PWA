@@ -1,4 +1,6 @@
 import "./Polyfills"
+import "./AutoErrorReport"
+import "./FatalErrorListener"
 import "./CoreLoaderListener"
 import "./LanguageSettings"
 import "./ThemeSettings"

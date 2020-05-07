@@ -4,9 +4,8 @@ import Listeners from "@Core/Services/Listeners"
 import Auth from "@App/modules/mono/services/Auth"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import { CoreLoader, CoreLoaderSkip, CoreLoaderResult } from "@Core/Init/CoreLoader"
+import resetApp from "@App/tools/interaction/resetApp"
 import { Report } from "@Core/Services/Report"
-import DBTool from "@Core/Tools/db/DBTool"
-import ObjectStoreTool from "@Core/Tools/db/ObjectStoreTool"
 
 const trustedOrigins = __TRUSTED_ORIGINS
 
@@ -19,20 +18,7 @@ async function messageListener(m) {
 
         try {
             if (m.data.command === "clear") {
-                let dbs = [{ name: "AuthStorage" }, { name: "OfflineCache" }, { name: "SettingsStorage" }, { name: "StatementStorage" }]
-                if ("databases" in indexedDB) {
-                    dbs = await window.indexedDB.databases()
-                }
-                await Promise.all(dbs.map(async (db) => new Promise(async (resolve, reject) => {
-                    try {
-                        const dbase = new DBTool(db.name, null)
-                        const osList = await dbase.getTablesList()
-                        await Promise.all(osList.map((r) => new ObjectStoreTool(dbase, r).clear()))
-                        resolve()
-                    } catch (e) {
-                        reject(e)
-                    }
-                })))
+                await resetApp()
             } else if (m.data.command === "import-accounts") {
                 const accounts = (await Auth.accountsDB())
                 await Promise.all(m.data.accounts.map((item) => accounts.put(item)))

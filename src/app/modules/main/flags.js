@@ -116,25 +116,36 @@ export default class FlagsUI {
         }))
     }
 
-    static renderSwitch(title, about, id) {
+    static renderSwitch(title, about, id, {
+        ls = false, showID = true, lsDefault = false, locked = false,
+    } = {}) {
         const sw = new SwitchLabel(
             [0, (n) => {
-                SettingsStorage.setFlag(id, n)
+                if (!ls) {
+                    SettingsStorage.setFlag(id, n)
+                } else {
+                    localStorage.setItem(id, n)
+                }
             }, { locked: true }],
             new DOM({
                 new: "div",
                 content: [
                     new DOM({ new: "div", content: title || $(`experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "20px" } }),
-                    new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } }),
+                    ...(showID ? [new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } })] : []),
                 ],
                 id: `flag-id-${id}`,
             }),
         )
 
         delayAction(async () => {
-            const r = await SettingsStorage.getFlag(id)
+            let r = (!ls ? await SettingsStorage.getFlag(id)
+                : localStorage.getItem(id))
+            if (ls) {
+                if (r === null || r === undefined) r = lsDefault
+                else r = Number.parseInt(r, 10)
+            }
             sw.switch.changeState(!!r)
-            sw.switch.changeLock(false)
+            if (!locked) sw.switch.changeLock(false)
         })
         return new Card([
             sw,
