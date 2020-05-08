@@ -84,7 +84,15 @@ class Money {
         else if (this.cur.number === 978) char = "€"
         else if (this.cur.number === 985) char = "zł"
 
-        return `${(this.minus ? "-" : "")}${this.full}.${String(this.dec).padStart(this.cur.digits, "0")} ${char}`
+        return `${(this.minus ? "-" : "")}${
+            Money.spacing(`${this.full}.${String(this.dec).padStart(this.cur.digits, "0")}`)
+            } ${char}`
+    }
+
+    static spacing(str) {
+        const comp = str.split(".")
+        comp[0] = comp[0].match(/.{1,3}(?=(.{3})*$)/g).join(" ")
+        return comp.join(".")
     }
 }
 
@@ -314,7 +322,7 @@ self.addEventListener("push", async (event) => {
             getCur(data.item.currencyCode),
         )
         const balance = new Money(
-            Math.abs(data.item.balance),
+            Math.abs(data.item.balance - data.account.creditLimit),
             getCur(data.account.currencyCode),
         )
 
@@ -327,7 +335,7 @@ self.addEventListener("push", async (event) => {
         const commentPart = data.item.description + ("comment" in data.item ? `\n👋 ${data.item.comment}` : "")
 
 
-        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${balance}`
+        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${(data.item.balance - data.account.creditLimit < 0 ? "-" : "")}${balance}`
 
         const content = `${commentPart}\n${balancePart}`
 
