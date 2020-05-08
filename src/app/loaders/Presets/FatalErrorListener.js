@@ -19,6 +19,7 @@ function l(name, fallback) {
 let FAInited = false
 
 CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
+    console.log(e)
     function escapeHTML(unsafeText) {
         const div = document.createElement("div")
         div.innerText = unsafeText
@@ -37,15 +38,20 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
     }
 
     let error
+
+    if ((e instanceof ErrorEvent) || (e instanceof PromiseRejectionEvent)) {
+        e = e.error || e.reason
+    }
+
     if (typeof e === "object") {
         const filename = e.fileName || e.filename || "[unknown file]"
         const lineno = e.lineNumber || e.lineno || "?"
         const colno = e.columnNumber || e.colno || "??"
         const stack = e.stack || false
 
-        error = (e.fileName || e.filename
+        error = ((e.fileName || e.filename
             || e.lineNumber || e.lineno
-            || e.columnNumber || e.colno
+            || e.columnNumber || e.colno) || (!stack || e.stack === "")
             ? `${e.message} on ${filename}:${lineno}:${colno} ${stack}` : stack)
     } else error = String(e)
     const ua = window.navigator.userAgent
@@ -76,6 +82,7 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
         error: l("fatal_error", "Сталась помилка"),
         explainer: l("fatal_error/explainer", "Застосунок не може завантажитись"),
         actions: l("fatal_error/actions", "Що ви можете зробити:"),
+        idb_error: l("recovery_mode/idb_error/description", "Виникли труднощі при спробі використання сховища браузера. Зверніть увагу, що застосунок не може працювати у приватному режимі Firefox"),
         send: {
             title: l("fatal_error/actions/send/title", "Надіслати звіт"),
             info: l("fatal_error/actions/send/info", "Для аналізу та виправлення"),
@@ -312,10 +319,13 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
         <div class="em-subtitle">${strings.explainer}</div>
         <pre id="em-error" tabindex="1">${text}</pre>
         
-        ${strings.actions}
+        <div id="em-possible-actions-title">${strings.actions}</div>
         <div id="em-actions">
         </div>
     </div>`
+    if (e instanceof DOMException && e.name === "InvalidStateError") {
+        document.getElementById("em-possible-actions-title").innerHTML = strings.idb_error
+    }
     const pre = document.getElementById("em-error")
     pre.onclick = function preClick() {
         this.classList.add("open")
@@ -323,24 +333,40 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
     document.addEventListener("keypress", (a) => { if (a.code === "Enter") { document.activeElement.click() } })
 
     const cont = document.getElementById("em-actions")
+    const autoReports = (
+        App.buildFlag("wg")
+        || localStorage.getItem("reports_auto_sending") === "1"
+    )
     cont.append(
-        card(strings.send.title, strings.send.info, icons.send, async () => {
-            const db = JSON.stringify(
-                await ReportStorage.export(),
-            )
+        card((autoReports ? strings.send.info_auto : strings.send.title),
+            (autoReports ? strings.send.info_sent : strings.send.info), icons.send,
+            async function sendClick() {
+                console.log(this)
+                this.style.opacity = ".7"
+                this.children[1].children[0].innerHTML = "..."
+                let db = []
+                try {
+                    db = JSON.stringify(
+                        await ReportStorage.export(),
+                    )
+                } catch (er) {
+                    // Ignore error
+                }
 
-            const log = {
-                error: text,
-                report: db,
-                v: `${App.version}/${App.branch}/${App.buildDate}`,
-            }
+                const log = {
+                    error: text,
+                    report: db,
+                    v: `${App.version}/${App.branch}/${App.buildDate}`,
+                }
 
-            await Axios({
-                method: "post",
-                url: "https://sominemo.com/mono/help/report/beacon",
-                data: log,
-            })
-        }, true),
+                await Axios({
+                    method: "post",
+                    url: "https://sominemo.com/mono/help/report/beacon",
+                    data: log,
+                })
+                this.children[1].children[0].innerHTML = strings.send.title_sent
+                this.children[1].children[1].innerHTML = strings.send.info_sent
+            }, true, (autoReports ? ".7" : 1)),
         card(strings.help.title, strings.help.info, icons.help, () => {
             window.open(__PACKAGE_FEEDBACK, "_blank")
         }),

@@ -1,7 +1,8 @@
 import { Report, ReportLogger, ReportStorage } from "@Core/Services/Report"
 import errorToObject from "@Core/Tools/transformation/object/errorToObject"
 import PWA from "@App/modules/main/PWA"
-import DBUserPresence from "@Core/Services/DBUserPresence"
+import delayAction from "@Core/Tools/objects/delayAction"
+import Axios from "axios"
 
 const beaconsAllowed = (
     PWA.isWG
@@ -30,10 +31,32 @@ const autosendAllowed = (
 if (autosendAllowed) {
     Report.newHook((report) => {
         if (report.level >= 3) {
-            DBUserPresence.get("ReportData").functions.find((e) => e.name === "send").handler(report.log)
-                .then(() => {
-                    Report.add("Report sent", ["report.storage"])
-                })
+            delayAction(async () => {
+                try {
+                    let db = []
+                    try {
+                        db = JSON.stringify(
+                            await ReportStorage.export(),
+                        )
+                    } catch (er) {
+                        // Ignore error
+                    }
+
+                    const log = {
+                        error: errorToObject(report.log),
+                        report: db,
+                        v: `${PWA.version}/${PWA.branch}/${PWA.buildDate}`,
+                    }
+
+                    await Axios({
+                        method: "post",
+                        url: "https://sominemo.com/mono/help/report/beacon",
+                        data: log,
+                    })
+                } catch (e) {
+                    console.error("Report send error", e)
+                }
+            })
         }
     }, "reportAutoSend")
 }

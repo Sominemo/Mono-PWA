@@ -83,7 +83,7 @@ CoreLoader.registerTask({
                                         }),
                                     )
                                 } catch (e) {
-                                    Report.add(e, ["report.storage.error"])
+                                    console.error("Report DB Export failed")
                                     reject(e)
                                 }
                             })

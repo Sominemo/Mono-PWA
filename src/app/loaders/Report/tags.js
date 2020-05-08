@@ -538,7 +538,7 @@ const tags = [
         },
     ),
     new ReportTag(
-        "lang.get.failure",
+        "settings.get.failure",
         {
             badge: {
                 sign: "Error",
@@ -548,7 +548,7 @@ const tags = [
         },
     ),
     new ReportTag(
-        "lang.set.failure",
+        "settings.set.failure",
         {
             badge: {
                 sign: "Error",
@@ -558,7 +558,7 @@ const tags = [
         },
     ),
     new ReportTag(
-        "lang.reset.failure",
+        "settings.reset.failure",
         {
             badge: {
                 sign: "Error",
