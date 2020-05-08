@@ -19,7 +19,6 @@ function l(name, fallback) {
 let FAInited = false
 
 CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
-    console.log(e)
     function escapeHTML(unsafeText) {
         const div = document.createElement("div")
         div.innerText = unsafeText
@@ -341,7 +340,6 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
         card((autoReports ? strings.send.info_auto : strings.send.title),
             (autoReports ? strings.send.info_sent : strings.send.info), icons.send,
             async function sendClick() {
-                console.log(this)
                 this.style.opacity = ".7"
                 this.children[1].children[0].innerHTML = "..."
                 let db = []
