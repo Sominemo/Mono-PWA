@@ -74,7 +74,7 @@ export default class CardCustomization {
                                     marginLeft: ".5em", fontWeight: "300", marginRight: "10px",
                                 },
                                 class: ["mono-card-list-pw-size"],
-                                content: printMoney(profile.balance),
+                                content: (profile.isOverdraft ? "-" : "") + printMoney(profile.balance),
 
                             }),
                             new DOM({

@@ -5,6 +5,7 @@ import { CoreLoader, CoreLoaderResult } from "@Core/Init/CoreLoader"
 import { API } from "@App/tools/API"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import MoneyPrintConfig from "@App/tools/transform/MoneyPrintConfig"
+import Account from "@App/modules/mono/API/classes/Account"
 
 CoreLoader.registerTask({
     id: "settings-defaults",
@@ -70,6 +71,15 @@ CoreLoader.registerTask({
                 },
             },
             {
+                name: "hide_credit_limit",
+                rule: {
+                    default: false,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                    onupdate(a) { Account.hideCreditLimit = a },
+                },
+            },
+            {
                 name: "enable_tab_navigation",
                 rule: {
                     default: false,
@@ -92,6 +102,7 @@ CoreLoader.registerTask({
 
         API.offlineMode = await SettingsStorage.getFlag("offline_mode")
         MoneyPrintConfig.showMinorPart = await SettingsStorage.getFlag("show_minor_part")
+        Account.hideCreditLimit = await SettingsStorage.getFlag("hide_credit_limit")
 
         return new CoreLoaderResult(true, { SettingsCheckProvider })
     },

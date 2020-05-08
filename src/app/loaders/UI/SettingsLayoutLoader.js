@@ -246,6 +246,16 @@ CoreLoader.registerTask({
                                 sideLogo("attach_money", $$("show_minor_part"), $("settings/descriptions/show_minor_part")),
                             ),
                         },
+                        {
+                            content: new SwitchLabel(
+                                [
+                                    await SettingsStorage.getFlag("hide_credit_limit"), (n) => {
+                                        SettingsStorage.setFlag("hide_credit_limit", n)
+                                    },
+                                ],
+                                sideLogo("label_off", $$("hide_credit_limit"), $("settings/descriptions/hide_credit_limit")),
+                            ),
+                        },
                     ])
                 },
                 options: [],

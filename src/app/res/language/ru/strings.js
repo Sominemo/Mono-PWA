@@ -233,6 +233,7 @@ export default {
             notifications: "Новости, изменение баланса",
             offline_mode: "Использовать сохранённые данные",
             show_minor_part: "Отображать суммы в формате 00.00",
+            hide_credit_limit: "Отнимать кредитный лимит от баланса",
             experiments: "Тестируемые возможности",
         },
         auth: {
@@ -474,6 +475,7 @@ export default {
     continue: "далее",
     search: "поиск",
     offline_mode: "автономный режим",
+    hide_credit_limit: "скрыть кредитные средства",
     quick_settings: "опции",
     show_minor_part: "показывать копейки",
     recommendation: "рекомендация",

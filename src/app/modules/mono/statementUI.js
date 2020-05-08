@@ -486,7 +486,7 @@ export default class StatementUI {
 
             const balanceItem = new DOM({
                 new: "div",
-                content: printMoney(account.balance),
+                content: (account.isOverdraft ? "-" : "") + printMoney(account.balance),
                 class: "mono-card-absolute-balance-number",
             })
 

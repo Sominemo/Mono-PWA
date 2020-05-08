@@ -234,6 +234,7 @@ export default {
             notifications: "Новини, зміна балансу",
             offline_mode: "Використовувати збережені дані",
             show_minor_part: "Відображати суми у форматі 00.00",
+            hide_credit_limit: "Віднімати кредитний ліміт від балансу",
             experiments: "Функціональність, що у процесі тестування",
         },
         auth: {
@@ -475,6 +476,7 @@ export default {
     continue: "далі",
     search: "пошук",
     offline_mode: "автономний режим",
+    hide_credit_limit: "приховати кредитні кошти",
     quick_settings: "опції",
     show_minor_part: "показувати копійки",
     recommendation: "рекомендація",
