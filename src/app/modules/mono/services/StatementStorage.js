@@ -56,6 +56,7 @@ export default class StatementStorage {
 
         const order = await SettingsStorage.get("card_order") || []
         const accounts = Array.from(cardList.values())
+        const curOrder = ["UAH", "USD", "EUR", "PLN"]
 
         let list = [...order.map((el) => {
             const ind = accounts.findIndex((em) => em && em.id === el)
@@ -75,6 +76,30 @@ export default class StatementStorage {
                     return 0
                 },
             )
+            const uah = []
+            const known = []
+            const unknown = []
+            list.forEach((e) => {
+                let arr
+                if (e.balance.currency.code === "UAH") arr = uah
+                else arr = (curOrder.indexOf(e.balance.currency.code) === -1 ? unknown : known)
+                arr.push(e)
+            })
+            list = [...uah.sort(
+                (a, b) => {
+                    if (a.cards[0].type === "white" && b.cards[0].type !== "white") return 1
+                    return 0
+                },
+            ),
+            ...known.sort(
+                (a, b) => {
+                    const indA = curOrder.indexOf(a.balance.currency.code)
+                    const indB = curOrder.indexOf(b.balance.currency.code)
+                    if (indA < indB) return -1
+                    if (indA > indB) return 1
+                    return 0
+                },
+            ), ...unknown]
         }
 
         return (objects ? list : list.map((e) => e.id))
