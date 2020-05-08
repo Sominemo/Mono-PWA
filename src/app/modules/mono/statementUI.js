@@ -167,6 +167,10 @@ export default class StatementUI {
                             }
                         }
 
+                        if (item.amount.currency.code !== item.operationAmount.currency.code) {
+                            descriptionArray.push([new DOM({ type: "t", new: printMoney(item.operationAmount) })])
+                        }
+
                         if (!item.commissionRate.isZero) {
                             descriptionArray.push([new Icon("remove_circle"), new DOM({ type: "t", new: `${item.commissionRate.string}` })])
                         }
