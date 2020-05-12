@@ -1,1 +1,11 @@
-[]
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.monoweb",
+      "sha256_cert_fingerprints": [
+        "D1:93:6B:74:3A:C7:CD:AD:C0:B7:E2:9E:C8:14:6D:C4:90:DD:F1:2B:DE:B9:96:FF:62:01:52:45:C2:11:64:E2",
+        "DF:D2:84:23:28:06:BA:1B:E0:ED:5E:A3:07:34:AC:15:B9:7B:E0:C6:A1:D3:CF:18:CB:DB:24:15:FD:B2:F9:FE"
+      ]
+    }
+  }]
