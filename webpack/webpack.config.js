@@ -13,34 +13,15 @@ const fecha = require("fecha")
 const fs = require("fs-extra")
 const chokidar = require("chokidar")
 const mccCodes = require("mcc/emojiMap")
-
-const __root = process.cwd()
+const cc = require("currency-codes/data")
+const PATHS = require(path.join(__dirname, "paths"))
 
 const DOWNLOAD_LANG_PACKS = false
 
-const PATHS = {
-    root: __root,
-    source: path.join(__root, "src"),
-    build: path.join(__root, "build"),
-    localBuild: path.join(__root, "local_build"),
-    wgBuild: path.join(__root, "wg_build", "build"),
-    generated: path.join(__root, "generated"),
-    public: "https://mono.sominemo.com/",
-}
-
-PATHS.app = path.join(PATHS.source, "app")
-PATHS.core = path.join(PATHS.source, "core")
-PATHS.environment = path.join(PATHS.source, "environment")
-PATHS.themesGenerated = path.join(PATHS.generated, "themes")
-
-PATHS.resources = path.join(PATHS.app, "res")
-PATHS.envResources = path.join(PATHS.environment, "res")
-PATHS.language = path.join(PATHS.resources, "language")
-PATHS.themes = [
-    path.join(PATHS.resources, "styles", "themes"),
+const trustedOrigins = [
+    "https://wg.mono.sominemo.com",
+    "https://mono.sominemo.com",
 ]
-
-// Own scripts
 
 if (!fs.existsSync(PATHS.generated)) {
     fs.mkdirSync(PATHS.generated)
@@ -49,13 +30,15 @@ if (!fs.existsSync(PATHS.generated)) {
 const makeLangMap = require(path.join(__dirname, "scripts", "languageList"))
 const makeThemesMap = require(path.join(__dirname, "scripts", "themesList"))
 const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
+const ccSW = require(path.join(__dirname, "scripts", "ccSW"))
 makeLangMap(PATHS.language, PATHS.generated)
 makeThemesMap(PATHS.themes, PATHS.generated)
 const mccEmojiMap = mccEmoji(mccCodes)
+const ccSWMap = ccSW(cc)
 PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
 
 const builder = {
-    pack: require(path.join(__root, "package.json")),
+    pack: require(path.join(PATHS.root, "package.json")),
 }
 
 const resolveAlias = {
@@ -69,12 +52,28 @@ const resolveAlias = {
     "@Themes": PATHS.themesGenerated,
 }
 
+const buildFlags = []
+
 module.exports = (env = {}) => {
     const PROD = !!env.PRODUCTION
+    const CHANGELOG = env.CHANGELOG || null
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
     const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
 
-    if(PROD) console.log("-- PRODUCTION BUILD --")
+    if (PROD) {
+        console.log("-- PRODUCTION BUILD --")
+        buildFlags.push("prod")
+    } else {
+        env.DEBUG = true
+    }
+
+    if (env.CI) {
+        buildFlags.push("ci")
+    }
+    if (env.WG) buildFlags.push("wg")
+    if (env.DEBUG) buildFlags.push("debug")
+    if (env.LOCAL) buildFlags.push("local")
+    if (env.ANALYTICS) buildFlags.push("analytics")
 
     if (env.watch && !env.CI) {
         const cb = () => {
@@ -91,18 +90,29 @@ module.exports = (env = {}) => {
             .on("unlink", cb)
     }
 
+    const feedbackLink = "tg://join?invite=BEBMsBLX6NclKYzGkNlGNw"
+
+    const mainDefine = {
+        __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
+        __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
+        __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
+        __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
+        __PACKAGE_BUILD_FLAGS: JSON.stringify(buildFlags),
+        __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
+        __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
+        __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
+        __PACKAGE_FEEDBACK: JSON.stringify(feedbackLink),
+        __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
+        __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
+    }
+
     const definePlugin =
+        new webpack.DefinePlugin(mainDefine)
+
+    const definePluginSW =
         new webpack.DefinePlugin({
-            __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
-            __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
-            __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
-            __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
-            __PACKAGE_CHANGELOG: JSON.stringify([]),
-            __PACKAGE_WG: JSON.stringify(!!env.WG),
-            __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
-            __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),
-            __MCC_CODES_EMOJI: JSON.stringify(mccEmojiMap),
-            __TRUSTED_ORIGINS: JSON.stringify(["https://wg.mono.sominemo.com", "https://mono.sominemo.com"]),
+            ...mainDefine,
+            __CC_SHRUNK_DATASET: JSON.stringify(ccSWMap),
         })
 
     const appConfig = {
@@ -112,17 +122,20 @@ module.exports = (env = {}) => {
             namedChunks: true,
             runtimeChunk: false,
             splitChunks: {
+                automaticNameDelimiter: '.',
                 cacheGroups: {
-                    vendor: {
+                    /*vendor: {
                         test: /node_modules/,
                         chunks: "initial",
                         name: "vendor",
                         enforce: true,
-                    },
+                        reuseExistingChunk: true,
+                    },*/
                     ...(DOWNLOAD_LANG_PACKS ? {
                         language: {
                             test: /language[\\/].+[\\/]/,
                             enforce: true,
+                            reuseExistingChunk: true,
                             name(module, chunks) {
                                 const packageName = module.context
                                     .match(/language[\\/](.*?)([\\/]|$)/)[1]
@@ -149,7 +162,7 @@ module.exports = (env = {}) => {
         entry: {
             index: path.join(PATHS.core, "Init", "index.js"),
         },
-        ...(!PROD || env.DEBUG ? { devtool: "source-map" } : {}),
+        ...(env.DEBUG ? { devtool: "source-map" } : {}),
         output: {
             path: PATHS.build,
             chunkFilename: "[id].js",
@@ -369,7 +382,7 @@ module.exports = (env = {}) => {
             new CleanWebpackPlugin({
                 cleanStaleWebpackAssets: false,
             }),
-            definePlugin
+            definePluginSW
         ]
     }
 

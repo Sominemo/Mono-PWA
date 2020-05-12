@@ -64,4 +64,22 @@ export default class Money {
 
         return Money.integer(a.number + b.number, a.currency)
     }
+
+    static max(...a) {
+        let m = a[0]
+        a.forEach((e) => {
+            if (!(e instanceof Money)) throw new TypeError("Money constructor expected")
+            if (e.number > m.number) m = e
+        })
+        return m
+    }
+
+    static min(...a) {
+        let m = a[0]
+        a.forEach((e) => {
+            if (!(e instanceof Money)) throw new TypeError("Money constructor expected")
+            if (e.number < m.number) m = e
+        })
+        return m
+    }
 }

@@ -5,13 +5,13 @@ export default class OfflineCache {
 
     static AdditionalStorageName = "int"
 
-    static _dbConnectionInstance = null
+    static #dbConnectionInstance = null
 
     static async DBConnection() {
         const self = this
 
-        if (!this._dbConnectionInstance) {
-            this._dbConnectionInstance = new DBTool("OfflineCache", 5, {
+        if (!this.#dbConnectionInstance) {
+            this.#dbConnectionInstance = new DBTool("OfflineCache", 5, {
                 upgrade(db, oldVersion, newVersion, transaction) {
                     try {
                         db.createObjectStore(self.StorageName, {
@@ -32,21 +32,25 @@ export default class OfflineCache {
             })
         }
 
-        return this._dbConnectionInstance.onReady()
+        return this.#dbConnectionInstance.onReady()
     }
 
+    static #dbOS
+
+    static #adbOS
+
     static async DBOS() {
-        if (this._dbOS) return this._dbOS
+        if (this.#dbOS) return this.#dbOS
         const db = await this.DBConnection()
-        this._dbOS = db.OSTool(this.StorageName)
-        return this._dbOS
+        this.#dbOS = db.OSTool(this.StorageName)
+        return this.#dbOS
     }
 
     static async ADBOS() {
-        if (this._adbOS) return this._adbOS
+        if (this.#adbOS) return this.#adbOS
         const db = await this.DBConnection()
-        this._adbOS = db.OSTool(this.AdditionalStorageName)
-        return this._adbOS
+        this.#adbOS = db.OSTool(this.AdditionalStorageName)
+        return this.#adbOS
     }
 
     static async saveCurrencies(raw) {

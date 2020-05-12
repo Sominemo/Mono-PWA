@@ -16,15 +16,15 @@ export default class StatementStorage {
     }
 
     static async syncAccountStorageList() {
-        let _db = null
+        let dbConnection = null
         const dbTool = await this.statementDB()
 
         const db = async () => {
-            if (!_db) {
+            if (!dbConnection) {
                 dbTool.request.close()
-                _db = this.upgradeDB()
+                dbConnection = this.upgradeDB()
             }
-            return (await _db)[1]
+            return (await dbConnection)[1]
         }
         const res = await Promise.all([this.getAccountList(), dbTool.getTablesList()])
         await Promise.all(res[0].map(async (e) => {
@@ -56,6 +56,7 @@ export default class StatementStorage {
 
         const order = await SettingsStorage.get("card_order") || []
         const accounts = Array.from(cardList.values())
+        const curOrder = ["UAH", "USD", "EUR", "PLN"]
 
         let list = [...order.map((el) => {
             const ind = accounts.findIndex((em) => em && em.id === el)
@@ -75,6 +76,30 @@ export default class StatementStorage {
                     return 0
                 },
             )
+            const uah = []
+            const known = []
+            const unknown = []
+            list.forEach((e) => {
+                let arr
+                if (e.balance.currency.code === "UAH") arr = uah
+                else arr = (curOrder.indexOf(e.balance.currency.code) === -1 ? unknown : known)
+                arr.push(e)
+            })
+            list = [...uah.sort(
+                (a, b) => {
+                    if (a.cards[0].type === "white" && b.cards[0].type !== "white") return 1
+                    return 0
+                },
+            ),
+            ...known.sort(
+                (a, b) => {
+                    const indA = curOrder.indexOf(a.balance.currency.code)
+                    const indB = curOrder.indexOf(b.balance.currency.code)
+                    if (indA < indB) return -1
+                    if (indA > indB) return 1
+                    return 0
+                },
+            ), ...unknown]
         }
 
         return (objects ? list : list.map((e) => e.id))
@@ -111,18 +136,18 @@ export default class StatementStorage {
                     },
                 })
                 if (nonUpgrade) resolve(dbTool)
-                this._db = dbTool
+                this.#db = dbTool
             } catch (e) {
                 reject()
             }
         })
     }
 
-    static _db = null
+    static #db = null
 
     static async statementDB(connection = false) {
-        if (this._db === null) await this.upgradeDB(await SettingsStorage.get("statement_db_version"), true)
-        const db = await this._db.onReady()
-        return (connection ? this._db : db)
+        if (this.#db === null) await this.upgradeDB(await SettingsStorage.get("statement_db_version"), true)
+        const db = await this.#db.onReady()
+        return (connection ? this.#db : db)
     }
 }

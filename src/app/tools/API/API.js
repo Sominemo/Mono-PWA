@@ -1,5 +1,5 @@
 import Axios from "axios"
-import Report from "@Core/Services/report"
+import { Report } from "@Core/Services/Report"
 import APIError from "./APIError"
 
 export default class API {
@@ -42,17 +42,15 @@ export default class API {
         this.name = name
     }
 
-    get _tokenError() {
+    get tokenError() {
         return new APIError(403, { type: 1 })
     }
 
-    _floodError(errorObject) {
+    floodError(errorObject) {
         return errorObject.info.data === 429
     }
 
-    _tokenErrorHandler() {
-
-    }
+    #tokenErrorHandler = () => { }
 
     call(method, {
         methodID = null, data = {}, requestMethod = "get", useAuth = this.token !== null, settings = API.flags.waiting,
@@ -61,8 +59,8 @@ export default class API {
         if (API.offlineMode) return Promise.reject(new APIError(0, { type: 1 }))
 
         if (this.token === null && useAuth && !customToken) {
-            this._tokenErrorHandler()
-            return Promise.reject(this._tokenError)
+            this.#tokenErrorHandler()
+            return Promise.reject(this.tokenError)
         }
 
 
@@ -72,7 +70,7 @@ export default class API {
             resolve = res
             reject = (e) => {
                 if (e instanceof APIError
-                    && (e.data === 403 || e.data === 401)) this._tokenErrorHandler()
+                    && (e.data === 403 || e.data === 401)) this.#tokenErrorHandler()
                 rej()
             }
         })
@@ -88,11 +86,11 @@ export default class API {
         const dataObject = { request, resolve, reject }
 
         if (request.settings & API.flags.skipGlobal) {
-            this._sendRequest(dataObject)
+            this.sendRequest(dataObject)
             return
         } if (request.settings & (API.flags.waiting | API.flags.skip)) {
             this.cart.push(dataObject)
-            this._cartRunner()
+            this.cartRunner()
             return
         }
 
@@ -101,24 +99,24 @@ export default class API {
             return
         }
         this.cart.push(dataObject)
-        this._cartRunner()
+        this.cartRunner()
     }
 
-    _cartBusy = false
+    #cartBusy = false
 
-    _cartRunner(myself = false) {
-        if (this._cartBusy && !myself) return
+    cartRunner(myself = false) {
+        if (this.#cartBusy && !myself) return
         if (this.cart.length === 0) {
-            this._cartBusy = false
+            this.#cartBusy = false
             return
         }
 
-        this._cartBusy = true
+        this.#cartBusy = true
         let minValue = null
         try {
             const globalWait = this.lastRequest + this.globalTimeout - Date.now()
             if (globalWait > 0) {
-                setTimeout(() => this._cartRunner(true), globalWait)
+                setTimeout(() => this.cartRunner(true), globalWait)
                 return
             }
 
@@ -140,16 +138,16 @@ export default class API {
                 }
 
                 this.lastRequest = Date.now()
-                this._sendRequest(requestObject)
+                this.sendRequest(requestObject)
                 this.cart.splice(index, 1)
                 if (this.globalTimeout > 0) throw new APIError(1, { type: 2 })
             })
         } catch (e) {
-            this._cartBusy = false
+            this.#cartBusy = false
             if (!(e instanceof APIError && e.info.type === 2 && e.info.data === 1)) throw e
         }
-        if (this.cart.length > 0 && minValue > 0) setTimeout(() => this._cartRunner(true), minValue)
-        this._cartBusy = false
+        if (this.cart.length > 0 && minValue > 0) setTimeout(() => this.cartRunner(true), minValue)
+        this.#cartBusy = false
     }
 
     cartStatus(methodID = null, getValue = false) {
@@ -170,7 +168,7 @@ export default class API {
         return (getValue ? value : value === 0)
     }
 
-    async _sendRequest({
+    async sendRequest({
         request, resolve, reject, originalTimestamp = null,
     }) {
         const self = this
@@ -193,7 +191,7 @@ export default class API {
                     self.lastRequests[request.methodID] = Date.now()
                 },
             }
-            if (request.useAuth) object = this._authAttacher(object, request)
+            if (request.useAuth) object = this.authAttacher(object, request)
 
             const response = await Axios(object)
 
@@ -208,10 +206,10 @@ export default class API {
             } else {
                 errorObject = new APIError(-1, { type: 1 })
                 self.lastRequests[request.methodID] = originalTimestamp || 0
-                Report.write("Error", error.message)
+                Report.add(error.message, ["api.error"])
             }
 
-            if ((this._floodError(errorObject)
+            if ((this.floodError(errorObject)
                 && request.settings & API.flags.resendOnFlood)
                 || request.settings & API.flags.resend) {
                 this.sendToCart(request, resolve, reject)
@@ -222,7 +220,7 @@ export default class API {
         }
     }
 
-    _authAttacher(object, request) {
+    authAttacher(object, request) {
         object.headers["X-Token"] = (request.customToken ? request.customToken : this.token)
         return object
     }

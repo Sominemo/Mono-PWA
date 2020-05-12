@@ -57,18 +57,18 @@ export default class MonoNotificationCluster extends MonoNotificationService {
         }))
 
         return Array.from(res.values()).map((channel) => {
-            channel._service = channel.service
+            channel.shadowService = channel.service
             channel.service = self
             return channel
         })
     }
 
     async subscribe(channel, sub) {
-        await channel._service.subscribe(channel, sub)
+        await channel.shadowService.subscribe(channel, sub)
         this.activated(sub)
     }
 
     unsubscribe(channel, sub) {
-        return channel._service.unsubscribe(channel, sub)
+        return channel.shadowService.unsubscribe(channel, sub)
     }
 }

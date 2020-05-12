@@ -2,10 +2,11 @@ import fileSizeForHuman from "@Core/Tools/transformation/text/fileSizeForHuman"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import { $$, $ } from "@Core/Services/Language/handler"
 import IconSide from "@Environment/Library/DOM/object/iconSide"
-import { SettingsSectionElement, SettingsGroupContainer } from "@Environment/Library/DOM/settings"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import { Button } from "@Environment/Library/DOM/object/input"
 import DBUserPresence from "@Core/Services/DBUserPresence"
+import { SettingsSectionElement, SettingsGroupContainer } from "@App/modules/main/settings"
+
 
 export default function generateDBSettingsLayout(act) {
     const list = DBUserPresence.getAll()
@@ -27,12 +28,12 @@ export default function generateDBSettingsLayout(act) {
             sizeContainer.clear(new DOM({
                 new: "div",
                 content: [
-                    `${$$("@settings/storage/used")} ${size}${("quota" in e ? ` ${$("@settings/storage/of")} ${quota}` : "")}`,
+                    `${$$("settings/storage/used")} ${size}${("quota" in e ? ` ${$("settings/storage/of")} ${quota}` : "")}`,
                     ...(byteSize > byteQuota
                         ? [
                             new IconSide(
                                 "warning",
-                                (e.functions.find((er) => er.name === "auto-clean") ? $$("@settings/storage/cleanup_planned") : $$("@settings/storage/over_quota")),
+                                (e.functions.find((er) => er.name === "auto-clean") ? $$("settings/storage/cleanup_planned") : $$("settings/storage/over_quota")),
                             ),
                         ]
                         : []),
@@ -44,7 +45,7 @@ export default function generateDBSettingsLayout(act) {
             calculateSize()
         }
 
-        sizeContainer = new DOM({ new: "div", content: `${$$("@settings/storage/calculating")}...`, onRender: updateStatus })
+        sizeContainer = new DOM({ new: "div", content: `${$$("settings/storage/calculating")}...`, onRender: updateStatus })
 
         act.createSection({
             id: sectionName,

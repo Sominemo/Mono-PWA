@@ -24,7 +24,7 @@ export default class MonoAPI extends API {
 
     clientInfo = clientInfo.bind(this)
 
-    _tokenErrorHandler = destroyInstance.bind(this)
+    #tokenErrorHandler = destroyInstance.bind(this)
 
     get authed() {
         return true

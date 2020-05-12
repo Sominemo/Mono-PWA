@@ -55,7 +55,7 @@ export default class PartnersUI {
         async function retry(caller) {
             const text = new DOM({
                 new: "div",
-                content: $$("@currency/refreshing"),
+                content: $$("currency/refreshing"),
                 style: {
                     padding: "15px",
                 },
@@ -68,12 +68,12 @@ export default class PartnersUI {
             )).map((e) => e.data)
 
             if (cur instanceof APIError || cur instanceof Error) {
-                text.clear(new DOM({ type: "text", new: $$("@currency/error_refresh") }))
+                text.clear(new DOM({ type: "text", new: $$("currency/error_refresh") }))
             } else {
                 if (typeof caller === "function") await caller()
                 b.clear()
                 self.renderList(b, cur, false, filterKey)
-                text.clear(new DOM({ type: "text", new: $$("@currency/refreshed") }))
+                text.clear(new DOM({ type: "text", new: $$("currency/refreshed") }))
             }
             await Sleep(3000)
             toast.pop()
@@ -99,13 +99,13 @@ export default class PartnersUI {
             if (selection === -1) opts.push({ content: filterKey, value: filterKey })
 
             const p = Prompt({
-                title: $$("@p4/categories"),
+                title: $$("p4/categories"),
                 text: [
-                    $$("@p4/choose_category"),
+                    $$("p4/choose_category"),
                     new SelectInput({
-                        placeholder: $$("@p4/category"),
+                        placeholder: $$("p4/category"),
                         options: opts,
-                        emptySelection: $$("@p4/all"),
+                        emptySelection: $$("p4/all"),
                         change(o) {
                             filter(o.value)
                             p.close()
@@ -122,12 +122,12 @@ export default class PartnersUI {
             navMenu: [
                 {
                     icon: "refresh",
-                    title: $$("@currency/refresh"),
+                    title: $$("currency/refresh"),
                     handler: retry,
                 },
                 {
                     icon: "filter_list",
-                    title: $$("@p4/category"),
+                    title: $$("p4/category"),
                     handler: filterUI,
                 },
             ],
@@ -149,11 +149,11 @@ export default class PartnersUI {
             b.render(new WarningConstructorButton({
                 type: 3,
                 button: {
-                    content: $$("@p4/retry"),
+                    content: $$("p4/retry"),
                     handler: () => retry(),
                 },
-                title: $$("@p4/fetch_fail"),
-                content: $$("@p4/try_later"),
+                title: $$("p4/fetch_fail"),
+                content: $$("p4/try_later"),
             }))
         }
         w.render(b)
@@ -166,22 +166,22 @@ export default class PartnersUI {
             const warnCache = new WarningConstructorButton({
                 type: 2,
                 button: {
-                    content: $$("@currency/refresh"),
+                    content: $$("currency/refresh"),
                     handler: () => cache[1](() => new SlideOut({
                         duration: 100,
                         timingFunc: EaseOutCubic,
                     }).apply(warnCache)),
                 },
-                title: $$("@p4/cached_title"),
-                content: `${$$("@p4/cache_for")} ${new Date(cache[0]).toLocaleDateString()} ${new Date(cache[0]).toLocaleTimeString()}`,
+                title: $$("p4/cached_title"),
+                content: `${$$("p4/cache_for")} ${new Date(cache[0]).toLocaleDateString()} ${new Date(cache[0]).toLocaleTimeString()}`,
             })
             w.render(warnCache)
         }
 
         function onlineIconExplanation() {
             Prompt({
-                title: $$("@p4/online"),
-                text: $$("@p4/online_exp"),
+                title: $$("p4/online"),
+                text: $$("p4/online_exp"),
                 buttons: [
                     {
                         handler: "close",
@@ -193,8 +193,8 @@ export default class PartnersUI {
 
         function deliveryIconExplanation() {
             Prompt({
-                title: $$("@p4/delivery"),
-                text: $$("@p4/delivery_exp"),
+                title: $$("p4/delivery"),
+                text: $$("p4/delivery_exp"),
                 buttons: [
                     {
                         handler: "close",
@@ -237,7 +237,7 @@ export default class PartnersUI {
                 right.push(new Icon("laptop"))
                 info.push(new DOM({
                     new: "div",
-                    content: new IconSide("laptop", $$("@p4/online"), { style: { margin: ".5em 1em", alignSelf: "start" } }),
+                    content: new IconSide("laptop", $$("p4/online"), { style: { margin: ".5em 1em", alignSelf: "start" } }),
                     class: ["card-list-item-clickable", "card-list-item", "no-border"],
                     events: [
                         {
@@ -253,7 +253,7 @@ export default class PartnersUI {
                 right.push(new Icon("local_shipping"))
                 info.push(new DOM({
                     new: "div",
-                    content: new IconSide("local_shipping", $$("@p4/delivery"), { style: { margin: ".5em 1em", alignSelf: "start" } }),
+                    content: new IconSide("local_shipping", $$("p4/delivery"), { style: { margin: ".5em 1em", alignSelf: "start" } }),
                     class: ["card-list-item-clickable", "card-list-item", "no-border"],
                     events: [
                         {
@@ -379,7 +379,7 @@ export default class PartnersUI {
                         content: new Align(new DOM({
                             new: "div",
                             content: [
-                                new Title($$("@p4/no_data"), 2, { fontSize: "4vmin" }),
+                                new Title($$("p4/no_data"), 2, { fontSize: "4vmin" }),
                                 new LottieAnimation(require("@Resources/animations/failed.json"),
                                     { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
                             ],

@@ -31,12 +31,12 @@ function relativeDate(date, hours = false) {
 
     let monthDate
 
-    if (sameDay(cur, dat)) monthDate = $("@dateformats/relative/today")
-    else if (prevDay(cur, dat)) monthDate = $("@dateformats/relative/yesterday")
-    else if (nextDay(cur, dat)) monthDate = $("@dateformats/relative/tomorrow")
-    else monthDate = `${date.getDate()} ${$(`@dateformats/month/months/${date.getMonth() + 1}`)}`
+    if (sameDay(cur, dat)) monthDate = $("dateformats/relative/today")
+    else if (prevDay(cur, dat)) monthDate = $("dateformats/relative/yesterday")
+    else if (nextDay(cur, dat)) monthDate = $("dateformats/relative/tomorrow")
+    else monthDate = `${date.getDate()} ${$(`dateformats/month/months/${date.getMonth() + 1}`)}`
 
-    return monthDate + (hours ? `, ${$("@dateformats/at")} ${date.getHours()}:${date.getMinutes()}` : "")
+    return monthDate + (hours ? `, ${$("dateformats/at")} ${date.getHours()}:${date.getMinutes()}` : "")
 }
 
 export {

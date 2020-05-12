@@ -74,7 +74,7 @@ export default class CardCustomization {
                                     marginLeft: ".5em", fontWeight: "300", marginRight: "10px",
                                 },
                                 class: ["mono-card-list-pw-size"],
-                                content: printMoney(profile.balance),
+                                content: (profile.isOverdraft ? "-" : "") + printMoney(profile.balance),
 
                             }),
                             new DOM({
@@ -177,7 +177,7 @@ export default class CardCustomization {
                     new Card(
                         new CardTextList([
                             new TwoSidesWrapper(
-                                new DOM({ new: "div", content: $$("@customization/cardholder") }),
+                                new DOM({ new: "div", content: $$("customization/cardholder") }),
                                 new DOM({ new: "div", content: cardholder }),
                             ),
                             new TwoSidesWrapper(
@@ -185,13 +185,13 @@ export default class CardCustomization {
                                 new DOM({ new: "div", content: id }),
                             ),
                             new TwoSidesWrapper(
-                                new DOM({ new: "div", content: $$("@customization/currency") }),
+                                new DOM({ new: "div", content: $$("customization/currency") }),
                                 new DOM({ new: "div", content: currencyCode }),
                             ),
                         ], {}, true),
                     ),
-                    new CardContent($$("@customization/warning")),
-                    new Title($$("@customization/bank"), 3),
+                    new CardContent($$("customization/warning")),
+                    new Title($$("customization/bank"), 3),
                     new Align([
                         ...new RadioLabel([
                             {
@@ -212,7 +212,7 @@ export default class CardCustomization {
                             },
                         ], [], false, true),
                     ], ["row", "middle"]),
-                    new Title($$("@customization/look"), 3),
+                    new Title($$("customization/look"), 3),
                     new DOM({
                         new: "div",
                         class: "three-column",
@@ -225,7 +225,7 @@ export default class CardCustomization {
                                                 if (!s) return
                                                 setColor(selectedColor)
                                             },
-                                            content: $$(`@customization/looks/${selectedColor}`),
+                                            content: $$(`customization/looks/${selectedColor}`),
                                             selected: look === selectedColor,
                                         }),
                                     ), [], false, true,

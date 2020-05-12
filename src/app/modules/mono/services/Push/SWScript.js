@@ -1,17 +1,145 @@
 /* eslint-disable no-restricted-globals */
-/* global registration, clients, __PACKAGE_APP_NAME, __PACKAGE_BUILD_TIME */
-import hashCode from "@Core/Tools/transformation/text/hashCode"
-import printMoney from "@App/tools/transform/printMoney"
-import MoneyPrintConfig from "@App/tools/transform/MoneyPrintConfig"
-import Money from "../../API/classes/Money"
-import { Currency } from "../../API/classes/Currency"
-import MCC from "../../API/classes/MCC"
-import cashback from "../../API/parsers/cashback"
+/* global registration, clients, __PACKAGE_APP_NAME, __PACKAGE_BUILD_TIME,
+__MCC_CODES_EMOJI, __CC_SHRUNK_DATASET */
+import errorToObject from "@Core/Tools/transformation/object/errorToObject"
 
-MoneyPrintConfig.showMinorPart = true
+const emojiMCCDataset = __MCC_CODES_EMOJI
+const ccDataset = __CC_SHRUNK_DATASET
 
 // eslint-disable-next-line no-unused-vars
 const compileTime = __PACKAGE_BUILD_TIME
+
+function report(...data) {
+    console.log(...data)
+    return new Promise(
+        (resolve, reject) => {
+            const dbOpenReq = indexedDB.open("ReportData")
+
+            dbOpenReq.onsuccess = (dbOpen) => {
+                const db = dbOpen.target.result
+                const request = db.transaction(["log"], "readwrite").objectStore("log")
+                    .add({
+                        log: errorToObject(data), time: Date.now(), tags: ["sw"], session: "webworker",
+                    })
+                request.onsuccess = resolve
+                request.onerror = reject
+            }
+
+            dbOpenReq.onerror = reject
+            dbOpenReq.onblocked = reject
+            dbOpenReq.onupgradeneeded = reject
+        },
+    )
+}
+
+function hashCode(str) {
+    let hash = 0
+    let i
+    let chr
+    if (str.length === 0) return hash
+    for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i)
+        hash = ((hash << 5) - hash) + chr
+        hash |= 0
+    }
+    return hash
+}
+
+function getMCCEmoji(code) {
+    return emojiMCCDataset[String(code).padStart(4, "0")]
+}
+
+function getCur(expression, code = false) {
+    const field = (code ? "code" : "number")
+    const info = ccDataset.find((v) => (v[field] === expression))
+    if (!info) {
+        return {
+            code: String(expression),
+            number: 0,
+            digits: 2,
+        }
+    }
+
+    return {
+        code: info.code,
+        number: info.number,
+        digits: info.digits,
+    }
+}
+
+class Money {
+    constructor(value, cur) {
+        this.cur = cur
+        this.minus = value < 0
+        value = Math.abs(value)
+        this.full = Math.floor(value / (10 ** cur.digits))
+        this.dec = value - this.full * (10 ** cur.digits)
+    }
+
+    toString() {
+        let char = this.cur.code
+
+        if (this.cur.number === 980) char = "₴"
+        else if (this.cur.number === 840) char = "$"
+        else if (this.cur.number === 978) char = "€"
+        else if (this.cur.number === 985) char = "zł"
+
+        return `${(this.minus ? "-" : "")}${
+            Money.spacing(`${this.full}.${String(this.dec).padStart(this.cur.digits, "0")}`)
+            } ${char}`
+    }
+
+    static spacing(str) {
+        const comp = str.split(".")
+        comp[0] = comp[0].match(/.{1,3}(?=(.{3})*$)/g).join(" ")
+        return comp.join(".")
+    }
+}
+
+function cashback(amount, type) {
+    const currency = getCur(type, true)
+    let obj = {}
+
+    if (currency.number !== 0) {
+        obj = {
+            type: "money",
+            amount,
+            mamount: new Money(amount, currency),
+            toString() {
+                return `👛 ${obj.mamount}`
+            },
+        }
+    } else
+
+    if (type === "Miles") {
+        obj = {
+            type: "miles",
+            amount,
+            toString() {
+                return `✈ ${obj.amount}`
+            },
+        }
+    } else
+    if (type === "None") {
+        obj = {
+            type: "none",
+            amount,
+            toString() {
+                return `✨ ${obj.amount}`
+            },
+        }
+    } else {
+        obj = {
+            type: "cashback",
+            amount,
+            toString() {
+                return `✨ ${obj.amount}`
+            },
+        }
+    }
+    return obj
+}
+
 
 const badges = {
     m: require("@Resources/images/badges/m.png").default,
@@ -95,9 +223,9 @@ function actionInterpreter(action, event) {
 }
 
 self.addEventListener("push", async (event) => {
-    console.log("Push recieved", event)
+    report("Push recieved", event)
     if (!(self.Notification && self.Notification.permission === "granted")) {
-        console.log("No Notification permission")
+        report("No Notification permission")
         return
     }
 
@@ -185,38 +313,36 @@ self.addEventListener("push", async (event) => {
         if (!("account" in data && "item" in data)) throw new Error("Incorrect statement-item Payload")
 
 
-        const amount = Money.integer(
+        const amount = new Money(
             Math.abs(data.item.amount),
-            Currency.number(data.account.currencyCode),
+            getCur(data.account.currencyCode),
         )
-        const operationAmount = Money.integer(
+        const operationAmount = new Money(
             Math.abs(data.item.operationAmount),
-            Currency.number(data.item.currencyCode),
+            getCur(data.item.currencyCode),
         )
-        const balance = Money.integer(
-            Math.abs(data.item.balance),
-            Currency.number(data.account.currencyCode),
+        const balance = new Money(
+            Math.abs(data.item.balance - data.account.creditLimit),
+            getCur(data.account.currencyCode),
         )
 
         const operationCashback = cashback(data.item.cashbackAmount, data.account.cashbackType)
 
-        const spentPart = printMoney(amount)
-            + (data.account.currencyCode !== data.item.currencyCode ? ` (${printMoney(operationAmount)})` : "")
-            + (operationCashback.amount > 0 ? ` ${operationCashback.string}` : "")
+        const spentPart = operationAmount
+            + (data.account.currencyCode !== data.item.currencyCode ? ` (${amount})` : "")
+            + (operationCashback.amount > 0 ? ` ${operationCashback}` : "")
 
         const commentPart = data.item.description + ("comment" in data.item ? `\n👋 ${data.item.comment}` : "")
 
 
-        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${printMoney(balance)}`
+        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${(data.item.balance - data.account.creditLimit < 0 ? "-" : "")}${balance}`
 
         const content = `${commentPart}\n${balancePart}`
 
         let emoji
         if (data.item.mcc === 4829) {
             emoji = data.item.amount < 0 ? "💳👉" : "💳👈"
-        } else emoji = new MCC(data.item.mcc).emoji
-
-        console.log(amount, operationAmount, balance)
+        } else emoji = getMCCEmoji(data.item.mcc)
 
         registration.showNotification(
             `${emoji} ${spentPart}`,
@@ -232,7 +358,6 @@ self.addEventListener("push", async (event) => {
 
 
 self.addEventListener("notificationclick", (clickEvent) => {
-    console.log(clickEvent)
     if (!clickEvent.notification.data) return
 
     if (clickEvent.action in clickEvent.notification.data.actionDescriptor) {

@@ -5,11 +5,11 @@ import { $$ } from "@Core/Services/Language/handler"
 
 export default function destroyInstance() {
     Auth.destroyInstance(this.id)
-    Toast.add($$("@auth/you_were_unlogined"), -1,
+    Toast.add($$("auth/you_were_unlogined"), -1,
         {
             buttons: [
                 {
-                    content: $$("@auth/reload"),
+                    content: $$("auth/reload"),
                     handler() {
                         // eslint-disable-next-line no-self-assign
                         Navigation.url = Navigation.url

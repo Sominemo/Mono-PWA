@@ -1,5 +1,0 @@
-@font-face {
-    font-family:"Emoji Font";
-    src: local("Noto Color Emoji"), url("~@Resources/emoji-fonts/NotoColorEmoji.ttf") format("truetype"),
-    url("~@Resources/emoji-fonts/TwitterColorEmoji.ttf") format("truetype");
-  }

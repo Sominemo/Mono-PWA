@@ -2,6 +2,8 @@
 
 import mcc from "mcc"
 import mccLocal from "@Resources/datasets/MCC-Localize-Dataset/mcc-loc.json"
+import icons from "@Resources/datasets/Emoji-To-MD-Icon/dataset"
+import { $$ } from "@Core/Services/Language/handler"
 
 const emojiFallback = "\uD83D\uDCB3"
 
@@ -13,7 +15,7 @@ export default class MCC {
     constructor(code) {
         const data = mcc.get(code)
 
-        let irsDescription = "Operation"
+        let irsDescription = $$("statement/operation")
         let usdaDescription = ""
         let combinedDescription = ""
         let editedDescription = ""
@@ -31,8 +33,10 @@ export default class MCC {
 
         const textCode = String(code).padStart(4, "0")
         const locMccData = mccLocal[textCode]
-        if (locMccData.uk && locMccData.uk.length > 0) this.ukTitle = locMccData.uk
-        if (locMccData.ru && locMccData.ru.length > 0) this.ruTitle = locMccData.ru
+        if (locMccData) {
+            if (locMccData.uk && locMccData.uk.length > 0) this.ukTitle = locMccData.uk
+            if (locMccData.ru && locMccData.ru.length > 0) this.ruTitle = locMccData.ru
+        }
 
         this.id = id
         this.code = code
@@ -43,5 +47,7 @@ export default class MCC {
         } catch (e) {
             this.emoji = emojiFallback
         }
+
+        this.md = icons[this.emoji] || icons[emojiFallback]
     }
 }

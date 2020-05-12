@@ -8,7 +8,7 @@ import printMoney from "@App/tools/transform/printMoney"
 import cubicBeizer from "@DOMPath/Animation/Library/Timing/cubicBeizer"
 import { Card } from "@Environment/Library/DOM/object/card"
 import {
-    Preloader, TwoSidesWrapper, Title,
+    Preloader, TwoSidesWrapper, Title, Icon,
 } from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
 import LottieAnimation from "@App/library/LottieAnimation"
@@ -16,7 +16,7 @@ import { Button } from "@Environment/Library/DOM/object/input"
 import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
-import Report from "@Core/Services/report"
+import { Report } from "@Core/Services/Report"
 import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/WarningConstructorButton"
 import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
@@ -36,18 +36,18 @@ import { statementDownloaderUI } from "./functions/statementDownloader"
 
 export default class StatementUI {
     static async Init() {
-        Navigation.updateTitle($$("@statement"))
+        Navigation.updateTitle($$("statement"))
 
         Navigation.Current = {
             navMenu: [
                 {
                     icon: "credit_card",
-                    title: $$("@customization/open"),
+                    title: $$("customization/open"),
                     handler() { CardCustomization.cardList(true) },
                 },
                 {
                     icon: "cloud_download",
-                    title: $$("@download_statement"),
+                    title: $$("download_statement"),
                     handler() { statementDownloaderUI() },
                 },
             ],
@@ -71,8 +71,8 @@ export default class StatementUI {
             let loadMoreCount = 0
             if (!account) {
                 const p = Prompt({
-                    title: $$("@statement/accounts_changed"),
-                    text: $$("@statement/accounts_changed_text"),
+                    title: $$("statement/accounts_changed"),
+                    text: $$("statement/accounts_changed_text"),
                     buttons: [
                         {
                             content: $$("reload"),
@@ -87,8 +87,8 @@ export default class StatementUI {
             if (account.client instanceof MonoAPI) {
                 if (!(await SettingsStorage.getFlag("seen_token_throttling_warn"))) {
                     Prompt({
-                        title: $$("@statement/warning"),
-                        text: $("@statement/requests_throttling"),
+                        title: $$("statement/warning"),
+                        text: $("statement/requests_throttling"),
                         buttons: [
                             {
                                 content: $$("close"),
@@ -148,27 +148,42 @@ export default class StatementUI {
 
                         const descriptionArray = []
 
-                        if (item.comment) descriptionArray.push(`👋 ${item.comment}`)
-                        descriptionArray.push(
-                            (LanguageCore.language.info.code === "ru" ? item.mcc.ruTitle : item.mcc.ukTitle)
-                            || item.mcc.title,
-                        )
+                        if (item.comment) descriptionArray.push([new Icon("chat_bubble"), new DOM({ type: "t", new: `${item.comment}` })])
+                        descriptionArray.push([
+                            new DOM({
+                                type: "t",
+                                new: (LanguageCore.language.info.code === "ru" ? item.mcc.ruTitle : item.mcc.ukTitle)
+                                    || item.mcc.title,
+                            }),
+                        ])
 
                         if (!(item.cashback instanceof NoCashback || item.cashback.amount === 0)) {
                             if (item.cashback instanceof MoneyCashback) {
-                                if (!item.cashback.object.isZero) descriptionArray.push(`👛 ${(item.cashback.sign === -1 ? "-" : "") + printMoney(item.cashback.object, true)}`)
+                                if (!item.cashback.object.isZero) descriptionArray.push([new Icon("account_balance_wallet"), new DOM({ type: "t", new: `${(item.cashback.sign === -1 ? "-" : "") + printMoney(item.cashback.object, true)}` })])
                             } else if (item.cashback instanceof MilesCashback) {
-                                descriptionArray.push(`✈ ${item.cashback.amount} mi`)
+                                descriptionArray.push([new Icon("flight"), new DOM({ type: "t", new: `${item.cashback.amount} mi` })])
                             } else {
-                                descriptionArray.push(`✨ ${item.cashback.amount} ${item.cashback.type}`)
+                                descriptionArray.push([new Icon("assistant"), new DOM({ type: "t", new: `${item.cashback.amount} ${item.cashback.type}` })])
                             }
                         }
 
-                        if (!item.commissionRate.isZero) {
-                            descriptionArray.push(`➖ ${item.commissionRate.string}`)
+                        if (item.amount.currency.code !== item.operationAmount.currency.code) {
+                            descriptionArray.push([new DOM({ type: "t", new: printMoney(item.operationAmount) })])
                         }
 
-                        const description = descriptionArray.join(" | ")
+                        if (!item.commissionRate.isZero) {
+                            descriptionArray.push([new Icon("remove_circle"), new DOM({ type: "t", new: `${item.commissionRate.string}` })])
+                        }
+
+                        const description = descriptionArray.reduce(
+                            (r, a, ind) => r.concat(
+                                ...[...a,
+                                    ...(ind + 1 === descriptionArray.length
+                                        ? []
+                                        : [new DOM({ type: "t", new: " | " })]),
+                                ],
+                            ), [],
+                        )
 
                         toRender.push(new DOM({
                             new: "div",
@@ -195,7 +210,10 @@ export default class StatementUI {
                                         new DOM({
                                             new: "div",
                                             class: "statement-item-category",
-                                            content: item.mcc.emoji,
+                                            content: new Icon(item.mcc.md.icon),
+                                            style: {
+                                                background: item.mcc.md.color,
+                                            },
                                         }),
                                         new DOM({
                                             new: "div",
@@ -223,7 +241,7 @@ export default class StatementUI {
                                 ),
                         }))
                     } catch (e) {
-                        Report.error("Failed to render statement item", JSON.parse(JSON.stringify(item)))
+                        Report.add([e, JSON.parse(JSON.stringify(item))], ["statement.renderError"])
                     }
                 })
 
@@ -240,9 +258,9 @@ export default class StatementUI {
                                 content: [
                                     new LottieAnimation(require("@Resources/animations/failed.json"),
                                         { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
-                                    new Title((loadMoreCount > 0 ? $$("@statement/still_nothing") : $$("@statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
+                                    new Title((loadMoreCount > 0 ? $$("statement/still_nothing") : $$("statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
                                     new Button({
-                                        content: $$("@statement/load_more"),
+                                        content: $$("statement/load_more"),
                                         handler() {
                                             contentCard.clear()
                                             loadMore()
@@ -254,7 +272,7 @@ export default class StatementUI {
                     } else if (!contentCard.classList.contains("originally-null")) {
                         loader = new Align(
                             new Button({
-                                content: $$("@statement/load_more"),
+                                content: $$("statement/load_more"),
                                 handler() {
                                     loadMore()
                                 },
@@ -268,7 +286,7 @@ export default class StatementUI {
                     contentCard.classList.remove("originally-null")
                     loader = new Align(
                         new Button({
-                            content: $$("@statement/load_more"),
+                            content: $$("statement/load_more"),
                             handler() {
                                 loadMore()
                             },
@@ -296,7 +314,7 @@ export default class StatementUI {
                                 flexDirection: "column",
                             },
                             content: [
-                                new Title($$("@statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
+                                new Title($$("statement/choose_platinum_color"), 3, { marginTop: "0", textAlign: "center" }),
                                 new Align(
                                     [
                                         new DOM({
@@ -380,11 +398,11 @@ export default class StatementUI {
                     if (v || curAccount !== account) return
                     const warning = new WarningConstructorButton({
                         type: 3,
-                        title: $$("@statement/hint_customize"),
-                        content: $$("@statement/hint_customize_text"),
+                        title: $$("statement/hint_customize"),
+                        content: $$("statement/hint_customize_text"),
                         icon: "credit_card",
                         button: {
-                            content: $$("@statement/open"),
+                            content: $$("statement/open"),
                             handler() {
                                 CardCustomization.cardList(true)
                             },
@@ -472,7 +490,7 @@ export default class StatementUI {
 
             const balanceItem = new DOM({
                 new: "div",
-                content: printMoney(account.balance),
+                content: (account.isOverdraft ? "-" : "") + printMoney(account.balance),
                 class: "mono-card-absolute-balance-number",
             })
 

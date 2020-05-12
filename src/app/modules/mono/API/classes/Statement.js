@@ -1,4 +1,4 @@
-import Report from "@Core/Services/report"
+import { Report } from "@Core/Services/Report"
 import StatementItem from "./StatementItem"
 
 export default class Statement {
@@ -14,7 +14,7 @@ export default class Statement {
                     new StatementItem(item, account),
                 )
             } catch (e) {
-                Report.error("Failed to construct StatementItem", JSON.parse(JSON.stringify(item)), e)
+                Report.add([JSON.parse(JSON.stringify(item)), e], ["statement.constructorFailure"])
             }
         })
     }

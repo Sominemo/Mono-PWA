@@ -21,5 +21,5 @@ export default class MonoAnonymousAPI extends API {
 
     currency = currency.bind(this)
 
-    _tokenErrorHandler = destroyInstance.bind(this)
+    #tokenErrorHandler = destroyInstance.bind(this)
 }

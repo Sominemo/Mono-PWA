@@ -26,7 +26,7 @@ import parseCurrencyRAW from "./API/parsers/currency"
 
 export default class CurrencyUI {
     static async Init() {
-        Navigation.updateTitle($$("@currency"))
+        Navigation.updateTitle($$("currency"))
         const self = this
         const w = new WindowContainer()
         const b = new DOM({ new: "div" })
@@ -35,7 +35,7 @@ export default class CurrencyUI {
         async function retry(caller) {
             const text = new DOM({
                 new: "div",
-                content: $$("@currency/refreshing"),
+                content: $$("currency/refreshing"),
                 style: {
                     padding: "15px",
                 },
@@ -48,12 +48,12 @@ export default class CurrencyUI {
             )).map((e) => e.data)
 
             if (cur instanceof APIError || cur instanceof Error) {
-                text.clear(new DOM({ type: "text", new: $$("@currency/error_refresh") }))
+                text.clear(new DOM({ type: "text", new: $$("currency/error_refresh") }))
             } else {
                 if (typeof caller === "function") await caller()
                 b.clear()
                 self.renderList(b, cur)
-                text.clear(new DOM({ type: "text", new: $$("@currency/refreshed") }))
+                text.clear(new DOM({ type: "text", new: $$("currency/refreshed") }))
             }
             await Sleep(3000)
             toast.pop()
@@ -63,13 +63,13 @@ export default class CurrencyUI {
             navMenu: [
                 {
                     icon: "refresh",
-                    title: $$("@currency/refresh"),
+                    title: $$("currency/refresh"),
                     handler: retry,
                 },
             ],
         }
 
-        w.render(new Title($$("@currency")))
+        w.render(new Title($$("currency")))
         const loader = loadingPopup()
         let cur
         let cache = false
@@ -99,11 +99,11 @@ export default class CurrencyUI {
             b.render(new WarningConstructorButton({
                 type: 3,
                 button: {
-                    content: $$("@currencies/retry"),
+                    content: $$("currencies/retry"),
                     handler: () => retry(),
                 },
-                title: $$("@currencies/fetch_fail"),
-                content: $$("@currencies/try_later"),
+                title: $$("currencies/fetch_fail"),
+                content: $$("currencies/try_later"),
             }))
         }
         w.render(b)
@@ -118,14 +118,14 @@ export default class CurrencyUI {
             const warnCache = new WarningConstructorButton({
                 type: 2,
                 button: {
-                    content: $$("@currency/refresh"),
+                    content: $$("currency/refresh"),
                     handler: () => cache(() => new SlideOut({
                         duration: 100,
                         timingFunc: EaseOutCubic,
                     }).apply(warnCache)),
                 },
-                title: $$("@currency/cached_title"),
-                content: `${$$("@currency/cache_for")} ${cur[0].date.toLocaleDateString()} ${cur[0].date.toLocaleTimeString()}`,
+                title: $$("currency/cached_title"),
+                content: `${$$("currency/cache_for")} ${cur[0].date.toLocaleDateString()} ${cur[0].date.toLocaleTimeString()}`,
             })
             w.render(warnCache)
         }
@@ -136,7 +136,7 @@ export default class CurrencyUI {
             let amount = 1
             const result = new ContentEditable({
                 editable: false,
-                placeholder: $$("@currency/result"),
+                placeholder: $$("currency/result"),
                 content: String(data.rateSell),
             })
             const input = new TextInput({
@@ -150,7 +150,7 @@ export default class CurrencyUI {
                     min: "0.01",
                     type: "number",
                     step: "0.01",
-                    placeholder: $$("@currency/amount"),
+                    placeholder: $$("currency/amount"),
                     value: "1.00",
                 },
             })
@@ -197,7 +197,7 @@ export default class CurrencyUI {
 
 
             Prompt({
-                title: $$("@currency/convert"),
+                title: $$("currency/convert"),
                 text: new DOM({
                     new: "div",
                     style: {
@@ -209,7 +209,7 @@ export default class CurrencyUI {
                         input,
                         new DOM({
                             new: "div",
-                            content: [`${$$("@currency/sell")}:`, ...chooser],
+                            content: [`${$$("currency/sell")}:`, ...chooser],
                             style: {
                                 display: "flex",
                                 justifyContent: "start",
@@ -279,16 +279,16 @@ export default class CurrencyUI {
                                     content: [
                                         new DOM({
                                             new: "div",
-                                            content: $$("@currency/one"),
+                                            content: $$("currency/one"),
                                         }),
                                         new DOM({
                                             new: "div",
-                                            content: $$("@currency/buy"),
+                                            content: $$("currency/buy"),
                                             style: { textAlign: "center" },
                                         }),
                                         new DOM({
                                             new: "div",
-                                            content: $$("@currency/sell"),
+                                            content: $$("currency/sell"),
                                             style: { textAlign: "center" },
                                         }),
                                     ],
@@ -302,7 +302,7 @@ export default class CurrencyUI {
         }
         let searchbox
         if (cross.length) {
-            w.render(new Title($$("@currency/payment_systems"), 2))
+            w.render(new Title($$("currency/payment_systems"), 2))
             w.render(searchbox = new Card(
                 new CardContent(
                     new IconSide(
@@ -351,11 +351,11 @@ export default class CurrencyUI {
                                     content: [
                                         new DOM({
                                             new: "div",
-                                            content: $$("@currency/one"),
+                                            content: $$("currency/one"),
                                         }),
                                         new DOM({
                                             new: "div",
-                                            content: $$("@currency/numbers"),
+                                            content: $$("currency/numbers"),
                                             style: { textAlign: "right" },
                                         }),
                                     ],

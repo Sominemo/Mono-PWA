@@ -48,9 +48,9 @@ export default class MonoCorpAPI extends API {
 
     clientInfo = clientInfo.bind(this)
 
-    _tokenErrorHandler = destroyInstance.bind(this)
+    #tokenErrorHandler = destroyInstance.bind(this)
 
-    _authAttacher(object, request) {
+    authAttacher(object, request) {
         object.headers["X-Request-Id"] = this.token
         return object
     }
