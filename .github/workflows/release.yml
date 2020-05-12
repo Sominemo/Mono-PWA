@@ -73,4 +73,3 @@ jobs:
           inititial_status: pending
           environment: wg
           description: "Pre-Release publication"
-
