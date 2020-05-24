@@ -1,5 +1,6 @@
 {
     "code": "ru",
     "name": "Русский",
-    "author": "Sominemo"
+    "author": "Sominemo",
+    "fallback": ["uk"]
 }
