@@ -70,7 +70,6 @@ export default class PWA extends App {
                         $$("about/disclaimer_title")]),
                     disableWrapper: true,
                 },
-                { content: new SettingsActLink(["transformators", $$("settings/tf")]), disableWrapper: true },
             ],
         ))
         w.render(infocard)

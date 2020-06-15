@@ -1,6 +1,6 @@
 import { Preloader } from "@Environment/Library/DOM/object"
-import LottieAnimation from "@App/library/LottieAnimation"
+import { SVG } from "@Environment/Library/DOM/basic"
 
 Preloader.setPreloader(({
     size, style,
-} = {}) => new LottieAnimation(require("@Resources/animations/loader.json"), { size, style }))
+} = {}) => new SVG(require("@Resources/images/vector/mono.svg"), { height: "12vmin" }))
