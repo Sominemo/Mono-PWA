@@ -1,4 +1,4 @@
-@import "~@EnvResources/styles/themes/dark/theme.css";
+@import "~@EnvResources/styles/themes/default/theme.css";
 :root {
 	--color-main-light-a: #fc888a;
 	--color-main-light: #fd6063;
@@ -10,15 +10,12 @@
 	--color-accent: var(--color-main);
 	--color-accent-light: var(--color-main-light);
 	--color-accent-light-a: var(--color-main-light-a);
-	--color-card-main-shadow: 0px 5px 13px rgba(245, 80, 83, .2);
+	--color-card-main-shadow: 0 1vmin 2vmin rgba(245, 80, 83, .2);
 	--color-card-main-border: rgba(245, 80, 83, 0.25);
-	--color-card-accent-shadow: 0px 5px 13px rgba(245, 80, 83, .2);
+	--color-card-accent-shadow: 0 1vmin 2vmin rgba(245, 80, 83, .2);
 	--color-card-accent-border: rgba(245, 80, 83, 0.25);
 	--color-button-text: var(--color-generic);
-	--color-toast-bg: #080808;
-	--color-toast-text: var(--color-generic);
-	--color-button-text-light: #ffffff;
-	--color-card-tip-shadow: 0px 10px 20px 0px rgba(165, 133, 31, 0.2), 0 0 0 2px rgba(251, 191, 0, .4);
+	--color-card-tip-shadow: 0 2vmin 4vmin 0 rgba(165, 133, 31, 0.2), 0 0 0 .1vmin rgba(251, 191, 0, .4);
 }
 
 md-button.alert {

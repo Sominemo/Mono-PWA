@@ -2,7 +2,7 @@ import { WindowContainer } from "@Environment/Library/DOM/buildBlock"
 import WindowManager from "@Core/Services/SimpleWindowManager"
 import Navigation from "@Core/Services/navigation"
 import { $$ } from "@Core/Services/Language/handler"
-import { CoreLoader } from "@Core/Init/CoreLoader"
+import { CoreLoader, CoreLoaderSkip, CoreLoaderResult } from "@Core/Init/CoreLoader"
 import { Title } from "@Environment/Library/DOM/object"
 import { Card, CardList } from "@Environment/Library/DOM/object/card"
 import IconSide from "@Environment/Library/DOM/object/iconSide"
@@ -118,7 +118,9 @@ export default class MenuUI {
 CoreLoader.registerTask({
     id: "menu_module",
     presence: "Menu",
-    task() {
+    async task() {
+        if (await SettingsStorage.getFlag("next_features")) return new CoreLoaderSkip()
+
         Navigation.addModule({
             name: "Menu",
             id: "menu",
@@ -134,5 +136,7 @@ CoreLoader.registerTask({
         }
 
         Navigation.titleFallback = "monobank"
+
+        return new CoreLoaderResult()
     },
 })

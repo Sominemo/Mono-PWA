@@ -11,7 +11,6 @@ import {
     Preloader, TwoSidesWrapper, Title, Icon,
 } from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
-import LottieAnimation from "@App/library/LottieAnimation"
 import { Button } from "@Environment/Library/DOM/object/input"
 import { $$, $ } from "@Core/Services/Language/handler"
 import { sameDay, relativeDate } from "@App/tools/transform/relativeDates"
@@ -247,7 +246,6 @@ export default class StatementUI {
 
                 contentCard.render(...toRender)
 
-
                 if (items.length === 0) {
                     if (!noReplace || contentCard.classList.contains("originally-null")) {
                         contentCard.classList.add("originally-null")
@@ -256,8 +254,14 @@ export default class StatementUI {
                                 new: "div",
                                 style: { margin: "auto", textAlign: "center" },
                                 content: [
-                                    new LottieAnimation(require("@Resources/animations/failed.json"),
-                                        { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
+                                    new DOM({
+                                        new: "img",
+                                        src: require("@Resources/images/placeholders/failed.png").default,
+                                        style: {
+                                            height: "33vh",
+                                            margin: "auto",
+                                        },
+                                    }),
                                     new Title((loadMoreCount > 0 ? $$("statement/still_nothing") : $$("statement/no_operations_for_last_week")), 3, { marginLeft: "5px", marginRight: "5px" }),
                                     new Button({
                                         content: $$("statement/load_more"),
@@ -563,7 +567,6 @@ export default class StatementUI {
 
         window.requestAnimationFrame(updateCards)
 
-
         function visibleWidth(card, container) {
             if (card.left >= container.left + container.width) return 0
             if (card.left < container.left) {
@@ -601,7 +604,6 @@ export default class StatementUI {
 
             scrollTo()
         }
-
 
         const rem = () => setTimeout(() => {
             scrollTo()

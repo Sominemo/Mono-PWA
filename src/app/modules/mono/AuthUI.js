@@ -191,7 +191,7 @@ export default class AuthUI {
                             [
                                 new Title($$("auth/settings/token"), 4, { margin: 0 }),
                                 new DOM({ new: "div", content: $$("auth/settings/token/description") }),
-                            ], { style: { marginRight: "15px" } }),
+                            ], { style: { marginRight: "3vmin" } }),
                     },
                     {
                         handler() { AuthUI.setDomain(state); p.close() },
@@ -199,7 +199,7 @@ export default class AuthUI {
                             [
                                 new Title($$("auth/settings/domain"), 4, { margin: 0 }),
                                 new DOM({ new: "div", content: $$("auth/settings/domain/description") }),
-                            ], { style: { marginRight: "15px" } }),
+                            ], { style: { marginRight: "3vmin" } }),
                     },
                     {
                         handler() { AuthUI.resetState(state); p.close() },
@@ -207,7 +207,7 @@ export default class AuthUI {
                             [
                                 new Title($$("auth/settings/revert"), 4, { margin: 0 }),
                                 new DOM({ new: "div", content: $$("auth/settings/revert/description") }),
-                            ], { style: { marginRight: "15px" } }),
+                            ], { style: { marginRight: "3vmin" } }),
                     },
                 ], true),
                 { style: { marginLeft: 0, marginRight: 0, marginTop: 0 } },
@@ -246,8 +246,8 @@ export default class AuthUI {
                         [
                             new Title($$("auth/settings/token"), 4, { margin: 0 }),
                             new DOM({ new: "div", content: $$("auth/settings/token/description") }),
-                        ], { style: { marginRight: "15px" } }),
-                ), { style: { margin: "10px 0" } }),
+                        ], { style: { marginRight: "3vmin" } }),
+                ), { style: { margin: "2vmin 0" } }),
             ],
             buttons: [
                 {
@@ -352,8 +352,8 @@ export default class AuthUI {
                         [
                             new Title($$("auth/settings/domain"), 4, { margin: 0 }),
                             new DOM({ new: "div", content: $$("auth/settings/domain/description") }),
-                        ], { style: { marginRight: "15px" } }),
-                ), { style: { margin: "10px 0" } }),
+                        ], { style: { marginRight: "3vmin" } }),
+                ), { style: { margin: "2vmin 0" } }),
             ],
             buttons: [
                 {
