@@ -3,7 +3,7 @@
 	url = https://github.com/ProcSec/PWA-Core.git
 [submodule "src/environment"]
 	path = src/environment
-	url = https://github.com/ProcSec/PWA-Environment.git
+	url = https://github.com/Sominemo/Modern-PWA.git
 [submodule "src/app/res/datasets/MCC-Localize-Dataset"]
 	path = src/app/res/datasets/MCC-Localize-Dataset
 	url = https://github.com/Sominemo/MCC-Localize-Dataset.git

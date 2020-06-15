@@ -21,7 +21,6 @@ import SlideInCSS from "@Environment/Library/Animations/SlideInCSS"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import { SelectInput } from "@Environment/Library/DOM/object/input"
 import { Align } from "@Environment/Library/DOM/style"
-import LottieAnimation from "@App/library/LottieAnimation"
 import Design from "@Core/Services/design"
 import OfflineCache from "./services/OfflineCache"
 
@@ -380,8 +379,14 @@ export default class PartnersUI {
                             new: "div",
                             content: [
                                 new Title($$("p4/no_data"), 2, { fontSize: "4vmin" }),
-                                new LottieAnimation(require("@Resources/animations/failed.json"),
-                                    { lottieOptions: { loop: false }, size: "33vmin", style: { margin: "auto" } }),
+                                new DOM({
+                                    new: "img",
+                                    src: require("@Resources/images/placeholders/failed.png").default,
+                                    style: {
+                                        height: "33vh",
+                                        margin: "auto",
+                                    },
+                                }),
                             ],
                         }), ["row", "center"]),
                         style: {
@@ -402,7 +407,6 @@ export default class PartnersUI {
         return w
     }
 }
-
 
 CoreLoader.registerTask({
     id: "p4_partners_module",

@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "3.4.0",
+    "version": "4.0.0-dev.10",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -66,11 +66,9 @@
         "currency-codes": "^2.1.0",
         "custom-protocol-detection": "^1.0.1",
         "idb": "^5.0.2",
-        "lottie-web": "^5.6.8",
         "mcc": "^2.2.0",
         "regenerator-runtime": "^0.13.5",
         "requestidlecallback-polyfill": "^1.0.2",
-        "sjcl": "^1.0.8",
         "smoothscroll-polyfill": "^0.4.4",
         "sortablejs": "^1.10.2"
     }
