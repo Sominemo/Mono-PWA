@@ -220,14 +220,16 @@ module.exports = (env = {}) => {
         },
         plugins: [
             new BitBarWebpackProgressPlugin(),
-            new CopyWebpackPlugin([
-                { from: path.join(PATHS.resources, ".well-known"), to: path.join(PATHS.build, ".well-known") },
-                { from: path.join(PATHS.resources, "template.htaccess"), to: path.join(PATHS.build, ".htaccess"), toType: "file" },
-                { from: path.join(PATHS.resources, "robots.txt"), to: path.join(PATHS.build, "robots.txt"), toType: "file" },
-                { from: path.join(PATHS.envResources, "language.template.htaccess"), to: path.join(PATHS.build, ".assets", "language", ".htaccess"), toType: "file" },
-                { from: path.join(PATHS.resources, "images", "logo", "ios"), to: path.join(PATHS.build, ".assets", "icons", "ios") },
-                { from: path.join(PATHS.resources, "animations"), to: path.join(PATHS.build, ".assets", "animations") },
-            ]),
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: path.join(PATHS.resources, ".well-known"), to: path.join(PATHS.build, ".well-known") },
+                    { from: path.join(PATHS.resources, "template.htaccess"), to: path.join(PATHS.build, ".htaccess"), toType: "file" },
+                    { from: path.join(PATHS.resources, "robots.txt"), to: path.join(PATHS.build, "robots.txt"), toType: "file" },
+                    { from: path.join(PATHS.envResources, "language.template.htaccess"), to: path.join(PATHS.build, ".assets", "language", ".htaccess"), toType: "file" },
+                    { from: path.join(PATHS.resources, "images", "logo", "ios"), to: path.join(PATHS.build, ".assets", "icons", "ios") },
+                    { from: path.join(PATHS.resources, "animations"), to: path.join(PATHS.build, ".assets", "animations") },
+                ],
+            }),
             new HtmlWebpackPlugin({
                 title: "monobank",
                 favicon: path.join(PATHS.resources, "images", "logo", "favicon.ico"),

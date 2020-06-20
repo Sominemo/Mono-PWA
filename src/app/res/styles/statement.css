@@ -145,6 +145,7 @@
     border-radius: 50%;
     line-height: 1;
     font-size: 1.3em;
+    color: white;
 }
 
 .statement-item-category>md-icon {

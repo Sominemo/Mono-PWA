@@ -227,7 +227,6 @@ export default class AuthUI {
             p.close()
         }
 
-
         p = Prompt({
             title: $$("auth/settings/token/title"),
             text: [
@@ -647,7 +646,7 @@ export default class AuthUI {
                                 src: `data:image/png;base64, ${state.roll.qr}`,
                             },
                             style: {
-                                width: "22%",
+                                width: "45%",
                                 borderRadius: "6px",
                                 marginBottom: "15px",
                                 cursor: "pointer",
@@ -691,13 +690,6 @@ export default class AuthUI {
                                 [
                                     new Title($$("auth/stage/instructions/scan"), 4, { margin: 0 }),
                                     new DOM({ new: "div", content: $$("auth/stage/instructions/scan/description") }),
-                                ], { style: { marginRight: "15px" } }),
-                        },
-                        {
-                            content: new IconSide("link",
-                                [
-                                    new Title($$("auth/stage/instructions/follow"), 4, { margin: 0 }),
-                                    new DOM({ new: "div", content: $$("auth/stage/instructions/follow/description") }),
                                 ], { style: { marginRight: "15px" } }),
                         },
                         {

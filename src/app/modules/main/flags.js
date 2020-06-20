@@ -97,7 +97,7 @@ export default class FlagsUI {
         w.render(new DOM({
             new: "div",
             style: {
-                padding: "4vmin 0",
+                padding: "20px 0",
             },
             content: [
                 new SVG(pic, {
@@ -109,9 +109,9 @@ export default class FlagsUI {
                     new: "div",
                     style: {
                         textAlign: "center",
-                        marginTop: "4vmin",
+                        marginTop: "20px",
                         fontFamily: Design.getVar("font-accent"),
-                        fontSize: "4vmin",
+                        fontSize: "20px",
                     },
                     content: $$("experiments/no_exps_placeholder"),
                 }),
@@ -133,8 +133,8 @@ export default class FlagsUI {
             new DOM({
                 new: "div",
                 content: [
-                    new DOM({ new: "div", content: title || $(`experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "4vmin" } }),
-                    ...(showID ? [new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "3.5vmin" } })] : []),
+                    new DOM({ new: "div", content: title || $(`experiments/about/${id}/title`), style: { fontWeight: "500", fontSize: "20px" } }),
+                    ...(showID ? [new DOM({ new: "div", content: id, style: { color: "lightgray", fontSize: "12px" } })] : []),
                 ],
                 id: `flag-id-${id}`,
             }),

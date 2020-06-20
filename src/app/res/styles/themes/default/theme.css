@@ -1,5 +1,6 @@
 @import "~@EnvResources/styles/themes/default/theme.css";
 :root {
+	--color-main-light-b: #ffaaac;
 	--color-main-light-a: #fc888a;
 	--color-main-light: #fd6063;
 	--color-main: #F55053;
@@ -14,7 +15,6 @@
 	--color-card-main-border: rgba(245, 80, 83, 0.25);
 	--color-card-accent-shadow: 0 1vmin 2vmin rgba(245, 80, 83, .2);
 	--color-card-accent-border: rgba(245, 80, 83, 0.25);
-	--color-button-text: var(--color-generic);
 	--color-card-tip-shadow: 0 2vmin 4vmin 0 rgba(165, 133, 31, 0.2), 0 0 0 .1vmin rgba(251, 191, 0, .4);
 }
 
