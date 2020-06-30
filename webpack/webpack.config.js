@@ -108,13 +108,13 @@ module.exports = (env = {}) => {
     if (env.ANALYTICS) buildFlags.push("analytics")
 
     // Build version changer
+    builder.build = Number.parseInt(builder.pack.version.match(/^.+\+(\d+)$/)[1]) + (env.CI ? 0 : 1)
+    const clearVersion = builder.pack.version.match(/^(.+)\+\d+$/)[1]
     if (!env.CI) {
-        builder.build = Number.parseInt(builder.pack.version.match(/^.+\+(\d+)$/)[1]) + 1
-        const clearVersion = builder.pack.version.match(/^(.+)\+\d+$/)[1]
         builder.pack.version = `${clearVersion}+${builder.build}`
         fs.writeFile(path.join(PATHS.root, "package.json"), JSON.stringify(builder.pack, null, 4))
-        builder.pack.version = clearVersion
     }
+    builder.pack.version = clearVersion
 
     // Copy updated theme files if in watch mode
     if (env.watch && !env.CI) {
