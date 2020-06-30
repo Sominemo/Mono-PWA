@@ -194,7 +194,7 @@ export default class ClientsWidget {
                         comment: $$("dashboard/clients/choose_type"),
                     }
                 }
-                if (!checkFit(2, 1)) {
+                if (!checkFit(...(data.type === "simple" ? [2, 1] : [3, 2]))) {
                     Toast.add($$("dashboard/cant_fit"))
                     throw new SetupError("This widget doesn't fit")
                 }
