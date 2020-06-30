@@ -22,6 +22,7 @@ import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
 import Sleep from "@Core/Tools/objects/sleep"
 import WarningConstructor from "@Environment/Library/DOM/object/warnings/WarningConstructor"
 import LanguageCore from "@Core/Services/Language/core"
+import hexToRgb from "@Core/Tools/transformation/text/hexToRgb"
 import StatementStorage from "./services/StatementStorage"
 import NoCashback from "./API/classes/cashbacks/NoCashback"
 import MoneyCashback from "./API/classes/cashbacks/MoneyCashback"
@@ -211,7 +212,8 @@ export default class StatementUI {
                                             class: "statement-item-category",
                                             content: new Icon(item.mcc.md.icon),
                                             style: {
-                                                background: item.mcc.md.color,
+                                                color: item.mcc.md.color,
+                                                background: `rgba(${hexToRgb(item.mcc.md.color, { array: true }).join(",")}, .15)`,
                                             },
                                         }),
                                         new DOM({

@@ -38,7 +38,6 @@ function sideLogo(icon, text, moreText) {
     ], ["row", "middle"], { marginRight: "5px" })
 }
 
-
 CoreLoader.registerTask({
     id: "settings-layout",
     presence: "Settings Layout",
@@ -72,7 +71,6 @@ CoreLoader.registerTask({
                 dom: SettingsActContainer,
                 options: { name: $$("settings/privacy") },
             })
-
 
         const isPushSupported = "ServiceWorkerRegistration" in window
             && "pushManager" in ServiceWorkerRegistration.prototype
@@ -114,6 +112,7 @@ CoreLoader.registerTask({
         }
 
         settingsMain
+            .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "dashboard", params: ["settings"] } }, sideLogo("dashboard", $$("dashboard"), $("settings/descriptions/dashboard"))], id: "dashboard-link" })
             .createItem({ dom: SettingsActLink, options: ["storage", sideLogo("storage", $$("settings/storage"), $("settings/descriptions/storage"))], id: "storage-link" })
             .createItem({ dom: SettingsActLink, options: ["language", sideLogo("translate", $$("settings/language"), $("settings/descriptions/language"))], id: "language-link" })
             .createItem({ dom: SettingsActLink, options: ["privacy", sideLogo("https", $$("settings/privacy"), $("settings/privacy/info"))], id: "privacy-link" })
@@ -277,7 +276,6 @@ CoreLoader.registerTask({
                     content: $$("recovery_mode/back_to_normal"),
                 },
             })
-
 
         layout.getAct("settings")
             .createSection({

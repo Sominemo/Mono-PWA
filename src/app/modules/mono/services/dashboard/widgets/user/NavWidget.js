@@ -3,12 +3,16 @@ import DOM from "@DOMPath/DOM/Classes/dom"
 import { $$ } from "@Core/Services/Language/handler"
 import Navigation from "@Core/Services/navigation"
 import { Icon } from "@Environment/Library/DOM/object"
+import hexToRgb from "@Core/Tools/transformation/text/hexToRgb"
+import SetupFramework from "../../setup/SetupFramework"
+import objectGenerator from "../../cards/funcs/objectGenerator"
+import SetupError from "../../setup/SetupError"
 
 export default class NavWidget {
     static table = {
         settings: {
             icon: "settings",
-            sign: "settings",
+            sign: "settings/tile_name",
             colors: { main: "#607D8B", light: "#b0bec5" },
         },
         statement: {
@@ -71,5 +75,44 @@ export default class NavWidget {
                 }
             },
         })
+    }
+
+    static icon = "link"
+
+    static name = $$("dashboard/nav")
+
+    static setup({ checkFit }) {
+        return new SetupFramework({
+            name: this.name,
+            func: (data, state) => {
+                if (!checkFit(1, 1)) throw new SetupError("Widget won't fit")
+                if (!data.link) {
+                    let res
+                    const next = () => new Promise((resolve) => { res = resolve })
+                    const ui = objectGenerator(
+                        Array.from(Object.entries(this.table)).map(([key, e]) => ({
+                            type: "icon",
+                            icon: e.icon,
+                            color: hexToRgb(e.colors.main, { array: true }).join(","),
+                            content: $$(e.sign),
+                            clickable: true,
+                            events: [
+                                {
+                                    event: "click",
+                                    handler() { data.link = { module: key }; res() },
+                                },
+                            ],
+                        })),
+                    )
+
+                    return {
+                        comment: $$("dashboard/nav/choose_link"),
+                        next,
+                        ui,
+                    }
+                }
+                return {}
+            },
+        }, checkFit)
     }
 }

@@ -27,7 +27,6 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
 
     if (consoleIt) console.error(e)
 
-
     if (!document.body) await new Promise((resolve) => { document.onload = resolve })
     try {
         SplashScreenController.enabled = false
@@ -354,7 +353,7 @@ CriticalLoadErrorListener.listener = async (e, consoleIt = true) => {
                 const log = {
                     error: text,
                     report: db,
-                    v: `${App.version}/${App.branch}/${App.buildDate}`,
+                    v: `${App.version}/${App.branch}/${App.build}`,
                 }
 
                 await Axios({
