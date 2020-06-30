@@ -77,6 +77,7 @@ export default class PWA extends App {
         w.render(new Card(new CardList(
             [
                 { content: new TwoSidesWrapper($$("about/build_date"), this.buildDate) },
+                { content: new TwoSidesWrapper($$("about/build"), String(this.build)) },
                 { content: new TwoSidesWrapper($$("about/branch"), this.branch) },
                 { content: new TwoSidesWrapper($$("about/build_flags"), this.buildFlags.join(", ")) },
                 ...("Windows" in window ? [{ content: new TwoSidesWrapper("WinRT", "true") }] : []),

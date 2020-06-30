@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "4.0.0-dev.10",
+    "version": "4.0.0-dev.10+16",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -52,7 +52,7 @@
         "svg-inline-loader": "^0.8.2",
         "terser-webpack-plugin": "^3.0.5",
         "url-loader": "^4.0.0",
-        "webpack": "^4.42.0",
+        "webpack": "^4.43.0",
         "webpack-auto-inject-version": "^1.2.2",
         "webpack-cli": "^3.3.11",
         "webpack-dev-server": "^3.10.3",

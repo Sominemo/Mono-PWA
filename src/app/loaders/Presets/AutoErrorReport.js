@@ -16,7 +16,7 @@ if (beaconsAllowed) {
                 JSON.stringify(
                     {
                         log: errorToObject(report.log),
-                        v: `${PWA.version}/${PWA.branch}/${PWA.buildDate}`,
+                        v: `${PWA.version}/${PWA.branch}/${PWA.build}`,
                     },
                 ))
         }
@@ -45,7 +45,7 @@ if (autosendAllowed) {
                     const log = {
                         error: errorToObject(report.log),
                         report: db,
-                        v: `${PWA.version}/${PWA.branch}/${PWA.buildDate}`,
+                        v: `${PWA.version}/${PWA.branch}/${PWA.build}`,
                     }
 
                     await Axios({

@@ -72,7 +72,7 @@ CoreLoader.registerTask({
                                     const log = {
                                         error: (error === null ? `Manual report ${Report.session.id}` : errorToObject(error)),
                                         report: db,
-                                        v: `${PWA.version}/${PWA.branch}/${PWA.buildDate}`,
+                                        v: `${PWA.version}/${PWA.branch}/${PWA.build}`,
                                     }
 
                                     resolve(

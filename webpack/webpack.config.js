@@ -16,31 +16,44 @@ const mccCodes = require("mcc/emojiMap")
 const cc = require("currency-codes/data")
 const PATHS = require(path.join(__dirname, "paths"))
 
+// Set to true to use downloadable lanugages
 const DOWNLOAD_LANG_PACKS = false
 
+// Origins with access to postMessage commands
 const trustedOrigins = [
     "https://wg.mono.sominemo.com",
     "https://mono.sominemo.com",
 ]
 
+// Create dir for generated assets
 if (!fs.existsSync(PATHS.generated)) {
     fs.mkdirSync(PATHS.generated)
 }
 
+// Generates list of available languages
 const makeLangMap = require(path.join(__dirname, "scripts", "languageList"))
-const makeThemesMap = require(path.join(__dirname, "scripts", "themesList"))
-const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
-const ccSW = require(path.join(__dirname, "scripts", "ccSW"))
 makeLangMap(PATHS.language, PATHS.generated)
+
+// Generates list of available themes from environment and app and combines them
+const makeThemesMap = require(path.join(__dirname, "scripts", "themesList"))
 makeThemesMap(PATHS.themes, PATHS.generated)
-const mccEmojiMap = mccEmoji(mccCodes)
-const ccSWMap = ccSW(cc)
 PATHS.themes.map((el) => fs.copySync(el, PATHS.themesGenerated))
 
+// Generates custom emoji map for MCC search
+const mccEmoji = require(path.join(__dirname, "scripts", "mccEmoji"))
+const mccEmojiMap = mccEmoji(mccCodes)
+
+// Simplified country-codes dataset for service worker
+const ccSW = require(path.join(__dirname, "scripts", "ccSW"))
+const ccSWMap = ccSW(cc)
+
+// Holder for manifest related stuff
 const builder = {
     pack: require(path.join(PATHS.root, "package.json")),
 }
 
+
+// Webpack aliases for constant locations
 const resolveAlias = {
     "@DOMPath": path.join(PATHS.core, "DOM"),
     "@Resources": PATHS.resources,
@@ -52,29 +65,58 @@ const resolveAlias = {
     "@Themes": PATHS.themesGenerated,
 }
 
+// Variable that will contain used build flags
 const buildFlags = []
 
 module.exports = (env = {}) => {
+    // If true -- it's a production build
     const PROD = !!env.PRODUCTION
+
+    // Var with passed changelog URL
     const CHANGELOG = env.CHANGELOG || null
+
+    // Set path for output
     PATHS.build = (env.LOCAL ? PATHS.localBuild : (env.WG ? PATHS.wgBuild : PATHS.build))
+
+    // If not null - GA will be enabled
     const ANALYTICS_TAG = (env.ANALYTICS ? (!env.WG ? "G-81RB2HPF8X" : "G-PEX3Q03WQ6") : null)
 
+    // Output warning if it's a production build
     if (PROD) {
         console.log("-- PRODUCTION BUILD --")
+        // Add `prod` build flag
         buildFlags.push("prod")
     } else {
         env.DEBUG = true
     }
 
+    // Mark if in CI mode
     if (env.CI) {
         buildFlags.push("ci")
     }
+
+    // Mark if pre-release build
     if (env.WG) buildFlags.push("wg")
+
+    // Mark if debug is enabled
     if (env.DEBUG) buildFlags.push("debug")
+
+    // Mark if this build is made for localhost deployment
     if (env.LOCAL) buildFlags.push("local")
+
+    // Mark if GA is enabled
     if (env.ANALYTICS) buildFlags.push("analytics")
 
+    // Build version changer
+    if (!env.CI) {
+        builder.build = Number.parseInt(builder.pack.version.match(/^.+\+(\d+)$/)[1]) + 1
+        const clearVersion = builder.pack.version.match(/^(.+)\+\d+$/)[1]
+        builder.pack.version = `${clearVersion}+${builder.build}`
+        fs.writeFile(path.join(PATHS.root, "package.json"), JSON.stringify(builder.pack, null, 4))
+        builder.pack.version = clearVersion
+    }
+
+    // Copy updated theme files if in watch mode
     if (env.watch && !env.CI) {
         const cb = () => {
             try {
@@ -90,11 +132,14 @@ module.exports = (env = {}) => {
             .on("unlink", cb)
     }
 
+    // Feedback URL for error screen
     const feedbackLink = "tg://join?invite=BEBMsBLX6NclKYzGkNlGNw"
 
+    // Contants that will be passes both to main flow and WebWorker
     const mainDefine = {
         __PACKAGE_APP_NAME: JSON.stringify(builder.pack.description),
         __PACKAGE_VERSION_NUMBER: JSON.stringify(builder.pack.version),
+        __PACKAGE_BUILD: JSON.stringify(builder.build),
         __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
         __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
         __PACKAGE_BUILD_FLAGS: JSON.stringify(buildFlags),
@@ -106,15 +151,18 @@ module.exports = (env = {}) => {
         __TRUSTED_ORIGINS: JSON.stringify(trustedOrigins),
     }
 
+    // Contsnts for main flow
     const definePlugin =
         new webpack.DefinePlugin(mainDefine)
 
+    // Constants for WebWorker
     const definePluginSW =
         new webpack.DefinePlugin({
             ...mainDefine,
             __CC_SHRUNK_DATASET: JSON.stringify(ccSWMap),
         })
 
+    // Main flow webpack config
     const appConfig = {
         watch: !!env.watch,
         performance: { hints: false },
@@ -124,6 +172,7 @@ module.exports = (env = {}) => {
             splitChunks: {
                 automaticNameDelimiter: '.',
                 cacheGroups: {
+                    // Uncomment to produce vendor.js chunk
                     /*vendor: {
                         test: /node_modules/,
                         chunks: "initial",
@@ -146,6 +195,7 @@ module.exports = (env = {}) => {
 
                 },
             },
+            // Use minimizer in production
             ...(PROD ? {
                 minimizer: [
                     new TerserPlugin({
@@ -162,6 +212,7 @@ module.exports = (env = {}) => {
         entry: {
             index: path.join(PATHS.core, "Init", "index.js"),
         },
+        // Source maps are generated only in debug mode
         ...(env.DEBUG ? { devtool: "source-map" } : {}),
         output: {
             path: PATHS.build,
