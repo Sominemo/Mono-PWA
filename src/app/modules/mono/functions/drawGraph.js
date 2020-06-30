@@ -84,7 +84,6 @@ export default function drawGraph({ data, color, style }) {
         ctx.fill(pb)
         const p = new Path2D(path.join(" "))
         ctx.stroke(p)
-        console.log(`${path.join(" ")} L ${clientWidth} ${clientHeight} L 0 ${clientHeight} Z`)
     }
 
     canvasDOM.onEvent("rendered", () => {

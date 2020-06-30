@@ -4,7 +4,6 @@ const WebpackPwaManifest = require("webpack-pwa-manifest")
 const workboxPlugin = require("workbox-webpack-plugin")
 const BitBarWebpackProgressPlugin = require("bitbar-webpack-progress-plugin")
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
-const WebpackAutoInject = require("webpack-auto-inject-version")
 const TerserPlugin = require("terser-webpack-plugin")
 const ResourceHintWebpackPlugin = require("resource-hints-webpack-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
@@ -108,11 +107,11 @@ module.exports = (env = {}) => {
     if (env.ANALYTICS) buildFlags.push("analytics")
 
     // Build version changer
-    builder.build = Number.parseInt(builder.pack.version.match(/^.+\+(\d+)$/)[1]) + (env.CI ? 0 : 1)
-    const clearVersion = builder.pack.version.match(/^(.+)\+\d+$/)[1]
+    builder.build = Number.parseInt(builder.pack.version.match(/^.+?(\+(\d+))?$/)[2]) + (env.CI ? 0 : 1)
+    const clearVersion = builder.pack.version.match(/^(.+?)(\+\d+)?$/)[1]
     if (!env.CI) {
         builder.pack.version = `${clearVersion}+${builder.build}`
-        fs.writeFile(path.join(PATHS.root, "package.json"), JSON.stringify(builder.pack, null, 4))
+        if (builder.build !== null) fs.writeFile(path.join(PATHS.root, "package.json"), JSON.stringify(builder.pack, null, 4))
     }
     builder.pack.version = clearVersion
 

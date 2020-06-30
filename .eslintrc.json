@@ -7,7 +7,10 @@
         "import/resolver": {
             "node": {},
             "webpack": {
-                "config": "./webpack/webpack.config.js"
+                "config": "./webpack/webpack.config.js",
+                "env": {
+                    "CI": true
+                }
             }
         }
     },
