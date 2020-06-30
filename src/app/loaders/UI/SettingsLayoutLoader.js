@@ -112,7 +112,15 @@ CoreLoader.registerTask({
         }
 
         settingsMain
-            .createItem({ dom: SettingsActLink, options: [() => { Navigation.url = { module: "dashboard", params: ["settings"] } }, sideLogo("dashboard", $$("dashboard"), $("settings/descriptions/dashboard"))], id: "dashboard-link" })
+            .createItem({
+                dom: SettingsActLink,
+                options: [() => { Navigation.url = { module: "dashboard", params: ["settings"] } }, sideLogo("dashboard", $$("dashboard"), $("settings/descriptions/dashboard"))],
+                id: "dashboard-link",
+                display() {
+                    const nextState = CoreLoader.getResult("dashboard_module")
+                    return nextState.type === 0 && nextState.state === 0
+                },
+            })
             .createItem({ dom: SettingsActLink, options: ["storage", sideLogo("storage", $$("settings/storage"), $("settings/descriptions/storage"))], id: "storage-link" })
             .createItem({ dom: SettingsActLink, options: ["language", sideLogo("translate", $$("settings/language"), $("settings/descriptions/language"))], id: "language-link" })
             .createItem({ dom: SettingsActLink, options: ["privacy", sideLogo("https", $$("settings/privacy"), $("settings/privacy/info"))], id: "privacy-link" })
