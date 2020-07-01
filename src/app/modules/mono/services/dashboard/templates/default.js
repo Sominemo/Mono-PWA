@@ -55,15 +55,15 @@ export default function defaultDashboardTemplate() {
         },
         {
             item: "Nav",
-            data: { link: { module: "settings" } },
-            y: 2,
-            x: 4,
+            data: { link: { module: "statement" } },
+            y: 1,
+            x: 5,
         },
         {
-            item: "ClientsCount",
-            data: { type: "simple" },
-            y: 3,
-            x: 1,
+            item: "Hints",
+            data: { },
+            y: 2,
+            x: 4,
         },
     ]
     return template

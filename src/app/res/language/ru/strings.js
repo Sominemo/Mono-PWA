@@ -39,6 +39,10 @@ export default {
             "": "Ссылка",
             choose_link: "Выберите назначение",
         },
+        hints: {
+            "": "Подсказки",
+            will_be_soon: "Скоро здесь появятся подсказки",
+        },
         clients: {
             "": "Клиенты monobank",
             sign: "Клиентов monobank",
@@ -87,7 +91,7 @@ export default {
     menu: {
         "": "меню",
         app_upgraded: "приложение обновлено",
-        see_whats_new: "посмотрите, что нового",
+        see_whats_new: "нажмите, чтобы узнать, что нового",
     },
     auth: {
         "": "Авторизация",
@@ -513,6 +517,45 @@ export default {
             },
         },
     },
+    hints: {
+        list: {
+            pushes: {
+                title: "Следите за операциями",
+                info: "Больше про меню \"Уведомления\"",
+            },
+            updates: {
+                title: "Следите за новостями",
+                info: "Получайте оповещения об обновлениях в mono PWA",
+            },
+            change_order: {
+                title: "Меняйте порядок карт",
+                info: "Больше о меню \"Мои карты\"",
+            },
+            offline_statement: {
+                title: "Выписка без сети",
+                info: "Загружайте историю наперёд",
+            },
+            convert_currencies: {
+                title: "Конвертируйте валюты",
+                info: "Благодаря функции в меню \"Курсы валют\"",
+            },
+            find_currencies: {
+                title: "Ищите валюты",
+                info: "Узнайте о скрытых возможностях меню \"Курсы валют\"",
+            },
+            partner_sections: {
+                title: "Категории в списке партнёров",
+                info: "Ищите желаемого продавца быстрее",
+            },
+        },
+    },
+    greeting: {
+        morning: "доброе утро!",
+        afternoon: "добрый день!",
+        evening: "добрый вечер!",
+        night: "доброй ночи!",
+        generic: "здравствуйте!",
+    },
     unexpected_error: "ой!",
     select_option: "выберите из списка",
     tap_to_change: "нажмите, чтобы изменить",
@@ -534,6 +577,7 @@ export default {
     recommendation: "рекомендация",
     tip: "совет",
     hint: "подсказка",
+    message: "сообщение",
     reload: "перегрузить",
     enable_accessibility: "включить специальные возможности",
     skip_nav: "пропуск меню",

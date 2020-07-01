@@ -5,6 +5,7 @@ import DefaultTemplate from "@App/modules/mono/services/dashboard/templates/defa
 import LiteralActions from "@App/modules/mono/services/dashboard/cards/funcs/LiteralActions"
 import Navigation from "@Core/Services/navigation"
 import ClientsWidget from "@App/modules/mono/services/dashboard/widgets/user/ClientsWidget"
+import HintsWidget from "@App/modules/mono/services/dashboard/widgets/user/HintsWidget"
 
 DashboardCore.registerWidget({
     id: "Nav",
@@ -22,6 +23,12 @@ DashboardCore.registerWidget({
     id: "Text",
     builder: TextWidget,
     user: false,
+})
+
+DashboardCore.registerWidget({
+    id: "Hints",
+    builder: HintsWidget,
+    user: true,
 })
 
 DashboardCore.defaultLayout = DefaultTemplate
