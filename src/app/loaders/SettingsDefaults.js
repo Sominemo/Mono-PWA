@@ -6,6 +6,7 @@ import { API } from "@App/tools/API"
 import SettingsStorage from "@Core/Services/Settings/SettingsStorage"
 import MoneyPrintConfig from "@App/tools/transform/MoneyPrintConfig"
 import Account from "@App/modules/mono/API/classes/Account"
+import PWA from "@App/modules/main/PWA"
 
 CoreLoader.registerTask({
     id: "settings-defaults",
@@ -83,6 +84,14 @@ CoreLoader.registerTask({
                 name: "enable_tab_navigation",
                 rule: {
                     default: false,
+                    checker: new FieldChecker({ type: "boolean" }),
+                    onfail: async (a, b, c) => { await c(!!a); return true },
+                },
+            },
+            {
+                name: "next_features",
+                rule: {
+                    default: PWA.isWG,
                     checker: new FieldChecker({ type: "boolean" }),
                     onfail: async (a, b, c) => { await c(!!a); return true },
                 },
