@@ -277,6 +277,7 @@ module.exports = (env = {}) => {
                     { from: path.join(PATHS.resources, "robots.txt"), to: path.join(PATHS.build, "robots.txt"), toType: "file" },
                     { from: path.join(PATHS.envResources, "language.template.htaccess"), to: path.join(PATHS.build, ".assets", "language", ".htaccess"), toType: "file" },
                     { from: path.join(PATHS.resources, "images", "logo", "ios"), to: path.join(PATHS.build, ".assets", "icons", "ios") },
+                    { from: path.join(PATHS.resources, "images", "shortcuts"), to: path.join(PATHS.build, ".assets", "shortcuts") },
                     { from: path.join(PATHS.resources, "animations"), to: path.join(PATHS.build, ".assets", "animations") },
                 ],
             }),
@@ -300,11 +301,98 @@ module.exports = (env = {}) => {
             new WebpackPwaManifest({
                 name: `monobank${env.WG ? " WG" : ""}`,
                 short_name: `mono${env.WG ? " WG" : ""}`,
+                scope: "/",
                 description: "monobank Progressive Web Application",
-                background_color: "#181A1D",
-                theme_color: "#181A1D",
-                start_url: "/",
+                categories: ["banks", "finance", "money", "monobank", "finance management"],
+                iarc_rating_id: "20f63c49-902f-44f5-bf08-50a6e18c5139",
+                orientation: "any",
+                related_applications: [
+                    {
+                        platform: "play",
+                        url: "https://play.google.com/store/apps/details?id=app.monoweb",
+                        id: "app.monoweb"
+                    }
+                ],
+                background_color: "#FFFFFF",
+                theme_color: "#FFFFFF",
+                start_url: "/start/#/home",
                 display: "standalone",
+                screenshots: [
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/1.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/2.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/3.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/4.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/5.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                    {
+                        src: "https://sominemo.com/mono/assets/pictures/screenshots/6.png",
+                        sizes: "596x1060",
+                        type: "image/png",
+                    },
+                ],
+                shortcuts: [
+                    {
+                        name: "Виписка",
+                        short_name: "Виписка",
+                        description: "Відкрити список рахунків",
+                        url: "/statement",
+                        icons: [
+                            {
+                                src: "/.assets/shortcuts/statement.png",
+                                type: "image/svg+xml",
+                                sizes: "96x96",
+                                purpose: "any",
+                            },
+                        ],
+                    },
+                    {
+                        name: "Курси валют",
+                        short_name: "Курси валют",
+                        description: "Перевірити курси валют",
+                        url: "/currency",
+                        icons: [
+                            {
+                                src: "/.assets/shortcuts/currency.png",
+                                type: "image/svg+xml",
+                                sizes: "96x96",
+                                purpose: "any",
+                            },
+                        ],
+                    },
+                    {
+                        name: "Партнери",
+                        short_name: "Партнери",
+                        description: "Переглянути каталог партнерів",
+                        url: "/partners",
+                        icons: [
+                            {
+                                src: "/.assets/shortcuts/partners.png",
+                                type: "image/svg+xml",
+                                sizes: "96x96",
+                                purpose: "any",
+                            },
+                        ],
+                    },
+                ],
                 icons: [
                     {
                         src: path.join(PATHS.resources, "images", "logo", "512.png"),

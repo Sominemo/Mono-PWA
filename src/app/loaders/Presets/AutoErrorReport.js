@@ -5,8 +5,8 @@ import delayAction from "@Core/Tools/objects/delayAction"
 import Axios from "axios"
 
 const beaconsAllowed = (
-    PWA.isWG
-    || localStorage.getItem("beacon_error_reports") !== "0"
+    !PWA.buildFlag("local") && (PWA.isWG
+        || localStorage.getItem("beacon_error_reports") !== "0")
 )
 
 if (beaconsAllowed) {
