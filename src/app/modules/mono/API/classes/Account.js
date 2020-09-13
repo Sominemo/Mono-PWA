@@ -6,7 +6,7 @@ import DetectPaymentSystem from "./cardTypes/DetectPaymentSystem"
 
 export default class Account {
     constructor({
-        id, balance, creditLimit, cashbackType, isOverdraft, cards: { masks, type },
+        id, balance, creditLimit, cashbackType, isOverdraft, cards: { masks, type }, iban,
     }, mono = null) {
         if (typeof id !== "string") throw new TypeError("Incorrect ID")
         if (!(balance instanceof Money)) throw new TypeError("Money constructor expected")
@@ -21,7 +21,7 @@ export default class Account {
 
         const cards = masks.map((mask) => {
             const spl = mask.split("*")
-            const num = { start: spl[0], end: spl[1] }
+            const num = { start: spl[0], end: spl[spl.length - 1] }
 
             const paymentSystem = DetectPaymentSystem(num)
             const level = null
@@ -33,6 +33,11 @@ export default class Account {
         Object.defineProperties(this, {
             id: {
                 value: id,
+                writable: false,
+                configurable: true,
+            },
+            iban: {
+                value: iban,
                 writable: false,
                 configurable: true,
             },

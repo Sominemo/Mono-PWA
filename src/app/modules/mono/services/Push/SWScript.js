@@ -140,7 +140,6 @@ function cashback(amount, type) {
     return obj
 }
 
-
 const badges = {
     m: require("@Resources/images/badges/m.png").default,
     news: require("@Resources/images/badges/news.png").default,
@@ -302,7 +301,6 @@ self.addEventListener("push", async (event) => {
             actionDescriptor: pushObject.actionDescriptor || {},
         }
 
-
         if (registration.showNotification) {
             registration.showNotification(title, push)
         } else {
@@ -311,7 +309,6 @@ self.addEventListener("push", async (event) => {
         }
     } else if (data.act === "statement-item") {
         if (!("account" in data && "item" in data)) throw new Error("Incorrect statement-item Payload")
-
 
         const amount = new Money(
             Math.abs(data.item.amount),
@@ -334,8 +331,8 @@ self.addEventListener("push", async (event) => {
 
         const commentPart = data.item.description + ("comment" in data.item ? `\n👋 ${data.item.comment}` : "")
 
-
-        const balancePart = `💳 **${data.account.maskedPan[0].split("*")[1]} — ${(data.item.balance - data.account.creditLimit < 0 ? "-" : "")}${balance}`
+        const num = data.account.maskedPan[0].split("*")
+        const balancePart = `💳 **${num[num.length - 1]} — ${(data.item.balance - data.account.creditLimit < 0 ? "-" : "")}${balance}`
 
         const content = `${commentPart}\n${balancePart}`
 
@@ -355,7 +352,6 @@ self.addEventListener("push", async (event) => {
         )
     }
 })
-
 
 self.addEventListener("notificationclick", (clickEvent) => {
     if (!clickEvent.notification.data) return

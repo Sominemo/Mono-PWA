@@ -485,4 +485,5 @@ export default {
     reload: "перезавантажити",
     enable_accessibility: "включити спеціальні можливості",
     skip_nav: "минути меню",
+    copied: "скопійовано",
 }

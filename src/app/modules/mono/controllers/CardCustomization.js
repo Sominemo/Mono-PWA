@@ -14,6 +14,7 @@ import { $$ } from "@Core/Services/Language/handler"
 import { RadioLabel } from "@Environment/Library/DOM/object/input"
 import { Align } from "@Environment/Library/DOM/style"
 import loadingPopup from "@App/library/loadingPopup"
+import Toast from "@Environment/Library/DOM/elements/toast"
 import { cardItemGenerator } from "../functions/cardItemGenerator"
 import StatementStorage from "../services/StatementStorage"
 import { Currency } from "../API/classes/Currency"
@@ -85,7 +86,7 @@ export default class CardCustomization {
                                     {
                                         event: "click",
                                         handler() {
-                                            self.cardSettings(profile.params, () => {
+                                            self.cardSettings(profile.params, profile, () => {
                                                 updateList()
                                             })
                                         },
@@ -136,10 +137,12 @@ export default class CardCustomization {
         })
     }
 
-    static cardSettings(params, refresh = false) {
+    static cardSettings(params, profile, refresh = false) {
         const {
             bank, look, cardholder, id, currency,
         } = params
+
+        const { iban } = profile
 
         const currencyCode = Currency.number(currency).code
 
@@ -183,6 +186,15 @@ export default class CardCustomization {
                             new TwoSidesWrapper(
                                 new DOM({ new: "div", content: "ID" }),
                                 new DOM({ new: "div", content: id }),
+                            ),
+                            new TwoSidesWrapper(
+                                new DOM({ new: "div", content: "IBAN" }),
+                                new DOM({
+                                    new: "div",
+                                    content: iban || "???",
+                                    style: { cursor: "pointer" },
+                                    events: [{ event: "click", handler() { navigator.clipboard.writeText(iban); Toast.add($$("copied")) } }],
+                                }),
                             ),
                             new TwoSidesWrapper(
                                 new DOM({ new: "div", content: $$("customization/currency") }),
