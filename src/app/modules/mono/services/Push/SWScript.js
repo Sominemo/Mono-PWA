@@ -341,6 +341,8 @@ self.addEventListener("push", async (event) => {
             emoji = data.item.amount < 0 ? "💳👉" : "💳👈"
         } else emoji = getMCCEmoji(data.item.mcc)
 
+        if (!emoji) emoji = "💸"
+
         registration.showNotification(
             `${emoji} ${spentPart}`,
             {
