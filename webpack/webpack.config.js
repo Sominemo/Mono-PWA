@@ -98,6 +98,7 @@ module.exports = (env = {}) => {
         __PACKAGE_BRANCH: JSON.stringify((env.WG ? "workgroup" : builder.pack.config.branch)),
         __PACKAGE_BUILD_TIME: webpack.DefinePlugin.runtimeValue(() => JSON.stringify(fecha.format(new Date(), "DD.MM.YYYY HH:mm:ss")), true),
         __PACKAGE_BUILD_FLAGS: JSON.stringify(buildFlags),
+        __PACKAGE_BUILD: '0',
         __PACKAGE_CHANGELOG: JSON.stringify(CHANGELOG),
         __PACKAGE_ANALYTICS: JSON.stringify(ANALYTICS_TAG),
         __PACKAGE_DOWNLOADABLE_LANG_PACKS: JSON.stringify(!!DOWNLOAD_LANG_PACKS),

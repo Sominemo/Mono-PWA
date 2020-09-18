@@ -46,7 +46,7 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    padding: 5% 8%;
+    padding: 3vmin 4vmin;
     box-shadow: rgba(0, 0, 0, 0.6) 0 -2vmin 10vmin, rgba(255, 255, 255, 0.15) 0 10vmin 20vmin;
     position: relative;
     overflow: hidden;

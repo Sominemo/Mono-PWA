@@ -5,3 +5,5 @@ SplashScreenController.splashImage.innerHTML = require("@Resources/images/logo/v
 
 SplashScreenController.splashImage = SplashScreenController.splashImage.firstChild
 SplashScreenController.splashImage.style.height = "30vh"
+SplashScreenController.splashBG = "#181A1D"
+SplashScreenController.splashColor = "#ffffff"

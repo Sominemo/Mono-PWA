@@ -55,23 +55,20 @@ export default class Auth {
         if (this.isAnyAuthed) {
             Nav.config = [
                 {
+                    name() { return $$("quick_settings") },
+                    icon: "more_vert",
+                    id: "options",
+                    handler: (ev, _) => {
+                        Nav.Toggle(_, ev)
+                    },
+                },
+                {
                     name() { return $$("statement") },
                     icon: "account_balance_wallet",
                     id: "statement",
                     handler: () => {
                         Navigation.url = {
                             module: "statement",
-                            params: {},
-                        }
-                    },
-                },
-                {
-                    name() { return $$("currency") },
-                    icon: "assessment",
-                    id: "currency",
-                    handler: () => {
-                        Navigation.url = {
-                            module: "currency",
                             params: {},
                         }
                     },
@@ -91,23 +88,20 @@ export default class Auth {
         } else {
             Nav.config = [
                 {
+                    name() { return $$("quick_settings") },
+                    icon: "more_vert",
+                    id: "options",
+                    handler: (ev, _) => {
+                        Nav.Toggle(_, ev)
+                    },
+                },
+                {
                     name() { return $$("currency") },
                     icon: "assessment",
                     id: "currency",
                     handler: () => {
                         Navigation.url = {
                             module: "currency",
-                            params: {},
-                        }
-                    },
-                },
-                {
-                    name() { return $$("p4/partners") },
-                    icon: "store",
-                    id: "partners",
-                    handler: () => {
-                        Navigation.url = {
-                            module: "partners",
                             params: {},
                         }
                     },
