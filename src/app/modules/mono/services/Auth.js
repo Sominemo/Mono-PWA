@@ -6,7 +6,6 @@ import hashCode from "@Core/Tools/transformation/text/hashCode"
 import PWA from "@App/modules/main/PWA"
 import delayAction from "@Core/Tools/objects/delayAction"
 import NotificationManager from "@Core/Services/Push/NotificationManager"
-import { CoreLoader } from "@Core/Init/CoreLoader"
 import MonoAPI from "../API/clients/MonoAPI"
 import MonoCorpAPI from "../API/clients/MonoCorpAPI"
 import MonoAnonymousAPI from "../API/clients/MonoAnonymousAPI"
@@ -53,8 +52,6 @@ export default class Auth {
     static #mainInstance = null
 
     static updateIcons() {
-        const dashboardState = CoreLoader.getResult("dashboard_module")
-        const nextActive = dashboardState.type === 0 && dashboardState.state === 0
         if (this.isAnyAuthed) {
             Nav.config = [
                 {
@@ -68,21 +65,6 @@ export default class Auth {
                         }
                     },
                 },
-                ...(
-                    nextActive
-                        ? [{
-                            name() { return $$("dashboard") },
-                            icon: "dashboard",
-                            id: "dashboard",
-                            handler: () => {
-                                Navigation.url = {
-                                    module: "dashboard",
-                                    params: {},
-                                }
-                            },
-                        }]
-                        : []
-                ),
                 {
                     name() { return $$("currency") },
                     icon: "assessment",
@@ -94,21 +76,17 @@ export default class Auth {
                         }
                     },
                 },
-                ...(
-                    nextActive
-                        ? []
-                        : [{
-                            name() { return $$("menu") },
-                            icon: "menu",
-                            id: "menu",
-                            handler: () => {
-                                Navigation.url = {
-                                    module: "menu",
-                                    params: {},
-                                }
-                            },
-                        }]
-                ),
+                {
+                    name() { return $$("menu") },
+                    icon: "menu",
+                    id: "menu",
+                    handler: () => {
+                        Navigation.url = {
+                            module: "menu",
+                            params: {},
+                        }
+                    },
+                },
             ]
         } else {
             Nav.config = [
@@ -123,21 +101,6 @@ export default class Auth {
                         }
                     },
                 },
-                ...(
-                    nextActive
-                        ? [{
-                            name() { return $$("dashboard") },
-                            icon: "dashboard",
-                            id: "dashboard",
-                            handler: () => {
-                                Navigation.url = {
-                                    module: "dashboard",
-                                    params: {},
-                                }
-                            },
-                        }]
-                        : []
-                ),
                 {
                     name() { return $$("p4/partners") },
                     icon: "store",
@@ -149,21 +112,17 @@ export default class Auth {
                         }
                     },
                 },
-                ...(
-                    nextActive
-                        ? []
-                        : [{
-                            name() { return $$("menu") },
-                            icon: "menu",
-                            id: "menu",
-                            handler: () => {
-                                Navigation.url = {
-                                    module: "menu",
-                                    params: {},
-                                }
-                            },
-                        }]
-                ),
+                {
+                    name() { return $$("menu") },
+                    icon: "apps",
+                    id: "menu",
+                    handler: () => {
+                        Navigation.url = {
+                            module: "menu",
+                            params: {},
+                        }
+                    },
+                },
             ]
         }
 

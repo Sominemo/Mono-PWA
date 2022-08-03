@@ -73,9 +73,6 @@ export default class FlagsUI {
 
         if (App.debug) {
             exps.push({
-                id: "next_features",
-            })
-            exps.push({
                 id: "miscellaneous_in_settings",
             })
             exps.push({

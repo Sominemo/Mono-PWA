@@ -1,5 +1,4 @@
 import "@App/modules/mono/services/UpgradeManager"
-import "@App/modules/mono/dashboard"
 import "@App/modules/mono/menu"
 import "@App/modules/mono/services/AuthInit"
 import "@App/modules/mono/AuthUI"
