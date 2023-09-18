@@ -95,6 +95,12 @@ export default class AuthUI {
                     type: 3,
                     style: { textAlign: "start" },
                 }),
+                unofficialApp: new WarningConstructor({
+                    content: $$("auth/unofficial_warning"),
+                    icon: "info",
+                    type: 3,
+                    style: { textAlign: "start" },
+                }),
             }
 
             const warnings = new DOM({
@@ -103,6 +109,7 @@ export default class AuthUI {
 
             const settings = new AuthSettings(start, { warnings, warningsList })
 
+            warnings.render(warningsList.unofficialApp)
             if (!settings.isDefault) warnings.render(warningsList.defaultsChanged)
 
             state = {
@@ -226,7 +233,6 @@ export default class AuthUI {
             state.settings.are = AuthUI.useDirect(value)
             p.close()
         }
-
 
         p = Prompt({
             title: $$("auth/settings/token/title"),

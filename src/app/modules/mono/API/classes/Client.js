@@ -27,7 +27,7 @@ export default class Client {
             },
         }, mono))
 
-        if (online && PWA.analyticsAllowed) {
+        /* if (online && PWA.analyticsAllowed) {
             delayAction(() => {
                 const hasCur = this.accounts.some(
                     (c) => (c.balance.currency.number !== 980 && c.balance.number > 0),
@@ -35,7 +35,7 @@ export default class Client {
 
                 window.gtag("set", { user_properties: { has_foreign_currency: hasCur } })
             })
-        }
+        } */
 
         this.api = mono
         this.raw = raw

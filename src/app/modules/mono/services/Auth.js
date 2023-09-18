@@ -186,7 +186,7 @@ export default class Auth {
         StatementStorage.syncAccountStorageList()
         this.updateIcons()
 
-        if (PWA.analyticsAllowed) {
+        /* if (PWA.analyticsAllowed) {
             delayAction(() => {
                 const accountsCount = Auth.all.filter(
                     (obj, pos, arr) => arr.map((mapObj) => mapObj.clientId)
@@ -195,7 +195,7 @@ export default class Auth {
 
                 window.gtag("set", { user_properties: { bank_accounts_count: accountsCount } })
             })
-        }
+        } */
 
         this.onInitResolve()
     }

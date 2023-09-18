@@ -112,7 +112,7 @@ export default class StatementStorage {
             if (!((await db.getWhere(null, (v) => v.id === e.id)).length)) db.put(e)
         }))).length
 
-        if (cnt && PWA.analyticsAllowed) {
+        /* if (cnt && PWA.analyticsAllowed) {
             delayAction(async () => {
                 const t = await dbTool.getTablesList()
 
@@ -122,7 +122,7 @@ export default class StatementStorage {
                 )))
                 window.gtag("set", { user_properties: { popular_spend_category: res } })
             })
-        }
+        } */
     }
 
     static upgradeDB(explict = false, nonUpgrade = false) {
