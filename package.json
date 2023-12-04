@@ -1,6 +1,6 @@
 {
     "name": "mono-pwa",
-    "version": "3.4.2-hotfix.2",
+    "version": "3.4.3",
     "description": "monobank PWA",
     "main": "index.html",
     "config": {
@@ -17,7 +17,7 @@
     },
     "repository": "git+https://github.com/SominemoMono-PWA.git",
     "keywords": [],
-    "author": "Sominemo <me@sominemo.com>",
+    "author": "Sominemo <support@sominemo.com>",
     "license": "GPL-2.0",
     "bugs": {
         "url": "https://github.com/SominemoMono-PWA/issues"

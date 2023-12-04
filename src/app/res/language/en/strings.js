@@ -7,13 +7,13 @@ export default {
         warning: "warning",
         requests_throttling: `This account is linked using a personal token. 
         Due to the fact that monobank limits the frequency of access to the statement, the data will be loaded slowly. 
-        It is recommended to connect the account using simplified authorization.`,
+        It is recommended to connect the account using simplified auth.`,
         hint_customize: "Not what you were expecting?",
-        hint_customize_text: "Control the order of cards and their appearance in the menu \"My cards\"",
+        hint_customize_text: "Control the order of cards and their appearance in the \"My cards\" menu",
         open: "open",
         choose_platinum_color: "choose the color of your platinum card",
         accounts_changed: "account list error",
-        accounts_changed_text: "it looks like the list of accounts has been updated. Reboot to apply changes",
+        accounts_changed_text: "it looks like the list of accounts has been updated. Reload to apply changes",
         operation: "transaction",
     },
     customization: {
@@ -34,40 +34,40 @@ export default {
         warning: "Due to the limitations of the monobank API, the application cannot determine the type of your card. However, you can set it yourself",
     },
     currencies: {
-        retry: "once again",
-        fetch_fail: "error in receiving courses",
+        retry: "retry",
+        fetch_fail: "error in receiving currencies",
         try_later: "try again later",
     },
     menu: {
         "": "menu",
-        app_upgraded: "the application has been updated",
+        app_upgraded: "new update just dropped",
         see_whats_new: "see what's new",
     },
     auth: {
-        "": "Authorization",
+        "": "Auth",
         unofficial_warning: "Mono PWA is an unofficial application. It is not developed by monobank. Use the application only if you trust the developer and understand the risks (see Disclaimer)",
-        you_were_unlogined: "you have been deauthorized",
+        you_were_unlogined: "you have been logged out",
         reload: "reload",
         login_params_changed: "the login parameters have been changed. Select \"Settings\", if you want to return them to their original state",
         login_promo: "log in to use all the features of Mono PWA",
         log_in: "log in",
-        skip_step: "skip a beat",
+        skip_step: "skip",
         unknown_auth_method: "unknown login method",
         success: "success",
-        fail: "We could not confirm the accuracy of the data",
+        fail: "We could not confirm the data is correct",
         login_data_fetch_fail: "Login credentials failed",
         settings: {
             "": "customization",
             token: {
                 "": "Use your own token",
-                description: "The application will send requests to monobank directly. You can get a token on the portal api.monobank.ua",
+                description: "The app will send requests to monobank directly. You can get a token on the api.monobank.ua portal",
                 title: "Own token",
 
                 token: "token",
             },
             domain: {
                 "": "Change the corporate server",
-                description: "If you do not trust the server to which requests are sent during simplified authorization, you can change it",
+                description: "If you do not trust the server to which requests are sent during simplified auth, you can change it",
                 title: "Change server",
 
                 unsupported_server: "incompatible server",
@@ -83,7 +83,7 @@ export default {
             },
             revert: {
                 "": "Continue as usual",
-                description: "Refuse advanced authorization settings and return to the default settings",
+                description: "Discard advanced authorization settings and return to the defaults",
             },
         },
         stage: {
@@ -96,11 +96,11 @@ export default {
             cancel: "cancel",
             authed: "authorized",
             error: "an error occurred",
-            timeout: "time is up",
+            timeout: "the request took too long",
             instructions: {
                 scan: {
                     "": "Scan the QR code",
-                    description: "Using any tool for scanning QR codes on a device with monobank installed (for example, Google Lens)",
+                    description: "Open monobank › More › QR-Code Scanner",
                 },
                 follow: {
                     "": "Follow the link",
@@ -108,13 +108,13 @@ export default {
                 },
                 permissions: {
                     "": "Provide access",
-                    description: "Confirm access to some data in the monobank application window",
+                    description: "Confirm access to some data in the monobank app window",
                 },
             },
         },
     },
     p4: {
-        "": "purchase by parts",
+        "": "buy now, pay later",
         partners: "partners",
         fetch_fail: "error in receiving the list of partners",
         try_later: "try again later",
@@ -123,8 +123,8 @@ export default {
         cache_for: "data as of",
         online: "online ordering",
         delivery: "with delivery",
-        delivery_exp: "this indicator means that when buying in parts, the partner provides an opportunity to place an order online with delivery",
-        online_exp: "this indicator means that when buying in parts, the partner provides an opportunity to place an order online, but you need to visit the store",
+        delivery_exp: "this indicator means that when buying in parts, the partner provides an option to place an order online with delivery",
+        online_exp: "this indicator means that when buying in parts, the partner provides an option to place an order online, but you need to visit the store",
         categories: "categories",
         category: "category",
         choose_category: "select a category",
@@ -135,10 +135,10 @@ export default {
         "": "exchange rates",
         one: "currency",
         numbers: "rate",
-        buy: "buying",
-        sell: "selling",
+        buy: "buy",
+        sell: "sell",
         refresh: "refresh",
-        payment_systems: "rates of payment systems",
+        payment_systems: "payment systems rates",
         result: "result",
         amount: "amount",
         convert: "currency converter",
@@ -149,11 +149,11 @@ export default {
         cache_for: "exchange rate as of",
         fetch_fail: "error in obtaining the exchange rate",
         try_later: "try again later",
-        rerty: "repeat",
+        rerty: "retry",
     },
     recovery_mode: {
         "": "Emergency mode",
-        enter: "restart the application to enter the Emergency mode",
+        enter: "restart the app to enter the Emergency mode",
         now: "Emergency mode is active",
         back_to_normal: "Restart the app without a custom hash to quit it",
         idb_fail: {
@@ -165,7 +165,7 @@ export default {
         min: {
             type: "func",
             name: "plural",
-            data: ["minute", "minutes", "minutes"],
+            data: ["minute", "minutes"],
         },
     },
     dateformats: {
@@ -215,31 +215,31 @@ export default {
                 9: "September",
                 10: "October",
                 11: "November",
-                12: "December"
-            }
+                12: "December",
+            },
         },
-        at: "in",
+        at: "at",
     },
     settings: {
         "": "settings",
-        locked_item: "Hint: You cannot make changes here",
-        restart_to_apply: "reboot to apply changes",
+        locked_item: "Hint: You can't make changes here",
+        restart_to_apply: "restart to apply changes",
         errors: {
             no_page: "there is no such settings page",
-            layout_failed: "It looks like we couldn't download Settings",
+            layout_failed: "It looks like we couldn't load Settings",
         },
         descriptions: {
-            about_app: "Version, additional information",
+            about_app: "Version, more info",
             storage: "Used space, reports, cache",
             language: "Ukrainian, Russian, English",
-            notifications: "News, rebalancing",
-            offline_mode: "Use the saved data",
-            show_minor_part: "Display amounts in the format 00.00",
-            hide_credit_limit: "Deduct the credit limit from the balance sheet",
-            experiments: "Functionality in the process of testing",
+            notifications: "Transactions alerts, news",
+            offline_mode: "Use saved data only",
+            show_minor_part: "Display amounts in 00.00 format",
+            hide_credit_limit: "Deduct credit limit from the main balance",
+            experiments: "Work in progress functionality",
         },
         auth: {
-            "": "authorization",
+            "": "Auth",
             log_in: "log in",
             not_logined_title: "you are not logged in to your account",
             not_logined_text: "sign in to use all features",
@@ -258,7 +258,7 @@ export default {
             push_service: "API",
             no_push_services_hint_title: "Don't understand why it's empty?",
             no_push_services_hint_body: "Learn how notifications work",
-            no_push_services_hint_link: "https://sominemo.com/mono/help/article/uk/how-push-servers-work",
+            no_push_services_hint_link: "https://sominemo.com/mono/help/article/en/how-push-servers-work",
         },
         privacy: {
             "": "privacy",
@@ -279,7 +279,7 @@ export default {
             },
         },
         actions: {
-            open_about: "about the application",
+            open_about: "about",
             go_main: "to the main page",
             restart: "reload",
         },
@@ -292,13 +292,13 @@ export default {
             "": "storage",
             used: "used",
             of: "of",
-            calculating: "calculation",
-            cleanup_planned: "the next startup will be cleaned up",
+            calculating: "calculating",
+            cleanup_planned: "clean up scheduled on next load",
             over_quota: "the storage has exceeded the limit, but does not support automatic cleaning",
             dbs: {
                 logs: {
                     "": "reports",
-                    description: "basic information about the program for debugging",
+                    description: "basic information about the state of the app for debugging",
                 },
                 offline_cache: {
                     "": "standalone data",
@@ -318,7 +318,7 @@ export default {
                 },
             },
             actions: {
-                clear: "flush",
+                clear: "delete",
                 export: "export",
                 import: "import",
                 log_out: {
@@ -328,8 +328,8 @@ export default {
             },
         },
         updates: {
-            "": "updates",
-            ready: "updates are already here",
+            "": "update",
+            ready: "an update is available",
             tell_more: "more",
             later: "later",
             restart_now: "apply now",
@@ -346,25 +346,24 @@ export default {
     },
     about: {
         "": "about",
-        app: "about the application",
+        app: "about the app",
         version: "version",
-        build_date: "date of build",
+        build_date: "dbuild date",
         branch: "branch",
         debug: "debug",
         build_flags: "assembly flags",
         disclaimer_title: "disclaimer",
-        disclaimer: `Mono PWA is not an official application and is not affiliated with monobank in any way.
-The application uses a publicly available API and does not transmit usage data to anyone for storage.
-If you are against the transfer of your personal data to support the operation of the service, you must refuse the simplified authorization service.
-You always have the right to use authorization with a personal token so that the data is transferred
-directly to monobank. You assume responsibility for any outgoing requests on behalf of this program made
+        disclaimer: `Mono PWA is not an official app and is not affiliated with monobank in any way.
+The application uses a publicly available API and does not share your dat with third-parties for them to store it.
+If you do not want to disclose your personal data to allow the service to function, you must discard the simplified auth service.
+You always have the right to use personal token auth so that the data is transferred
+directly to monobank. You assume responsibility for any outgoing requests on behalf of this software made
 by you knowingly.
-The application collects some depersonalized data, such as the number of linked accounts, the availability of purchased currency, 
-most frequent transaction category, etc., through the Google Analytics service. Your first name, last name, unique identifiers 
-and other sensitive data will not be disclosed to anyone. All data transmitted is used by the developer exclusively 
-for the purpose of audience analysis, thus improving the experience of using the application. You can always refuse the collection of 
-data in the Privacy menu or by enabling the Do Not Track function in your browser settings. 
-You always have the right to request the source code of the application at me@sominemo.com,
+The app collects some depersonalized data through the Google Analytics service. Your first name, last name, unique identifiers 
+and other sensitive data is not be disclosed to anyone. All data transmitted is used by the developer exclusively 
+for the purpose of audience analysis, thus improving the experience of the application. You can always reject data collection
+in the Privacy menu or by enabling the Do Not Track flag in your browser settings. 
+You always have the right to request the source code of the application at support@sominemo.com,
 modify, publish, and execute the code in any form, and you will be responsible for the content.`,
     },
     experiments: {
@@ -380,17 +379,17 @@ modify, publish, and execute the code in any form, and you will be responsible f
         about: {
             deny_analytics: {
                 title: "Opt out of data collection",
-                about: `Disable the Google Analytics service and stop collecting depersonalized data used to improve the user experience (for more information, see the menu "About" ' "Discloser").
+                about: `Disable the Google Analytics service and stop collecting depersonalized data used to improve the user experience (for more information, see the menu "About" › "Disclaimer").
                 This flag is enabled automatically if Do Not Track requests are enabled in the browser`,
             },
             miscellaneous_in_settings: {
-                title: "Show the Experiments menu in the menu",
+                title: "Show the Experiments menu in the settings",
                 about: "Adds this page to the settings menu",
             },
             enable_tab_navigation: {
                 title: "Navigate with the TAB key",
-                about: `Simulate navigation in an application where pressing TAB is equivalent to
-                to move to the next item and pressing Enter to click on the item`,
+                about: `Simulate navigation where pressing TAB is equivalent to
+                moving to the next item and pressing Enter to a click on the item`,
             },
         },
     },
@@ -398,34 +397,34 @@ modify, publish, and execute the code in any form, and you will be responsible f
         "": "download the statement",
         download: "begin",
         working: "downloading",
-        disable_offline_mode: "turn off the standalone mode",
+        disable_offline_mode: "turn off offline mode",
         from: "from",
         to: "to",
-        incorrect_range: "wrong spacing",
+        incorrect_range: "wrong range",
         description: "You may need to download the statement if you want to use the history of transactions for a certain period without access to the network. The statement of each available account will be saved.",
     },
     push: {
         i: {
             std: {
                 sign: "Notifications",
-                description: "Source of notifications",
+                description: "Notifications source",
             },
             statement: {
-                unknown_account: "Bill",
+                unknown_account: "Statement",
                 description: "Transaction notifications",
             },
             news: {
                 sign: "News",
-                description: "List of changes, important information",
+                description: "Changelogs, important information",
             },
         },
-        not_supported: "Not supported on your device. Click to learn more",
-        not_supported_title: "The feature is not available",
-        not_supported_text: "Notifications are not supported in the Safari browser on MacOS, as well as in any browser on iOS/iPadOS and the WebKit engine in general. This is due to Apple not adhering to web standards and restricting developers. In order to be able to send notifications to Safari users, Apple requires the presence of a developer account, which means having a MacBook and paying a regular fee of $100/year. Mono PWA is a free program developed on a voluntary basis, and the developer does not have such resources.\n\nConsider using a different browser if you are on MacOS.\nConsider using a different device if you are on iOS.\n\nPraise Apple."
+        not_supported: "Permission required",
+        not_supported_title: "Notifications access needed",
+        not_supported_text: "To receive notifications on an iOS/iPadOS device, make sure you are on iOS 16.4/iPadOS 16.4 or later.\n\n Safari only allows notifications if the app is added to the home screen. To do that, press the Share button in the browser and select \"Add to Home Screen\".\n\n If you are not on iOS or on an older iOS version and see this message, notifications are not supported on your device or in current browser.",
     },
     fatal_error: {
         "": "An error occurred",
-        explainer: "The application cannot load",
+        explainer: "The app cannot load",
         actions: {
             "": "What you can do:",
             send: {
@@ -459,8 +458,8 @@ modify, publish, and execute the code in any form, and you will be responsible f
             export: {
                 title: "Export report",
                 info: "A file will be generated",
-            }
-        }
+            },
+        },
     },
     unexpected_error: "oops!",
     select_option: "select from the list",
@@ -484,7 +483,7 @@ modify, publish, and execute the code in any form, and you will be responsible f
     tip: "tip",
     hint: "hint",
     reload: "reload",
-    enable_accessibility: "enable accessibility",
+    enable_accessibility: "enable accessibility mode",
     skip_nav: "skip navigation",
     copied: "copied",
 }
