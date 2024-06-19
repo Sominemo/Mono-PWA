@@ -166,12 +166,12 @@ export default class MonoAuth {
                     },
                 },
                 {
-                    name() { return $$("menu") },
-                    icon: "menu",
-                    id: "menu",
+                    name() { return $$("settings") },
+                    icon: "settings",
+                    id: "settings",
                     handler: () => {
                         Navigation.url = {
-                            module: "menu",
+                            module: "settings",
                             params: {},
                         }
                     },
@@ -190,7 +190,7 @@ export default class MonoAuth {
                         }
                     },
                 },
-                {
+                /*{
                     name() { return $$("p4/partners") },
                     icon: "store",
                     id: "partners",
@@ -200,14 +200,14 @@ export default class MonoAuth {
                             params: {},
                         }
                     },
-                },
+                },*/
                 {
-                    name() { return $$("menu") },
-                    icon: "apps",
-                    id: "menu",
+                    name() { return $$("settings") },
+                    icon: "settings",
+                    id: "settings",
                     handler: () => {
                         Navigation.url = {
-                            module: "menu",
+                            module: "settings",
                             params: {},
                         }
                     },

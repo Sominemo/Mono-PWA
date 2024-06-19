@@ -6,11 +6,12 @@ import Auth from "../../services/Auth"
 import MonoNotificationClusterController from "../../services/Push/MonoNotificationClusterController"
 
 export default class MonoCorpAPI extends API {
-    constructor(token, domain, clientId, id = null, name = "Mono Account", notificationServer = false, directDomain = "https://api.monobank.ua") {
+    constructor(token, base, domain, clientId, id = null, name = "Mono Account", notificationServer = false, directDomain = "https://api.monobank.ua") {
         if (typeof token !== "string") throw new TypeError("String token expected")
         if (typeof domain !== "string") throw new TypeError("String domain expected")
 
         super({
+            base,
             domain,
             requestTimeouts: {
                 "bank/currency": 60000,
@@ -47,6 +48,13 @@ export default class MonoCorpAPI extends API {
     currency = currency.bind(this)
 
     clientInfo = clientInfo.bind(this)
+
+    nuke() {
+        return this.call("/nuke/", {
+            useAuth: true,
+            domain: this.base,
+        });
+    }
 
     #tokenErrorHandler = destroyInstance.bind(this)
 

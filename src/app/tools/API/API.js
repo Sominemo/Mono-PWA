@@ -3,6 +3,8 @@ import { Report } from "@Core/Services/Report"
 import APIError from "./APIError"
 
 export default class API {
+    base = null
+
     domain = null
 
     token = null
@@ -28,9 +30,10 @@ export default class API {
     static offlineMode = false
 
     constructor({
-        domain, globalTimeout = 0, requestTimeouts = {}, token = null, clientId = null, id = null, name = "Account",
+        base, domain, globalTimeout = 0, requestTimeouts = {}, token = null, clientId = null, id = null, name = "Account",
         noAuthDomain = null, notificationServer = false,
     }) {
+        this.base = base
         this.domain = domain
         this.noAuthDomain = noAuthDomain || domain
         this.notificationServer = notificationServer
@@ -54,7 +57,7 @@ export default class API {
 
     call(method, {
         methodID = null, data = {}, requestMethod = "get", useAuth = this.token !== null, settings = API.flags.waiting,
-        customToken = null,
+        customToken = null, domain = null,
     } = {}) {
         if (API.offlineMode) return Promise.reject(new APIError(0, { type: 1 }))
 
@@ -76,7 +79,7 @@ export default class API {
         })
 
         this.sendToCart({
-            method, methodID, data, requestMethod, useAuth, settings, customToken,
+            method, methodID, data, requestMethod, useAuth, settings, customToken, domain
         }, resolve, reject)
 
         return p
@@ -180,7 +183,7 @@ export default class API {
             let object = {
                 method: request.requestMethod,
                 url,
-                baseURL: (request.useAuth ? this.domain : this.noAuthDomain),
+                baseURL: request.domain || (request.useAuth ? this.domain : this.noAuthDomain),
                 responseType: "json",
                 headers: {},
                 data: request.data,

@@ -19,7 +19,7 @@ export default class Account {
         })
         if (typeof type !== "string") throw new TypeError("Incorrect account type")
 
-        const cards = masks.map((mask) => {
+        let cards = masks.map((mask) => {
             const spl = mask.split("*")
             const num = { start: spl[0], end: spl[spl.length - 1] }
 
@@ -29,6 +29,10 @@ export default class Account {
 
             return new BankCard(this, num, paymentSystem, type, level, { color })
         })
+
+        if (cards.length === 0) {
+            cards = [new BankCard(this, { start: "0000", end: "0000" }, "Unknown", type, null, { color: null })]
+        }
 
         Object.defineProperties(this, {
             id: {

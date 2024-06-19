@@ -644,8 +644,7 @@ export default class StatementUI {
 
                     speed = Math.abs(deltaX / deltaTime / 4)
                     el.scrollBy({
-                        left: deltaX * cubicB(Math.abs(fullDelta) / el.sizes.width)
-                            * Math.max(1, speed),
+                        left: deltaX,
                     })
                 },
             })

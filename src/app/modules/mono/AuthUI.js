@@ -613,6 +613,7 @@ export default class AuthUI {
                 p.close()
                 const set = {
                     type: "corp",
+                    base: state.settings.are.domain,
                     domain: `${state.settings.are.domain}/request`,
                     notificationServer: state.settings.are.notificationServer,
                     mask: state.settings.are.mask,
@@ -643,53 +644,58 @@ export default class AuthUI {
     static async showQR(state) {
         const self = this
         let p1
+
+        var QRCode = require('qrcode')
+        var qrData = await QRCode.toDataURL(state.roll.url, {
+            errorCorrectionLevel: 'M',   
+            width: 300,     
+        });
+
         const p = Prompt({
             text: [
-                ...("qr" in state.roll ? [
-                    new Align(
-                        new DOM({
-                            new: "img",
-                            set: {
-                                src: `data:image/png;base64, ${state.roll.qr}`,
-                            },
-                            style: {
-                                width: "22%",
-                                borderRadius: "6px",
-                                marginBottom: "15px",
-                                cursor: "pointer",
-                            },
-                            events: [
-                                {
-                                    event: "click",
-                                    handler() {
-                                        p1 = Prompt({
-                                            text: new DOM({
-                                                new: "img",
-                                                set: {
-                                                    src: `data:image/png;base64, ${state.roll.qr}`,
-                                                },
-                                                style: {
-                                                    borderRadius: "6px",
-                                                },
-                                            }),
-                                            buttons: [
-                                                {
-                                                    content: $$("close"),
-                                                    handler: "close",
-                                                },
-                                            ],
-                                            popupSettings: { fullWidth: false },
-                                        })
-                                    },
-                                },
-                            ],
-                        }),
-                        ["row", "center"],
-                        {
-                            alignItems: "baseline",
+                new Align(
+                    new DOM({
+                        new: "img",
+                        set: {
+                            src: qrData,
                         },
-                    ),
-                ] : []),
+                        style: {
+                            width: "22%",
+                            borderRadius: "6px",
+                            marginBottom: "15px",
+                            cursor: "pointer",
+                        },
+                        events: [
+                            {
+                                event: "click",
+                                handler() {
+                                    p1 = Prompt({
+                                        text: new DOM({
+                                            new: "img",
+                                            set: {
+                                                src: qrData,
+                                            },
+                                            style: {
+                                                borderRadius: "6px",
+                                            },
+                                        }),
+                                        buttons: [
+                                            {
+                                                content: $$("close"),
+                                                handler: "close",
+                                            },
+                                        ],
+                                        popupSettings: { fullWidth: false },
+                                    })
+                                },
+                            },
+                        ],
+                    }),
+                    ["row", "center"],
+                    {
+                        alignItems: "baseline",
+                    },
+                ),
                 new Card(
                     new CardList([
                         {
@@ -746,6 +752,7 @@ export default class AuthUI {
                 const set = {
                     type: "corp",
                     domain: `${state.settings.are.domain}/request`,
+                    base: state.settings.are.domain,
                     notificationServer: state.settings.are.notificationServer,
                     mask: state.settings.are.mask,
                     token,

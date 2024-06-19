@@ -9,11 +9,11 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [18.x]
 
     steps:
     - name: Start GitHub Action
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
     - name: Init Git submodules
       uses: snickerbockers/submodules-init@v4
     - name: Install Node ${{ matrix.node-version }}

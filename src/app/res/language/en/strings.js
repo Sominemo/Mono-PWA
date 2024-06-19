@@ -270,12 +270,25 @@ export default {
                 info: "Sending minimal information to fix the error. Contains the text of the error, the location where it occurred, the version of the application, the name and version of the browser/OS",
             },
             send_reports: {
-                "": "automatically send reports",
-                info: "Sending the application event log. It contains events and errors, usage statistics, application version, browser and OS name and version",
+                "": "automatically send error reports",
+                info: "Sending the application event log if an error happens. It contains events and errors, usage statistics, application version, browser and OS name and version",
             },
             debug_log: {
                 "": "keep a detailed report",
-                info: "Collecting all possible information for defamation. Do not enable if you do not need it",
+                info: "Collecting all possible information for debugging. Do not enable if you do not need it",
+            },
+            delete_data: {
+                "": "delete data",
+                delete_account: "delete account",
+                nuke_confirm: "delete all data?",
+                nuke_confirm_description: "This action will delete all data associated with the account on the server. You will be logged out of the account and push notifications will be disabled",
+                nuke_error: "data deletion error",
+                corp_account: "Some data stored on intermediary server",
+                personal_account: "Direct communication with monobank — no data stored",
+                empty: "no accounts",
+                empty_info: "there are no accounts to delete",
+                control_access: "control access",
+                nuke_success: "All data associated with the account has been deleted",
             },
         },
         actions: {
@@ -348,23 +361,15 @@ export default {
         "": "about",
         app: "about the app",
         version: "version",
-        build_date: "dbuild date",
+        build_date: "build date",
+        privacy_policy: "privacy policy",
         branch: "branch",
         debug: "debug",
         build_flags: "assembly flags",
         disclaimer_title: "disclaimer",
         disclaimer: `Mono PWA is not an official app and is not affiliated with monobank in any way.
-The application uses a publicly available API and does not share your dat with third-parties for them to store it.
-If you do not want to disclose your personal data to allow the service to function, you must discard the simplified auth service.
-You always have the right to use personal token auth so that the data is transferred
-directly to monobank. You assume responsibility for any outgoing requests on behalf of this software made
-by you knowingly.
-The app collects some depersonalized data through the Google Analytics service. Your first name, last name, unique identifiers 
-and other sensitive data is not be disclosed to anyone. All data transmitted is used by the developer exclusively 
-for the purpose of audience analysis, thus improving the experience of the application. You can always reject data collection
-in the Privacy menu or by enabling the Do Not Track flag in your browser settings. 
-You always have the right to request the source code of the application at support@sominemo.com,
-modify, publish, and execute the code in any form, and you will be responsible for the content.`,
+The application uses a publicly available API with monobank's permission.
+See "About" › "Privacy Policy" for how your data is handled.`,
     },
     experiments: {
         "": "experiments",
@@ -379,7 +384,7 @@ modify, publish, and execute the code in any form, and you will be responsible f
         about: {
             deny_analytics: {
                 title: "Opt out of data collection",
-                about: `Disable the Google Analytics service and stop collecting depersonalized data used to improve the user experience (for more information, see the menu "About" › "Disclaimer").
+                about: `Disable the Google Analytics service and stop collecting depersonalized data used to improve the user experience.
                 This flag is enabled automatically if Do Not Track requests are enabled in the browser`,
             },
             miscellaneous_in_settings: {

@@ -20,7 +20,7 @@ export default class Client {
             balance: Money.integer(Math.abs(e.balance), Currency.number(e.currencyCode)),
             isOverdraft: (e.balance < 0),
             creditLimit: Money.integer(e.creditLimit, Currency.number(e.currencyCode)),
-            cashbackType: e.cashbackType,
+            cashbackType: e.cashbackType || "None",
             cards: {
                 masks: e.maskedPan,
                 type: e.type,

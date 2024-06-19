@@ -14,6 +14,7 @@ import AlignedContent from "@Environment/Library/DOM/object/AlignedContent"
 import { CoreLoader } from "@Core/Init/CoreLoader"
 import Prompt from "@Environment/Library/DOM/elements/prompt"
 import { SettingsActLink } from "./settings"
+import LanguageCore from "@Core/Services/Language/core"
 
 export default class PWA extends App {
     static get isWG() {
@@ -70,7 +71,12 @@ export default class PWA extends App {
                         $$("about/disclaimer_title")]),
                     disableWrapper: true,
                 },
-                { content: new SettingsActLink(["transformators", $$("settings/tf")]), disableWrapper: true },
+                {
+                    content: new SettingsActLink([
+                        () => this.privacyPolicy(),
+                        $$("about/privacy_policy")]),
+                    disableWrapper: true,
+                },
             ],
         ))
         w.render(infocard)
@@ -97,6 +103,10 @@ export default class PWA extends App {
                 },
             ],
         })
+    }
+
+    static privacyPolicy() {
+        window.open("https://sominemo.com/mono/help/article/"+ LanguageCore.language.info.code +"/privacy", "_blank")
     }
 }
 

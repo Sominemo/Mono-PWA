@@ -403,7 +403,7 @@ export default class PartnersUI {
     }
 }
 
-
+/*
 CoreLoader.registerTask({
     id: "p4_partners_module",
     presence: "P4 Partners",
@@ -415,3 +415,4 @@ CoreLoader.registerTask({
         })
     },
 })
+*/

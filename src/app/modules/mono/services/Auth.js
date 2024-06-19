@@ -52,7 +52,18 @@ export default class Auth {
     static #mainInstance = null
 
     static updateIcons() {
+        Navigation.InitNavigationError = () => {
+            Navigation.url = { module: "settings" }
+        }
+
+        Navigation.titleFallback = "monobank"
+
         if (this.isAnyAuthed) {
+
+            Navigation.defaultScreen = () => {
+                Navigation.url = { module: "statement" }
+            }
+
             Nav.config = [
                 {
                     name() { return $$("quick_settings") },
@@ -86,6 +97,11 @@ export default class Auth {
                 },
             ]
         } else {
+
+        Navigation.defaultScreen = () => {
+            Navigation.url = { module: "settings" }
+        }
+
             Nav.config = [
                 {
                     name() { return $$("quick_settings") },
@@ -241,6 +257,7 @@ export default class Auth {
         if (settings.type === "corp") {
             instance = new MonoCorpAPI(
                 settings.token,
+                settings.base || new URL(settings.domain).origin,
                 settings.domain,
                 settings.clientId,
                 account.id,

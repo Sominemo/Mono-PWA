@@ -42,11 +42,11 @@ export default class MenuUI {
                 icon: "assessment",
                 go: "currency",
             },
-            {
+            /*{
                 name: $$("p4"),
                 icon: "store",
                 go: "partners",
-            },
+            },*/
             {
                 name: $$("settings"),
                 icon: "settings",
@@ -125,7 +125,7 @@ CoreLoader.registerTask({
             callback() { MenuUI.Init() },
         })
 
-        Navigation.InitNavigationError = () => {
+        /*Navigation.InitNavigationError = () => {
             Navigation.url = { module: "menu" }
         }
 
@@ -133,6 +133,6 @@ CoreLoader.registerTask({
             Navigation.url = { module: "menu" }
         }
 
-        Navigation.titleFallback = "monobank"
+        Navigation.titleFallback = "monobank"*/
     },
 })
