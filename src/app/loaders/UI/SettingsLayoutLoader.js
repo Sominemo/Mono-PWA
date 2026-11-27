@@ -14,6 +14,7 @@ import WarningConstructorButton from "@Environment/Library/DOM/object/warnings/W
 import { TwoSidesWrapper, Icon } from "@Environment/Library/DOM/object"
 import { Align } from "@Environment/Library/DOM/style"
 import MonoAPI from "@App/modules/mono/API/clients/MonoAPI"
+import { isDeprecatedProxyAccount, createProxyWinddownWarning } from "@App/modules/mono/functions/proxyWinddown"
 import { CardList } from "@Environment/Library/DOM/object/card"
 import DOM from "@DOMPath/DOM/Classes/dom"
 import CardCustomization from "@App/modules/mono/controllers/CardCustomization"
@@ -81,6 +82,12 @@ CoreLoader.registerTask({
             .createSection({
                 id: "recovery-mode-section",
                 display: isRecoveryMode,
+                dom: SettingsSectionElement,
+                options: {},
+            })
+            .createSection({
+                id: "proxy-winddown-section",
+                display: () => Auth.authed.some(isDeprecatedProxyAccount),
                 dom: SettingsSectionElement,
                 options: {},
             })
@@ -276,6 +283,17 @@ CoreLoader.registerTask({
                     title: $$("recovery_mode/now"),
                     content: $$("recovery_mode/back_to_normal"),
                 },
+            })
+
+        layout.getAct("settings").getSection("proxy-winddown-section")
+            .createGroup({
+                id: "proxy-winddown-alert", dom: SettingsGroupContainer, options: {},
+            })
+            .getGroup("proxy-winddown-alert")
+            .createItem({
+                id: "proxy-winddown-alert-text",
+                dom: createProxyWinddownWarning,
+                options: {},
             })
 
 

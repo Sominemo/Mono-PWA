@@ -33,6 +33,7 @@ import Account from "./API/classes/Account"
 import { cardItemGenerator } from "./functions/cardItemGenerator"
 import CardCustomization from "./controllers/CardCustomization"
 import { statementDownloaderUI } from "./functions/statementDownloader"
+import { isDeprecatedProxyAccount, createProxyWinddownWarning } from "./functions/proxyWinddown"
 
 export default class StatementUI {
     static async Init() {
@@ -105,7 +106,11 @@ export default class StatementUI {
                 new Preloader({ style: { margin: "auto" } }),
                 { style: { display: "flex", flexDirection: "column" } },
             )
-            statementBody.clear(contentCard)
+            statementBody.clear()
+            if (isDeprecatedProxyAccount(account.client)) {
+                statementBody.render(createProxyWinddownWarning({ margin: "15px" }))
+            }
+            statementBody.render(contentCard)
 
             let loader
 

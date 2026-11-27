@@ -16,10 +16,6 @@ CoreLoader.registerTask({
 
         await Promise.all(
             accounts.map(async (account) => {
-                if (account.settings.domain === `${Flags.AuthConfig.domain}/request`) {
-                    account.settings.notificationServer = Flags.AuthConfig.notificationServer
-                }
-
                 account.settings.mask |= Flags.Auth.PUSH_SUPPORTED
                 await Auth.updateInstance(account.id, account.settings)
             }),

@@ -6,8 +6,7 @@ export default {
         still_nothing: "still empty",
         warning: "warning",
         requests_throttling: `This account is linked using a personal token. 
-        Due to the fact that monobank limits the frequency of access to the statement, the data will be loaded slowly. 
-        It is recommended to connect the account using simplified auth.`,
+        Due to the fact that monobank limits the frequency of access to the statement, the data will be loaded slowly.`,
         hint_customize: "Not what you were expecting?",
         hint_customize_text: "Control the order of cards and their appearance in the \"My cards\" menu",
         open: "open",
@@ -45,6 +44,12 @@ export default {
     },
     auth: {
         "": "Auth",
+        proxy_winddown: {
+            "": "The default api.mono.sominemo.com proxy server has been shut down. To log in, use a personal token (api.monobank.ua) or your own corporate server.",
+            title: "Default proxy shut down",
+            more: "learn more",
+            link: "https://sominemo.com/mono/help/article/en/proxy-winddown",
+        },
         unofficial_warning: "Mono PWA is an unofficial application. It is not developed by monobank. Use the application only if you trust the developer and understand the risks (see Disclaimer)",
         you_were_unlogined: "you have been logged out",
         reload: "reload",
@@ -66,9 +71,9 @@ export default {
                 token: "token",
             },
             domain: {
-                "": "Change the corporate server",
-                description: "If you do not trust the server to which requests are sent during simplified auth, you can change it",
-                title: "Change server",
+                "": "Use a corporate server",
+                description: "Specify the address of your own compatible corporate proxy server for simplified auth",
+                title: "Corporate server",
 
                 unsupported_server: "incompatible server",
                 url: "URL",

@@ -20,6 +20,7 @@ import { Report } from "@Core/Services/Report"
 import PWA from "../main/PWA"
 import Auth from "./services/Auth"
 import Flags from "./services/Flags"
+import { createProxyWinddownWarning } from "./functions/proxyWinddown"
 
 class AuthSettings {
     constructor(s = null, options = {}) {
@@ -56,7 +57,7 @@ export default class AuthUI {
     }
 
     static getDefault() {
-        return this.useCorp()
+        return null
     }
 
     static useDirect(token) {
@@ -70,8 +71,7 @@ export default class AuthUI {
         }
     }
 
-    static useCorp(userDomain = Flags.AuthConfig.domain,
-        notificationServer = Flags.AuthConfig.notificationServer) {
+    static useCorp(userDomain, notificationServer = false) {
         const domain = filterURL(userDomain)
         if (!domain) throw new TypeError("String domain expected")
 
@@ -95,6 +95,7 @@ export default class AuthUI {
                     type: 3,
                     style: { textAlign: "start" },
                 }),
+                proxyWinddown: createProxyWinddownWarning({ textAlign: "start" }),
                 unofficialApp: new WarningConstructor({
                     content: $$("auth/unofficial_warning"),
                     icon: "info",
@@ -109,6 +110,7 @@ export default class AuthUI {
 
             const settings = new AuthSettings(start, { warnings, warningsList })
 
+            warnings.render(warningsList.proxyWinddown)
             warnings.render(warningsList.unofficialApp)
             if (!settings.isDefault) warnings.render(warningsList.defaultsChanged)
 
@@ -187,42 +189,35 @@ export default class AuthUI {
         state.blockerPopup = p
     }
 
-    static settings(state) {
-        const p = Prompt({
-            title: $$("auth/settings"),
+    static settings(state, autoContinue = false) {
+        let p
+        const makeItem = (icon, key, action) => ({
+            handler() { action(); p.close() },
+            content: new IconSide(icon,
+                [
+                    new Title($$(`auth/settings/${key}`), 4, { margin: 0 }),
+                    new DOM({ new: "div", content: $$(`auth/settings/${key}/description`) }),
+                ], { style: { marginRight: "15px" } }),
+        })
+
+        const items = [
+            makeItem("vpn_key", "token", () => AuthUI.setToken(state, autoContinue)),
+            makeItem("domain", "domain", () => AuthUI.setDomain(state, autoContinue)),
+            ...(!state.settings.isDefault
+                ? [makeItem("history", "revert", () => AuthUI.resetState(state))]
+                : []),
+        ]
+
+        p = Prompt({
+            title: autoContinue ? $$("auth/log_in") : $$("auth/settings"),
             text: new Card(
-                new CardList([
-                    {
-                        handler() { AuthUI.setToken(state); p.close() },
-                        content: new IconSide("vpn_key",
-                            [
-                                new Title($$("auth/settings/token"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("auth/settings/token/description") }),
-                            ], { style: { marginRight: "15px" } }),
-                    },
-                    {
-                        handler() { AuthUI.setDomain(state); p.close() },
-                        content: new IconSide("domain",
-                            [
-                                new Title($$("auth/settings/domain"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("auth/settings/domain/description") }),
-                            ], { style: { marginRight: "15px" } }),
-                    },
-                    {
-                        handler() { AuthUI.resetState(state); p.close() },
-                        content: new IconSide("history",
-                            [
-                                new Title($$("auth/settings/revert"), 4, { margin: 0 }),
-                                new DOM({ new: "div", content: $$("auth/settings/revert/description") }),
-                            ], { style: { marginRight: "15px" } }),
-                    },
-                ], true),
+                new CardList(items, true),
                 { style: { marginLeft: 0, marginRight: 0, marginTop: 0 } },
             ),
         })
     }
 
-    static setToken(state) {
+    static setToken(state, autoContinue = false) {
         let value = ""
 
         let p
@@ -232,6 +227,7 @@ export default class AuthUI {
             if (!(value.length > 0)) return
             state.settings.are = AuthUI.useDirect(value)
             p.close()
+            if (autoContinue) AuthUI.continue(state)
         }
 
         p = Prompt({
@@ -269,7 +265,7 @@ export default class AuthUI {
         })
     }
 
-    static setDomain(state) {
+    static setDomain(state, autoContinue = false) {
         let domain = ""
 
         let p
@@ -319,10 +315,11 @@ export default class AuthUI {
                                 state.proto = r
                                 state.settings.are = AuthUI.useCorp(
                                     domain,
-                                    ("push" in r.server && "api" in r.server.push && "cert" in r.server.push & "name" in r.server.push ? r.server.push : false),
+                                    ("push" in r.server && "api" in r.server.push && "cert" in r.server.push && "name" in r.server.push ? r.server.push : false),
                                 )
                                 ap.close()
                                 p.close()
+                                if (autoContinue) AuthUI.continue(state)
                             },
                         },
                     ],
@@ -346,7 +343,8 @@ export default class AuthUI {
                         next()
                     },
                     content: (
-                        state.settings.are.type === AuthUI.authTypes.CORP
+                        state.settings.are !== null
+                            && state.settings.are.type === AuthUI.authTypes.CORP
                             && typeof state.settings.are.domain === "string"
                             && !state.settings.isDefault
                             ? state.settings.are.domain
@@ -381,6 +379,10 @@ export default class AuthUI {
     }
 
     static async continue(state) {
+        if (state.settings.are === null) {
+            this.settings(state, true)
+            return
+        }
         Report.add(state.settings.are, ["auth.settings"])
         if (state.settings.are.type === AuthUI.authTypes.DIRECT) {
             this.directUI(state)

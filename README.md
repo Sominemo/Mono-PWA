@@ -7,9 +7,8 @@ monobank Progressive Web Application
 - Додавання декількох профілів monobank
 - Необмежена кількість прив'язуваних пристроїв - [Список пристроїв](https://api.monobank.ua)
 - Авторизація за приватним токеном - [Отримати токен](https://api.monobank.ua)
-- Спрощена авторизація через корпоративний сервер (встановлено за замовчуванням)
-- Зміна корпоративного сервера на власний:  
-  Для роботи застосунку з корпоративним API підтримується сервер mono Corp API Proxy. За замовчуванням використовується власний сервер [[адреса]](https://api.mono.sominemo.com) - [Реалізація](https://github.com/Sominemo/mono-Corp-API-Proxy-PHP)
+- Підтримка власного корпоративного сервера:  
+  Проксі-сервер `api.mono.sominemo.com`, який використовувався за замовчуванням, припинив роботу ([детальніше](https://sominemo.com/mono/help/article/uk/proxy-winddown)). Для роботи застосунку з корпоративним API підтримується власний сервер mono Corp API Proxy - [Реалізація](https://github.com/Sominemo/mono-Corp-API-Proxy-PHP)
 
 ### Курси валют**
 - Список курсу валют від monobank
